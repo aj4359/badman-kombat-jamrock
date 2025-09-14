@@ -47,16 +47,36 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        // 80's Neon Colors
+        neon: {
+          cyan: "hsl(var(--neon-cyan))",
+          pink: "hsl(var(--neon-pink))",
+          green: "hsl(var(--neon-green))",
+          orange: "hsl(var(--neon-orange))",
+          purple: "hsl(var(--neon-purple))",
         },
+        // Jamaica Colors
+        jamaica: {
+          green: "hsl(var(--jamaica-green))",
+          yellow: "hsl(var(--jamaica-yellow))",
+          red: "hsl(var(--jamaica-red))",
+        },
+      },
+      fontFamily: {
+        retro: ["var(--font-retro)"],
+        body: ["var(--font-body)"],
+      },
+      backgroundImage: {
+        "gradient-neon": "var(--gradient-neon)",
+        "gradient-retro": "var(--gradient-retro)",
+        "gradient-jamaica": "var(--gradient-jamaica)",
+        "gradient-cyber": "var(--gradient-cyber)",
+      },
+      boxShadow: {
+        "neon-cyan": "var(--shadow-neon-cyan)",
+        "neon-pink": "var(--shadow-neon-pink)",
+        "neon-green": "var(--shadow-neon-green)",
+        combat: "var(--shadow-combat)",
       },
       borderRadius: {
         lg: "var(--radius)",
