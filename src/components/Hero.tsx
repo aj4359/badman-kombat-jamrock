@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Play, Volume2, VolumeX } from "lucide-react";
 import heroImage from "@/assets/fighter-hero.jpg";
 import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
@@ -110,13 +112,31 @@ const Hero = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <Button variant="combat" size="lg" className="text-lg px-8 py-4">
+          <Button 
+            variant="combat" 
+            size="lg" 
+            className="text-lg px-8 py-4"
+            onClick={() => navigate('/game')}
+          >
             START KOMBAT
           </Button>
-          <Button variant="neon" size="lg" className="text-lg px-8 py-4">
+          <Button 
+            variant="neon" 
+            size="lg" 
+            className="text-lg px-8 py-4"
+            onClick={() => {
+              const trailerSection = document.getElementById('trailer');
+              trailerSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
             WATCH TRAILER
           </Button>
-          <Button variant="jamaica" size="lg" className="text-lg px-8 py-4">
+          <Button 
+            variant="jamaica" 
+            size="lg" 
+            className="text-lg px-8 py-4"
+            onClick={() => navigate('/character-select')}
+          >
             SELECT FIGHTER
           </Button>
         </div>
