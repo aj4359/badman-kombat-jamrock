@@ -28,7 +28,7 @@ export interface FighterSprites {
   special: SpriteAnimation;
 }
 
-// Sprite frame definitions (assuming 8 frames per row, 128x128 per frame)
+// Sprite frame definitions (8 frames per row, 128x128 per frame for 1024x896 sprite sheets)
 const FRAME_WIDTH = 128;
 const FRAME_HEIGHT = 128;
 
@@ -102,52 +102,48 @@ export const useSpriteSystem = () => {
   useEffect(() => {
     const loadSprites = async () => {
       const sprites: Record<string, HTMLImageElement> = {};
+      const spriteMap = {
+        leroy: leroySprite,
+        jordan: jordanSprite,
+        sifu: sifuSprite,
+        razor: razorSprite,
+        rootsman: rootsmanSprite
+      };
       
-      // Load Leroy sprite
-      const leroyImg = new Image();
-      leroyImg.src = leroySprite;
-      await new Promise((resolve) => {
-        leroyImg.onload = resolve;
-      });
-      sprites.leroy = leroyImg;
+      try {
+        for (const [key, src] of Object.entries(spriteMap)) {
+          const img = new Image();
+          img.src = src;
+          
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = () => {
+              console.warn(`Failed to load sprite for ${key}:`, src);
+              resolve(null); // Continue loading other sprites
+            };
+            // Set a timeout to prevent hanging
+            setTimeout(() => {
+              console.warn(`Sprite loading timeout for ${key}`);
+              resolve(null);
+            }, 5000);
+          });
+          
+          if (img.complete && img.naturalWidth > 0) {
+            sprites[key] = img;
+            console.log(`Successfully loaded sprite for ${key}`);
+          }
+        }
 
-      // Load Jordan sprite
-      const jordanImg = new Image();
-      jordanImg.src = jordanSprite;
-      await new Promise((resolve) => {
-        jordanImg.onload = resolve;
-      });
-      sprites.jordan = jordanImg;
-
-      // Load Sifu sprite
-      const sifuImg = new Image();
-      sifuImg.src = sifuSprite;
-      await new Promise((resolve) => {
-        sifuImg.onload = resolve;
-      });
-      sprites.sifu = sifuImg;
-
-      // Load Razor sprite
-      const razorImg = new Image();
-      razorImg.src = razorSprite;
-      await new Promise((resolve) => {
-        razorImg.onload = resolve;
-      });
-      sprites.razor = razorImg;
-
-      // Load Rootsman sprite
-      const rootsmanImg = new Image();
-      rootsmanImg.src = rootsmanSprite;
-      await new Promise((resolve) => {
-        rootsmanImg.onload = resolve;
-      });
-      sprites.rootsman = rootsmanImg;
-
-      spriteImages.current = sprites;
-      setIsLoaded(true);
+        spriteImages.current = sprites;
+        setIsLoaded(true);
+        console.log('Sprite system loaded. Available sprites:', Object.keys(sprites));
+      } catch (error) {
+        console.error('Error loading sprites:', error);
+        setIsLoaded(true); // Still set loaded to true to use fallback
+      }
     };
 
-    loadSprites().catch(console.error);
+    loadSprites();
   }, []);
 
   const getCurrentFrame = useCallback((
@@ -181,9 +177,23 @@ export const useSpriteSystem = () => {
     }
   ) => {
     if (!isLoaded || !spriteImages.current[fighterId]) {
-      // Fallback to colored rectangle if sprites not loaded
-      ctx.fillStyle = effects?.color || 'hsl(180, 100%, 50%)';
+      // Enhanced fallback with character-specific styling
+      const fighterColors = {
+        leroy: 'hsl(190, 100%, 50%)', // Cyan
+        jordan: 'hsl(280, 100%, 60%)', // Purple/Magenta
+        sifu: 'hsl(45, 100%, 50%)', // Golden
+        razor: 'hsl(120, 100%, 40%)', // Green
+        rootsman: 'hsl(100, 60%, 40%)' // Earth green
+      };
+      
+      ctx.fillStyle = effects?.color || fighterColors[fighterId as keyof typeof fighterColors] || 'hsl(180, 100%, 50%)';
       ctx.fillRect(x, y, width, height);
+      
+      // Add character name text
+      ctx.fillStyle = 'white';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(fighterId.toUpperCase(), x + width/2, y + height/2);
       return;
     }
 
