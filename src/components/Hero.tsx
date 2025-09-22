@@ -1,44 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { useAudioManager } from "@/hooks/useAudioManager";
 import heroImage from "@/assets/fighter-hero.jpg";
 import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { isLoaded, currentLayer, settings, playLayer, stopAll, toggleMute } = useAudioManager();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audioElement = new Audio('/assets/bmk-soundtrack.mp3');
-    audioElement.loop = true;
-    audioElement.volume = 0.6;
-    setAudio(audioElement);
-
-    return () => {
-      audioElement.pause();
-      audioElement.src = '';
-    };
-  }, []);
+    if (isLoaded) {
+      playLayer('menu');
+    }
+  }, [isLoaded, playLayer]);
 
   const toggleAudio = () => {
-    if (audio) {
-      if (isPlaying) {
-        audio.pause();
-        setIsPlaying(false);
-      } else {
-        audio.play();
-        setIsPlaying(true);
-      }
+    if (isPlaying) {
+      stopAll();
+      setIsPlaying(false);
+    } else {
+      playLayer('menu');
+      setIsPlaying(true);
     }
   };
 
-  const toggleMute = () => {
-    if (audio) {
-      audio.muted = !isMuted;
-      setIsMuted(!isMuted);
+  const handleStartKombat = () => {
+    if (isLoaded) {
+      playLayer('intro');
+      // Navigate to VS screen after intro starts
+      setTimeout(() => {
+        navigate('/vs-screen');
+      }, 500);
+    } else {
+      navigate('/vs-screen');
     }
   };
 
@@ -65,14 +62,18 @@ const Hero = () => {
           onClick={toggleAudio}
           className="animate-neon-pulse"
         >
-          <Play className={`h-4 w-4 ${isPlaying ? 'text-neon-green' : 'text-neon-cyan'}`} />
+          {isPlaying ? (
+            <Pause className="h-4 w-4 text-neon-green" />
+          ) : (
+            <Play className="h-4 w-4 text-neon-cyan" />
+          )}
         </Button>
         <Button
           variant="cyber"
           size="icon"
           onClick={toggleMute}
         >
-          {isMuted ? (
+          {settings.isMuted ? (
             <VolumeX className="h-4 w-4 text-neon-pink" />
           ) : (
             <Volume2 className="h-4 w-4 text-neon-green" />
@@ -116,7 +117,7 @@ const Hero = () => {
             variant="combat" 
             size="lg" 
             className="text-lg px-8 py-4"
-            onClick={() => navigate('/game')}
+            onClick={handleStartKombat}
           >
             START KOMBAT
           </Button>

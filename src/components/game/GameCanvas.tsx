@@ -1,8 +1,10 @@
 import React from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
+import { useAudioManager } from '@/hooks/useAudioManager';
 
 const GameCanvas = () => {
   const { canvasRef, gameState } = useGameEngine();
+  const { playEffect } = useAudioManager();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-cyber p-4">

@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useAudioManager } from './useAudioManager';
 
 export interface Fighter {
   id: string;
@@ -66,6 +67,7 @@ export const useGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameRef = useRef<number>();
+  const { playEffect } = useAudioManager();
   
   const [gameState, setGameState] = useState<GameState>({
     screen: 'fighting',
@@ -171,6 +173,9 @@ export const useGameEngine = () => {
       }
 
       if (keys['j'] || keys['J']) {
+        if (updated.state !== 'attacking') {
+          playEffect('whoosh');
+        }
         updated.state = 'attacking';
         updated.attackBox = {
           x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
@@ -216,6 +221,9 @@ export const useGameEngine = () => {
       }
 
       if (keys['1'] || keys['End']) {
+        if (updated.state !== 'attacking') {
+          playEffect('whoosh');
+        }
         updated.state = 'attacking';
         updated.attackBox = {
           x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
@@ -392,6 +400,9 @@ export const useGameEngine = () => {
         if (updatedPlayer2.state !== 'blocking') {
           updatedPlayer2.health = Math.max(0, updatedPlayer2.health - 10);
           updatedPlayer2.state = 'hurt';
+          playEffect('hit');
+        } else {
+          playEffect('block');
         }
       }
 
@@ -399,6 +410,9 @@ export const useGameEngine = () => {
         if (updatedPlayer1.state !== 'blocking') {
           updatedPlayer1.health = Math.max(0, updatedPlayer1.health - 10);
           updatedPlayer1.state = 'hurt';
+          playEffect('hit');
+        } else {
+          playEffect('block');
         }
       }
 
