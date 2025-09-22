@@ -1,20 +1,31 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAudioManager } from './useAudioManager';
+import { useProjectileSystem } from './useProjectileSystem';
+import { useSuperMoveSystem } from './useSuperMoveSystem';
+import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
+import { Projectile, HitSpark, ComboData, FrameData, FighterState } from '@/types/gameTypes';
 
 export interface SpecialMove {
   name: string;
   input: string;
   damage: number;
   cost: number;
-  type: 'projectile' | 'melee' | 'grab' | 'counter';
+  type: 'projectile' | 'melee' | 'grab' | 'counter' | 'teleport';
   frames: {
     startup: number;
     active: number;
     recovery: number;
   };
   effects?: {
-    type: 'stun' | 'knockdown' | 'absorb' | 'combo';
+    type: 'stun' | 'knockdown' | 'absorb' | 'combo' | 'launch';
     duration: number;
+  };
+  projectile?: {
+    speed: number;
+    size: number;
+    range: number;
+    color: string;
+    type: 'fireball' | 'soundwave' | 'energy';
   };
 }
 
@@ -202,6 +213,23 @@ export const useEnhancedGameEngine = () => {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameRef = useRef<number>();
   const { playEffect } = useAudioManager();
+  const {
+    projectiles,
+    hitSparks,
+    createProjectile,
+    addProjectile,
+    createHitSpark,
+    updateProjectiles,
+    updateHitSparks,
+    checkProjectileCollision,
+    removeProjectile
+  } = useProjectileSystem();
+  
+  const {
+    checkSuperMoves,
+    createSuperProjectile,
+    getVoiceLine
+  } = useSuperMoveSystem();
   
   const [gameState, setGameState] = useState<GameState>({
     screen: 'fighting',
@@ -277,17 +305,40 @@ export const useEnhancedGameEngine = () => {
     };
   }, []);
 
-  // Check for special move execution
+  // Enhanced special move execution with projectile creation
   const checkSpecialMoves = useCallback((fighter: Fighter): { move: SpecialMove | null; newFighter: Fighter } => {
     const inputString = fighter.inputBuffer.join(',');
     
     for (const move of fighter.specialMoves) {
       if (inputString.includes(move.input) && fighter.stamina >= move.cost) {
+        // Create projectile if it's a projectile move
+        if (move.type === 'projectile' && move.projectile) {
+          const projectileX = fighter.facing === 'right' ? fighter.x + fighter.width : fighter.x - move.projectile.size;
+          const projectileY = fighter.y + fighter.height / 2;
+          
+          const newProjectile = createProjectile(
+            projectileX,
+            projectileY,
+            fighter.facing,
+            move.projectile.type,
+            fighter.id,
+            move.projectile.speed,
+            move.damage,
+            move.projectile.color
+          );
+          
+          addProjectile(newProjectile);
+          
+          // Play special move sound
+          playEffect('special');
+        }
+        
         return {
           move,
           newFighter: {
             ...fighter,
             stamina: fighter.stamina - move.cost,
+            superMeter: Math.min(fighter.maxSuperMeter, fighter.superMeter + 10), // Build super meter
             inputBuffer: [], // Clear buffer after successful move
             state: 'special',
             animation: { ...fighter.animation, currentMove: move.name }
@@ -297,10 +348,10 @@ export const useEnhancedGameEngine = () => {
     }
     
     return { move: null, newFighter: fighter };
-  }, []);
+  }, [createProjectile, addProjectile, playEffect]);
 
   const createFighter = useCallback((id: string, name: string, x: number, color: string): Fighter => {
-    const data = FIGHTER_DATA[id] || FIGHTER_DATA.leroy;
+    const data = ENHANCED_FIGHTER_DATA[id] || ENHANCED_FIGHTER_DATA.leroy;
     
     return {
       id,
@@ -340,7 +391,7 @@ export const useEnhancedGameEngine = () => {
         blockstun: 0,
         invulnerable: 0
       },
-      color,
+      color: data.colors.primary,
       specialMoves: data.specialMoves,
       inputBuffer: [],
       lastInputTime: 0
@@ -428,20 +479,38 @@ export const useEnhancedGameEngine = () => {
         }
 
         if (keys['j'] || keys['J']) {
-          if (updated.state !== 'attacking') {
-            playEffect('whoosh');
+          // Check for super move first (requires both punch and kick)
+          if ((keys['k'] || keys['K']) && updated.superMeter >= updated.maxSuperMeter) {
+            updated = updateInputBuffer(updated, 'punch+kick');
+            const { move: superMove, newFighter } = checkSuperMoves(updated);
+            if (superMove) {
+              updated = newFighter;
+              if (superMove.type === 'projectile') {
+                const projectileX = updated.facing === 'right' ? updated.x + updated.width : updated.x - 80;
+                const projectileY = updated.y + updated.height / 2;
+                const superProjectile = createSuperProjectile(projectileX, projectileY, updated.facing, superMove, 'player1');
+                addProjectile(superProjectile);
+              }
+              playEffect('special');
+              // Voice line will be handled in game canvas
+            }
+          } else {
+            // Regular attack
+            if (updated.state !== 'attacking') {
+              playEffect('whoosh');
+            }
+            updated.state = 'attacking';
+            updated.attackBox = {
+              x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
+              y: updated.y + 20,
+              width: 40,
+              height: 30,
+              active: true,
+              damage: 10,
+              type: 'light'
+            };
+            updated = updateInputBuffer(updated, 'punch');
           }
-          updated.state = 'attacking';
-          updated.attackBox = {
-            x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
-            y: updated.y + 20,
-            width: 40,
-            height: 30,
-            active: true,
-            damage: 10,
-            type: 'light'
-          };
-          updated = updateInputBuffer(updated, 'punch');
         } else {
           updated.attackBox = undefined;
         }
@@ -483,20 +552,37 @@ export const useEnhancedGameEngine = () => {
         }
 
         if (keys['1'] || keys['End']) {
-          if (updated.state !== 'attacking') {
-            playEffect('whoosh');
+          // Check for super move first (requires both punch and kick)
+          if ((keys['2'] || keys['PageDown']) && updated.superMeter >= updated.maxSuperMeter) {
+            updated = updateInputBuffer(updated, 'punch+kick');
+            const { move: superMove, newFighter } = checkSuperMoves(updated);
+            if (superMove) {
+              updated = newFighter;
+              if (superMove.type === 'projectile') {
+                const projectileX = updated.facing === 'right' ? updated.x + updated.width : updated.x - 80;
+                const projectileY = updated.y + updated.height / 2;
+                const superProjectile = createSuperProjectile(projectileX, projectileY, updated.facing, superMove, 'player2');
+                addProjectile(superProjectile);
+              }
+              playEffect('special');
+            }
+          } else {
+            // Regular attack
+            if (updated.state !== 'attacking') {
+              playEffect('whoosh');
+            }
+            updated.state = 'attacking';
+            updated.attackBox = {
+              x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
+              y: updated.y + 20,
+              width: 40,
+              height: 30,
+              active: true,
+              damage: 10,
+              type: 'light'
+            };
+            updated = updateInputBuffer(updated, 'punch');
           }
-          updated.state = 'attacking';
-          updated.attackBox = {
-            x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
-            y: updated.y + 20,
-            width: 40,
-            height: 30,
-            active: true,
-            damage: 10,
-            type: 'light'
-          };
-          updated = updateInputBuffer(updated, 'punch');
         } else {
           updated.attackBox = undefined;
         }
@@ -608,6 +694,79 @@ export const useEnhancedGameEngine = () => {
       ctx.stroke();
     }
 
+    // Draw projectiles with enhanced visual effects
+    projectiles.forEach(projectile => {
+      ctx.save();
+      
+      const alpha = projectile.life / projectile.maxLife;
+      ctx.globalAlpha = alpha;
+      
+      // Create glow effect for projectiles
+      ctx.shadowColor = projectile.color;
+      ctx.shadowBlur = 15;
+      
+      if (projectile.type === 'fireball') {
+        // Draw fireball with gradient
+        const gradient = ctx.createRadialGradient(
+          projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, 0,
+          projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, projectile.width / 2
+        );
+        gradient.addColorStop(0, projectile.color);
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
+      } else if (projectile.type === 'soundwave') {
+        // Draw soundwave with oscillating pattern
+        ctx.strokeStyle = projectile.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let i = 0; i < 3; i++) {
+          ctx.arc(
+            projectile.x + projectile.width / 2,
+            projectile.y + projectile.height / 2,
+            (projectile.width / 2) + (i * 8),
+            0,
+            Math.PI * 2
+          );
+        }
+        ctx.stroke();
+      } else {
+        // Draw energy projectile
+        ctx.fillStyle = projectile.color;
+        ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
+      }
+      
+      ctx.restore();
+    });
+
+    // Draw hit sparks
+    hitSparks.forEach(spark => {
+      ctx.save();
+      
+      const alpha = spark.life / spark.maxLife;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = spark.color;
+      
+      if (spark.type === 'critical') {
+        ctx.shadowColor = spark.color;
+        ctx.shadowBlur = 20;
+      }
+      
+      // Draw star-shaped spark
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const x = spark.x + Math.cos(angle) * spark.size;
+        const y = spark.y + Math.sin(angle) * spark.size;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.restore();
+    });
+
     // Draw particles
     gameState.particles.forEach(particle => {
       ctx.save();
@@ -695,7 +854,7 @@ export const useEnhancedGameEngine = () => {
       
       ctx.restore();
     }
-  }, [gameState]);
+  }, [gameState, projectiles, hitSparks]);
 
   const gameLoop = useCallback(() => {
     if (gameState.hitstop > 0) {
@@ -766,10 +925,45 @@ export const useEnhancedGameEngine = () => {
       }));
     }
 
+    // Update projectiles and check collisions
+    updateProjectiles();
+    updateHitSparks();
+    
+    // Check projectile vs fighter collisions
+    projectiles.forEach(projectile => {
+      if (projectile.owner === 'player1' && player2 && checkProjectileCollision(projectile.hitbox, player2.hitbox)) {
+        if (player2.state !== 'blocking' && player2.frameData.invulnerable === 0) {
+          player2.health = Math.max(0, player2.health - projectile.damage);
+          player2.frameData.hitstun = 20;
+          createHitSpark(projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, 'impact', projectile.color);
+          addScreenShake(3, 6);
+          playEffect('hit');
+        } else if (player2.state === 'blocking') {
+          createHitSpark(projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, 'block', 'hsl(180, 100%, 50%)');
+          playEffect('block');
+        }
+        removeProjectile(projectile.id);
+      }
+      
+      if (projectile.owner === 'player2' && player1 && checkProjectileCollision(projectile.hitbox, player1.hitbox)) {
+        if (player1.state !== 'blocking' && player1.frameData.invulnerable === 0) {
+          player1.health = Math.max(0, player1.health - projectile.damage);
+          player1.frameData.hitstun = 20;
+          createHitSpark(projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, 'impact', projectile.color);
+          addScreenShake(3, 6);
+          playEffect('hit');
+        } else if (player1.state === 'blocking') {
+          createHitSpark(projectile.x + projectile.width / 2, projectile.y + projectile.height / 2, 'block', 'hsl(180, 100%, 50%)');
+          playEffect('block');
+        }
+        removeProjectile(projectile.id);
+      }
+    });
+
     updateParticles();
     render();
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState, updateFighter, checkCollision, render, playEffect, createParticles, addScreenShake, updateParticles]);
+  }, [gameState, updateFighter, checkCollision, render, playEffect, createParticles, addScreenShake, updateParticles, updateProjectiles, updateHitSparks, projectiles, checkProjectileCollision, createHitSpark, removeProjectile]);
 
   // Keyboard event handlers
   useEffect(() => {
