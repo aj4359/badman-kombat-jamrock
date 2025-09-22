@@ -19,6 +19,7 @@ export const useAudioManager = () => {
   const [currentLayer, setCurrentLayer] = useState<'menu' | 'intro' | 'gameplay' | 'ambient'>('menu');
   const [audioErrors, setAudioErrors] = useState<string[]>([]);
   const [introPlaying, setIntroPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [settings, setSettings] = useState<AudioSettings>({
     masterVolume: 0.7,
     musicVolume: 0.8,
@@ -35,6 +36,7 @@ export const useAudioManager = () => {
 
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const loadedFilesRef = useRef<Set<string>>(new Set());
 
   // Initialize audio elements with error handling
   useEffect(() => {
@@ -52,6 +54,12 @@ export const useAudioManager = () => {
     const handleAudioLoad = (audioElement: HTMLAudioElement, name: string) => {
       audioElement.addEventListener('canplaythrough', () => {
         console.log(`Audio loaded successfully: ${name}`);
+        loadedFilesRef.current.add(name);
+        
+        // Check if all critical files are loaded
+        if (loadedFilesRef.current.has('intro') || loadedFilesRef.current.has('gameplay')) {
+          setIsLoaded(true);
+        }
       });
     };
 
@@ -111,6 +119,28 @@ export const useAudioManager = () => {
     ambient.muted = settings.isMuted;
   }, [settings]);
 
+  const stopAllAudio = useCallback(() => {
+    console.log('Force stopping all audio instances');
+    const { intro, gameplay, ambient } = audioRefs.current;
+    
+    // Clear any ongoing crossfades
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+    
+    // Force stop all audio with proper cleanup
+    [intro, gameplay, ambient].forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = 0;
+    });
+    
+    currentAudioRef.current = null;
+    setIsPlaying(false);
+    setIntroPlaying(false);
+  }, []);
+
   const crossFade = useCallback((fromAudio: HTMLAudioElement, toAudio: HTMLAudioElement, duration = 2000) => {
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
@@ -123,6 +153,9 @@ export const useAudioManager = () => {
     
     let step = 0;
     
+    // Ensure clean start - stop other audio first
+    stopAllAudio();
+    
     // Start the new audio
     toAudio.currentTime = 0;
     toAudio.volume = 0;
@@ -132,77 +165,100 @@ export const useAudioManager = () => {
       console.warn('Audio playback failed during crossfade:', error);
     });
     
+    setIsPlaying(true);
+    
     fadeIntervalRef.current = setInterval(() => {
       step++;
       const progress = step / steps;
       
       // Fade out current audio
-      fromAudio.volume = fromStartVolume * (1 - progress);
+      if (fromAudio && !fromAudio.paused) {
+        fromAudio.volume = fromStartVolume * (1 - progress);
+      }
       
       // Fade in new audio
       toAudio.volume = toTargetVolume * progress;
       
       if (step >= steps) {
-        fromAudio.pause();
-        fromAudio.currentTime = 0;
+        if (fromAudio && !fromAudio.paused) {
+          fromAudio.pause();
+          fromAudio.currentTime = 0;
+        }
         toAudio.volume = toTargetVolume;
         currentAudioRef.current = toAudio;
         clearInterval(fadeIntervalRef.current!);
         fadeIntervalRef.current = null;
       }
     }, stepTime);
-  }, [settings]);
+  }, [settings, stopAllAudio]);
 
   const playLayer = useCallback((layer: 'menu' | 'intro' | 'gameplay' | 'ambient', immediate = false) => {
-    if (!isLoaded) {
-      console.warn('Audio system not loaded yet');
-      return;
-    }
+    console.log(`Attempting to play audio layer: ${layer}, isLoaded: ${isLoaded}, currentLayer: ${currentLayer}`);
+    
+    // Force stop all current audio to prevent doubling
+    stopAllAudio();
     
     const { intro, gameplay, ambient } = audioRefs.current;
     const targetAudio = layer === 'intro' ? intro : layer === 'gameplay' ? gameplay : ambient;
+    
+    // Check if the target audio file exists and is loadable
+    if (!targetAudio.src || targetAudio.error) {
+      console.warn(`Audio file not available for layer: ${layer}`);
+      setAudioErrors(prev => [...prev, layer]);
+      return;
+    }
     
     console.log(`Playing audio layer: ${layer}`);
     setCurrentLayer(layer);
     
     if (layer === 'intro') {
       setIntroPlaying(true);
+      console.log('Setting up Shaw Brothers intro with auto-transition');
+      
+      // Clear any previous event listeners
+      intro.onended = null;
+      
       // Shaw Brothers intro - play once, then auto-transition to gameplay
-      intro.onended = () => {
+      intro.addEventListener('ended', () => {
+        console.log('Shaw Brothers intro ended, transitioning to gameplay');
         setIntroPlaying(false);
         playLayer('gameplay', true);
-      };
+      }, { once: true });
+    } else {
+      setIntroPlaying(false);
     }
     
-    if (currentAudioRef.current && currentAudioRef.current !== targetAudio && !immediate) {
-      crossFade(currentAudioRef.current, targetAudio);
-    } else {
-      // Stop all other audio
-      [intro, gameplay, ambient].forEach(audio => {
-        if (audio !== targetAudio) {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-      });
-      
-      // Play target audio with error handling
+    // Enhanced immediate playback with proper cleanup
+    if (immediate || !currentAudioRef.current) {
+      // Reset and configure target audio
       targetAudio.currentTime = 0;
-      targetAudio.play().catch(error => {
-        console.warn(`Failed to play ${layer} audio:`, error);
-      });
-      currentAudioRef.current = targetAudio;
+      targetAudio.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
+      
+      // Special handling for ambient layer
+      if (layer === 'ambient') {
+        targetAudio.volume *= 0.6;
+      }
+      
+      // Play target audio with comprehensive error handling
+      targetAudio.play()
+        .then(() => {
+          console.log(`Successfully started playing ${layer} audio`);
+          currentAudioRef.current = targetAudio;
+          setIsPlaying(true);
+        })
+        .catch(error => {
+          console.warn(`Failed to play ${layer} audio:`, error);
+          setAudioErrors(prev => [...prev, `${layer}-playback`]);
+        });
+    } else if (currentAudioRef.current && currentAudioRef.current !== targetAudio) {
+      // Use crossfade for smooth transitions
+      crossFade(currentAudioRef.current, targetAudio);
     }
-  }, [isLoaded, crossFade]);
+  }, [isLoaded, currentLayer, crossFade, stopAllAudio, settings]);
 
   const stopAll = useCallback(() => {
-    console.log('Stopping all audio');
-    const { intro, gameplay, ambient } = audioRefs.current;
-    [intro, gameplay, ambient].forEach(audio => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-    currentAudioRef.current = null;
-  }, []);
+    stopAllAudio();
+  }, [stopAllAudio]);
 
   const playEffect = useCallback((effectType: 'hit' | 'block' | 'whoosh' | 'special' | 'round-start' | 'ko' | 'specialMove') => {
     if (settings.isMuted) return;
@@ -277,6 +333,7 @@ export const useAudioManager = () => {
     settings,
     audioErrors,
     introPlaying,
+    isPlaying,
     playLayer,
     stopAll,
     playEffect,
