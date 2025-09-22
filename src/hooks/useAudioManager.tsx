@@ -74,10 +74,12 @@ export const useAudioManager = () => {
     
     // Configure intro audio (one-shot)
     intro.loop = false;
+    intro.preload = 'auto';
     intro.volume = settings.musicVolume * settings.masterVolume;
     
     // Configure gameplay audio (loop)
     gameplay.loop = true;
+    gameplay.preload = 'auto';
     gameplay.volume = settings.musicVolume * settings.masterVolume;
     
     // Configure ambient audio (loop)
@@ -277,36 +279,76 @@ export const useAudioManager = () => {
     if (settings.isMuted) return;
     
     try {
-      // Create temporary audio elements for sound effects with Web Audio API
+      // Create better sound effects with Web Audio API
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
       
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      // Create different types of sounds based on effect type
+      if (effectType === 'hit' || effectType === 'block') {
+        // Punch/impact sounds - use noise and filters
+        const bufferSize = 4096;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        // Generate noise
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        
+        const noise = audioContext.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(effectType === 'hit' ? 800 : 400, audioContext.currentTime);
+        
+        const gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(settings.effectsVolume * settings.masterVolume * 0.3, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+        
+        noise.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        noise.start(audioContext.currentTime);
+        noise.stop(audioContext.currentTime + 0.15);
+      } else {
+        // Other effects - use oscillators with envelopes
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Enhanced frequencies and waveforms for different effects
+        const soundConfig: Record<string, {frequency: number, type: OscillatorType, duration: number}> = {
+          whoosh: { frequency: 300, type: 'sawtooth', duration: 0.3 },
+          special: { frequency: 440, type: 'sine', duration: 0.5 },
+          specialMove: { frequency: 660, type: 'triangle', duration: 0.8 },
+          'round-start': { frequency: 523, type: 'square', duration: 1.0 },
+          ko: { frequency: 110, type: 'sawtooth', duration: 1.5 }
+        };
+        
+        const config = soundConfig[effectType] || { frequency: 220, type: 'sine', duration: 0.2 };
+        
+        oscillator.frequency.setValueAtTime(config.frequency, audioContext.currentTime);
+        oscillator.type = config.type;
+        
+        // Add frequency modulation for more interesting sounds
+        if (effectType === 'special' || effectType === 'specialMove') {
+          oscillator.frequency.exponentialRampToValueAtTime(config.frequency * 1.5, audioContext.currentTime + config.duration / 2);
+          oscillator.frequency.exponentialRampToValueAtTime(config.frequency * 0.8, audioContext.currentTime + config.duration);
+        }
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(settings.effectsVolume * settings.masterVolume * 0.2, audioContext.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + config.duration);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + config.duration);
+      }
       
-      // Different frequencies for different effects
-      const frequencies: Record<string, number> = {
-        hit: 200,
-        block: 150,
-        whoosh: 300,
-        special: 400,
-        specialMove: 450,
-        'round-start': 220,
-        ko: 100
-      };
-      
-      oscillator.frequency.setValueAtTime(frequencies[effectType] || 200, audioContext.currentTime);
-      oscillator.type = 'square';
-      
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(settings.effectsVolume * settings.masterVolume * 0.1, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
-      
-      console.log(`Played ${effectType} sound effect`);
+      console.log(`Played enhanced ${effectType} sound effect`);
     } catch (error) {
       console.warn('Sound effect playback failed:', error);
     }

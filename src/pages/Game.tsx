@@ -12,17 +12,17 @@ const Game = () => {
     console.log('Game page mounted');
     console.log('Audio loaded:', isLoaded, 'Current layer:', currentLayer);
     
-    // Ensure gameplay music is playing when audio loads
-    if (isLoaded && currentLayer !== 'gameplay') {
-      console.log('Starting gameplay audio...');
-      playLayer('gameplay');
+    // Start Shaw Brothers intro first if audio is loaded
+    if (isLoaded && currentLayer !== 'intro') {
+      console.log('Starting Shaw Brothers intro...');
+      playLayer('intro');
     }
 
-    // Mark game as ready after brief delay
+    // Mark game as ready after brief delay to allow audio initialization
     const readyTimer = setTimeout(() => {
       setGameReady(true);
       console.log('Game marked as ready');
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(readyTimer);
   }, [isLoaded, currentLayer, playLayer]);

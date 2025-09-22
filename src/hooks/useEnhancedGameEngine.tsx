@@ -1026,12 +1026,21 @@ export const useEnhancedGameEngine = () => {
       punch: 'j',
       kick: 'k',
       block: 's',
-      special: 'u'
+      special: 'u',
+      up: 'w',
+      down: 's'
     };
     
     const key = keyMap[action];
     if (key) {
       setKeys(prev => ({ ...prev, [key]: pressed }));
+    }
+  }, []);
+
+  // Auto-start fighting mode when component initializes
+  useEffect(() => {
+    if (gameState.screen !== 'fighting') {
+      setGameState(prev => ({ ...prev, screen: 'fighting' }));
     }
   }, []);
 

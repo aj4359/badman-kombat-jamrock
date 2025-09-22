@@ -177,7 +177,7 @@ export const useSpriteSystem = () => {
     }
   ) => {
     if (!isLoaded || !spriteImages.current[fighterId]) {
-      // Enhanced fallback with character-specific styling
+      // Enhanced fallback with character-specific styling and animations
       const fighterColors = {
         leroy: 'hsl(190, 100%, 50%)', // Cyan
         jordan: 'hsl(280, 100%, 60%)', // Purple/Magenta
@@ -186,14 +186,40 @@ export const useSpriteSystem = () => {
         rootsman: 'hsl(100, 60%, 40%)' // Earth green
       };
       
-      ctx.fillStyle = effects?.color || fighterColors[fighterId as keyof typeof fighterColors] || 'hsl(180, 100%, 50%)';
-      ctx.fillRect(x, y, width, height);
+      // Create more detailed fallback character representation
+      ctx.save();
       
-      // Add character name text
+      // Body
+      ctx.fillStyle = effects?.color || fighterColors[fighterId as keyof typeof fighterColors] || 'hsl(180, 100%, 50%)';
+      ctx.fillRect(x + width * 0.25, y + height * 0.3, width * 0.5, height * 0.4);
+      
+      // Head
+      ctx.fillStyle = 'hsl(30, 30%, 70%)'; // Skin color
+      ctx.fillRect(x + width * 0.3, y + height * 0.1, width * 0.4, height * 0.25);
+      
+      // Arms
+      ctx.fillStyle = effects?.color || fighterColors[fighterId as keyof typeof fighterColors] || 'hsl(180, 100%, 50%)';
+      ctx.fillRect(x + width * 0.1, y + height * 0.35, width * 0.15, height * 0.3);
+      ctx.fillRect(x + width * 0.75, y + height * 0.35, width * 0.15, height * 0.3);
+      
+      // Legs
+      ctx.fillRect(x + width * 0.3, y + height * 0.7, width * 0.15, height * 0.3);
+      ctx.fillRect(x + width * 0.55, y + height * 0.7, width * 0.15, height * 0.3);
+      
+      // Add character name and loading indicator
       ctx.fillStyle = 'white';
-      ctx.font = '12px Arial';
+      ctx.font = 'bold 10px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(fighterId.toUpperCase(), x + width/2, y + height/2);
+      ctx.fillText(fighterId.toUpperCase(), x + width/2, y - 5);
+      
+      // Loading indicator (pulsing dot)
+      const pulse = Math.sin(animationTimer * 0.1) * 0.5 + 0.5;
+      ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
+      ctx.beginPath();
+      ctx.arc(x + width/2, y + height + 15, 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
       return;
     }
 
