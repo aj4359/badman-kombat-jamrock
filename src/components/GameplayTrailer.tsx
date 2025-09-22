@@ -1,20 +1,50 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle } from "lucide-react";
 
 const GameplayTrailer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const togglePlay = () => {
+  useEffect(() => {
+    // Check if video can load
     if (videoRef.current) {
+      const video = videoRef.current;
+      
+      const handleLoadStart = () => setIsLoading(true);
+      const handleCanPlay = () => setIsLoading(false);
+      const handleError = () => {
+        setHasError(true);
+        setIsLoading(false);
+        console.warn('Video failed to load: /assets/bmk-trailer.mp4');
+      };
+
+      video.addEventListener('loadstart', handleLoadStart);
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('error', handleError);
+
+      return () => {
+        video.removeEventListener('loadstart', handleLoadStart);
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('error', handleError);
+      };
+    }
+  }, []);
+
+  const togglePlay = () => {
+    if (videoRef.current && !hasError) {
       if (isPlaying) {
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {
+          setHasError(true);
+          console.warn('Video playback failed');
+        });
         setIsPlaying(true);
       }
     }
@@ -57,40 +87,66 @@ const GameplayTrailer = () => {
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
           >
-            {/* Video Element */}
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              poster="/assets/bmk-reveal.gif"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onLoadedData={() => {
-                if (videoRef.current) {
-                  videoRef.current.muted = isMuted;
-                }
-              }}
-            >
-              <source src="/assets/bmk-trailer.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            {/* Video Element or Fallback */}
+            {!hasError ? (
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                poster="/assets/bmk-reveal.gif"
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onLoadedData={() => {
+                  if (videoRef.current) {
+                    videoRef.current.muted = isMuted;
+                  }
+                }}
+              >
+                <source src="/assets/bmk-trailer.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              // Fallback content when video fails to load
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-background/80 to-muted/20">
+                <div className="text-center p-8">
+                  <AlertCircle className="h-16 w-16 text-neon-orange mx-auto mb-4" />
+                  <h3 className="text-2xl font-retro text-neon-pink mb-4">TRAILER COMING SOON</h3>
+                  <p className="text-muted-foreground font-body mb-6">
+                    Epic gameplay footage is being prepared for your viewing experience
+                  </p>
+                  <div className="space-y-2 text-sm text-muted-foreground/80">
+                    <div>• 8 Unique Fighters</div>
+                    <div>• Special Attacks & Combos</div>
+                    <div>• Kingston Battlegrounds</div>
+                    <div>• Intense Combat Action</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Play Overlay */}
-            {!isPlaying && (
+            {!isPlaying && !hasError && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <Button
-                  variant="neon"
-                  size="lg"
-                  onClick={togglePlay}
-                  className="text-2xl px-8 py-6 rounded-full"
-                >
-                  <Play className="h-8 w-8 mr-2" />
-                  WATCH TRAILER
-                </Button>
+                {isLoading ? (
+                  <div className="text-center">
+                    <div className="animate-spin w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <div className="text-neon-cyan font-retro">LOADING...</div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="neon"
+                    size="lg"
+                    onClick={togglePlay}
+                    className="text-2xl px-8 py-6 rounded-full"
+                  >
+                    <Play className="h-8 w-8 mr-2" />
+                    WATCH TRAILER
+                  </Button>
+                )}
               </div>
             )}
 
             {/* Custom Video Controls */}
-            {isPlaying && (
+            {isPlaying && !hasError && (
               <div 
                 className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 ${
                   showControls ? 'opacity-100' : 'opacity-0'
