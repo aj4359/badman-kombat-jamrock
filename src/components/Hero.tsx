@@ -11,19 +11,16 @@ const Hero = () => {
   const { isLoaded, currentLayer, settings, playLayer, stopAll, toggleMute } = useAudioManager();
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Sync local state with AudioManager's global state
   useEffect(() => {
-    if (isLoaded) {
-      playLayer('menu');
-    }
-  }, [isLoaded, playLayer]);
+    setIsPlaying(currentLayer === 'gameplay' || currentLayer === 'intro' || currentLayer === 'ambient');
+  }, [currentLayer]);
 
   const toggleAudio = () => {
     if (isPlaying) {
       stopAll();
-      setIsPlaying(false);
     } else {
-      playLayer('menu');
-      setIsPlaying(true);
+      playLayer('ambient');
     }
   };
 

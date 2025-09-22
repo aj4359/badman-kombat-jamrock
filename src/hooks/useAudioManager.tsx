@@ -16,7 +16,7 @@ export interface AudioSettings {
 
 export const useAudioManager = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState<'menu' | 'intro' | 'gameplay' | 'ambient'>('menu');
+  const [currentLayer, setCurrentLayer] = useState<'intro' | 'gameplay' | 'ambient'>('ambient');
   const [audioErrors, setAudioErrors] = useState<string[]>([]);
   const [introPlaying, setIntroPlaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -192,14 +192,27 @@ export const useAudioManager = () => {
     }, stepTime);
   }, [settings, stopAllAudio]);
 
-  const playLayer = useCallback((layer: 'menu' | 'intro' | 'gameplay' | 'ambient', immediate = false) => {
+  const playLayer = useCallback((layer: 'intro' | 'gameplay' | 'ambient', immediate = false) => {
     console.log(`Attempting to play audio layer: ${layer}, isLoaded: ${isLoaded}, currentLayer: ${currentLayer}`);
     
     // Force stop all current audio to prevent doubling
     stopAllAudio();
     
     const { intro, gameplay, ambient } = audioRefs.current;
-    const targetAudio = layer === 'intro' ? intro : layer === 'gameplay' ? gameplay : ambient;
+    let targetAudio: HTMLAudioElement;
+    
+    switch (layer) {
+      case 'intro':
+        targetAudio = intro;
+        break;
+      case 'gameplay':
+        targetAudio = gameplay;
+        break;
+      case 'ambient':
+      default:
+        targetAudio = ambient;
+        break;
+    }
     
     // Check if the target audio file exists and is loadable
     if (!targetAudio.src || targetAudio.error) {
