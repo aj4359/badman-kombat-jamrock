@@ -18,6 +18,7 @@ export const useAudioManager = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentLayer, setCurrentLayer] = useState<'menu' | 'intro' | 'gameplay' | 'ambient'>('menu');
   const [audioErrors, setAudioErrors] = useState<string[]>([]);
+  const [introPlaying, setIntroPlaying] = useState(false);
   const [settings, setSettings] = useState<AudioSettings>({
     masterVolume: 0.7,
     musicVolume: 0.8,
@@ -164,6 +165,15 @@ export const useAudioManager = () => {
     console.log(`Playing audio layer: ${layer}`);
     setCurrentLayer(layer);
     
+    if (layer === 'intro') {
+      setIntroPlaying(true);
+      // Shaw Brothers intro - play once, then auto-transition to gameplay
+      intro.onended = () => {
+        setIntroPlaying(false);
+        playLayer('gameplay', true);
+      };
+    }
+    
     if (currentAudioRef.current && currentAudioRef.current !== targetAudio && !immediate) {
       crossFade(currentAudioRef.current, targetAudio);
     } else {
@@ -246,16 +256,33 @@ export const useAudioManager = () => {
     });
   }, []);
 
+  // iOS Audio Context fix
+  const initializeAudioContext = useCallback(() => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContext) {
+        const context = new AudioContext();
+        if (context.state === 'suspended') {
+          context.resume();
+        }
+      }
+    } catch (error) {
+      console.warn('Audio context initialization failed:', error);
+    }
+  }, []);
+
   return {
     isLoaded,
     currentLayer,
     settings,
     audioErrors,
+    introPlaying,
     playLayer,
     stopAll,
     playEffect,
     updateSettings,
     toggleMute,
+    initializeAudioContext,
     audioRefs: audioRefs.current
   };
 };

@@ -3,10 +3,11 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MobileControls } from '@/components/ui/MobileControls';
 
 const EnhancedGameCanvas = () => {
-  const { canvasRef, gameState } = useEnhancedGameEngine();
-  const { playEffect, isLoaded, audioErrors, toggleMute, settings } = useAudioManager();
+  const { canvasRef, gameState, handleMobileInput } = useEnhancedGameEngine();
+  const { playEffect, isLoaded, audioErrors, toggleMute, settings, initializeAudioContext } = useAudioManager();
   const [gameInitialized, setGameInitialized] = useState(false);
 
   useEffect(() => {
@@ -23,6 +24,16 @@ const EnhancedGameCanvas = () => {
 
     return () => clearTimeout(initTimer);
   }, [isLoaded, gameState, audioErrors]);
+
+  // iOS audio initialization
+  useEffect(() => {
+    const handleFirstTouch = () => {
+      initializeAudioContext();
+      document.removeEventListener('touchstart', handleFirstTouch);
+    };
+    document.addEventListener('touchstart', handleFirstTouch, { once: true });
+    return () => document.removeEventListener('touchstart', handleFirstTouch);
+  }, [initializeAudioContext]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-cyber p-4">
@@ -140,7 +151,7 @@ const EnhancedGameCanvas = () => {
         {/* Enhanced Game Canvas */}
         <canvas 
           ref={canvasRef}
-          className="border-2 border-neon-cyan/50 rounded-lg shadow-neon-cyan bg-background"
+          className="border-2 border-neon-cyan/50 rounded-lg shadow-neon-cyan bg-background touch-none"
           style={{ 
             width: '1024px', 
             height: '576px',
@@ -197,6 +208,9 @@ const EnhancedGameCanvas = () => {
             <div>Errors: {audioErrors.length}</div>
           </div>
         )}
+
+        {/* Mobile Controls */}
+        <MobileControls onTouch={handleMobileInput} />
       </div>
     </div>
   );

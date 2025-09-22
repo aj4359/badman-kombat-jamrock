@@ -1009,10 +1009,28 @@ export const useEnhancedGameEngine = () => {
     };
   }, [gameLoop, gameState.screen]);
 
+  // Mobile input handler  
+  const handleMobileInput = useCallback((action: string, pressed: boolean) => {
+    const keyMap: Record<string, string> = {
+      left: 'a',
+      right: 'd', 
+      punch: 'j',
+      kick: 'k',
+      block: 's',
+      special: 'u'
+    };
+    
+    const key = keyMap[action];
+    if (key) {
+      setKeys(prev => ({ ...prev, [key]: pressed }));
+    }
+  }, []);
+
   return {
     canvasRef,
     gameState,
     setGameState,
-    initializeFighters
+    initializeFighters,
+    handleMobileInput
   };
 };
