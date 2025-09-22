@@ -3,7 +3,8 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MobileControls } from '@/components/ui/MobileControls';
+import { EnhancedMobileControls } from '@/components/game/EnhancedMobileControls';
+import { EnhancedComboDisplay } from '@/components/game/EnhancedComboSystem';
 
 const EnhancedGameCanvas = () => {
   const { canvasRef, gameState, handleMobileInput } = useEnhancedGameEngine();
@@ -96,12 +97,14 @@ const EnhancedGameCanvas = () => {
                 }}
               />
             </div>
-            {/* Combo Counter */}
-            {(gameState.fighters.player1?.comboCount || 0) > 1 && (
-              <div className="text-neon-orange font-retro text-xl mt-2 animate-pulse">
-                {gameState.fighters.player1?.comboCount} HIT COMBO!
-              </div>
-            )}
+            {/* Enhanced Combo Display */}
+            <EnhancedComboDisplay
+              comboCount={gameState.fighters.player1?.comboCount || 0}
+              comboDamage={gameState.fighters.player1?.comboDamage || 0}
+              comboDecay={gameState.fighters.player1?.comboDecay || 0}
+              playerSide="left"
+              isActive={gameState.fighters.player1?.comboCount > 0}
+            />
           </div>
 
           {/* Timer & Round */}
@@ -139,12 +142,14 @@ const EnhancedGameCanvas = () => {
                 }}
               />
             </div>
-            {/* Combo Counter */}
-            {(gameState.fighters.player2?.comboCount || 0) > 1 && (
-              <div className="text-neon-purple font-retro text-xl mt-2 animate-pulse">
-                {gameState.fighters.player2?.comboCount} HIT COMBO!
-              </div>
-            )}
+            {/* Enhanced Combo Display */}
+            <EnhancedComboDisplay
+              comboCount={gameState.fighters.player2?.comboCount || 0}
+              comboDamage={gameState.fighters.player2?.comboDamage || 0}
+              comboDecay={gameState.fighters.player2?.comboDecay || 0}
+              playerSide="right"
+              isActive={gameState.fighters.player2?.comboCount > 0}
+            />
           </div>
         </div>
 
@@ -210,7 +215,21 @@ const EnhancedGameCanvas = () => {
         )}
 
         {/* Mobile Controls */}
-        <MobileControls onTouch={handleMobileInput} />
+      <EnhancedMobileControls 
+        onTouch={handleMobileInput}
+        onGesture={(gesture) => {
+          // Map gestures to actions
+          switch (gesture) {
+            case 'swipe-left': handleMobileInput('left', true); break;
+            case 'swipe-right': handleMobileInput('right', true); break;
+            case 'swipe-up': handleMobileInput('up', true); break;
+            case 'swipe-down': handleMobileInput('down', true); break;
+            case 'tap': handleMobileInput('punch', true); break;
+            case 'double-tap': handleMobileInput('kick', true); break;
+            case 'hold': handleMobileInput('block', true); break;
+          }
+        }}
+      />
       </div>
     </div>
   );

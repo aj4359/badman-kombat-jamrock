@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import CharacterSelect from "./pages/CharacterSelect";
 import Game from "./pages/Game";
 import VSScreen from "./pages/VSScreen";
+import ArcadeMode from "./pages/ArcadeMode";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/character-select" element={<CharacterSelect />} />
           <Route path="/vs-screen" element={<VSScreen />} />
           <Route path="/game" element={<Game />} />
+          <Route path="/arcade" element={<ArcadeMode />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

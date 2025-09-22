@@ -85,6 +85,7 @@ export interface Fighter {
   };
   comboCount: number;
   comboDecay: number;
+  comboDamage: number;
   frameData: {
     hitstun: number;
     blockstun: number;
@@ -386,6 +387,7 @@ export const useEnhancedGameEngine = () => {
       },
       comboCount: 0,
       comboDecay: 0,
+      comboDamage: 0,
       frameData: {
         hitstun: 0,
         blockstun: 0,
@@ -436,6 +438,7 @@ export const useEnhancedGameEngine = () => {
       updated.comboDecay--;
       if (updated.comboDecay === 0) {
         updated.comboCount = 0;
+        updated.comboDamage = 0;
       }
     }
 
@@ -877,6 +880,7 @@ export const useEnhancedGameEngine = () => {
           updatedPlayer2.frameData.hitstun = 15;
           updatedPlayer1.comboCount++;
           updatedPlayer1.comboDecay = MAX_COMBO_DECAY;
+          updatedPlayer1.comboDamage += 10;
           updatedPlayer1.superMeter = Math.min(updatedPlayer1.maxSuperMeter, updatedPlayer1.superMeter + 10);
           
           playEffect('hit');
@@ -897,6 +901,7 @@ export const useEnhancedGameEngine = () => {
           updatedPlayer1.frameData.hitstun = 15;
           updatedPlayer2.comboCount++;
           updatedPlayer2.comboDecay = MAX_COMBO_DECAY;
+          updatedPlayer2.comboDamage += 10;
           updatedPlayer2.superMeter = Math.min(updatedPlayer2.maxSuperMeter, updatedPlayer2.superMeter + 10);
           
           playEffect('hit');

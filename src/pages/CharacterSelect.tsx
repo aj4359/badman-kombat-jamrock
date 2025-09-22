@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useProgressionSystem } from '@/hooks/useProgressionSystem';
+import { Lock } from 'lucide-react';
 
 const fighters = [
   {
@@ -161,6 +163,7 @@ const fighters = [
 
 const CharacterSelect = () => {
   const navigate = useNavigate();
+  const { fighters: progressionFighters, getUnlockConditions } = useProgressionSystem();
   const [selectedP1, setSelectedP1] = useState<string | null>(null);
   const [selectedP2, setSelectedP2] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState<string | null>(null);
@@ -195,15 +198,34 @@ const CharacterSelect = () => {
 
       {/* Fighter Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-7xl">
-        {fighters.map((fighter) => (
-          <div key={fighter.id} className="relative">
+        {fighters.map((fighter) => {
+          const progressionData = progressionFighters.find(f => f.id === fighter.id);
+          const isUnlocked = progressionData?.unlocked ?? false;
+          const unlockCondition = getUnlockConditions(fighter.id);
+          
+           return (
+           <div key={fighter.id} className="relative">
             <div
-              className={`cursor-pointer transition-all duration-300 ${
+              className={`cursor-pointer transition-all duration-300 relative ${
+                !isUnlocked ? 'opacity-60' :
                 selectedP1 === fighter.id || selectedP2 === fighter.id
                   ? 'scale-105 shadow-neon-cyan'
                   : 'hover:scale-102 hover:shadow-neon-cyan/50'
               }`}
             >
+              {!isUnlocked && (
+                <div className="absolute inset-0 bg-black/70 rounded-lg z-10 flex items-center justify-center backdrop-blur-sm">
+                  <div className="text-center">
+                    <Lock className="h-8 w-8 text-neon-cyan mb-2 mx-auto" />
+                    <div className="text-xs text-neon-cyan font-retro">LOCKED</div>
+                    {unlockCondition && (
+                      <div className="text-xs text-foreground/60 mt-1">
+                        {unlockCondition.description}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className={`p-4 rounded-lg border-2 bg-card/90 backdrop-blur ${
                 selectedP1 === fighter.id || selectedP2 === fighter.id
                   ? 'border-neon-cyan shadow-neon-cyan'
@@ -258,7 +280,7 @@ const CharacterSelect = () => {
                     variant="outline"
                     className="flex-1 text-xs border-neon-pink/50 text-neon-pink hover:bg-neon-pink/10"
                     onClick={() => handleFighterSelect(fighter.id, 1)}
-                    disabled={selectedP2 === fighter.id}
+                    disabled={selectedP2 === fighter.id || !isUnlocked}
                   >
                     P1
                   </Button>
@@ -267,7 +289,7 @@ const CharacterSelect = () => {
                     variant="outline"
                     className="flex-1 text-xs border-neon-green/50 text-neon-green hover:bg-neon-green/10"
                     onClick={() => handleFighterSelect(fighter.id, 2)}
-                    disabled={selectedP1 === fighter.id}
+                    disabled={selectedP1 === fighter.id || !isUnlocked}
                   >
                     P2
                   </Button>
@@ -303,7 +325,8 @@ const CharacterSelect = () => {
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Selected Fighters Display */}
