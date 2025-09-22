@@ -402,13 +402,17 @@ export const useEnhancedGameEngine = () => {
       color: data.colors.primary,
       specialMoves: data.specialMoves,
       inputBuffer: [],
-      lastInputTime: 0
+      lastInputTime: 0,
+      attackBox: undefined
     };
   }, []);
 
   const initializeFighters = useCallback(() => {
+    console.log('Creating fighters...');
     const player1 = createFighter('leroy', 'Leroy', 200, 'hsl(180, 100%, 50%)');
     const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH - 200, 'hsl(270, 100%, 60%)');
+    
+    console.log('Fighter data:', { player1, player2 });
     
     setGameState(prev => ({
       ...prev,
@@ -417,6 +421,8 @@ export const useEnhancedGameEngine = () => {
         player2
       }
     }));
+    
+    console.log('Fighters initialized successfully');
   }, [createFighter]);
 
   const checkCollision = useCallback((rect1: any, rect2: any): boolean => {
@@ -789,23 +795,30 @@ export const useEnhancedGameEngine = () => {
     if (player1) {
       ctx.save();
       
-      // Draw fighter sprite instead of rectangle
-      drawFighterSprite(
-        ctx,
-        player1.id,
-        player1.x,
-        player1.y,
-        player1.width,
-        player1.height,
-        player1.state,
-        player1.animation.timer,
-        player1.facing,
-        {
-          hurt: player1.state === 'hurt',
-          special: player1.state === 'special',
-          color: player1.color
-        }
-      );
+      // Draw fighter sprite with fallback
+      try {
+        drawFighterSprite(
+          ctx,
+          player1.id,
+          player1.x,
+          player1.y,
+          player1.width,
+          player1.height,
+          player1.state,
+          player1.animation.timer,
+          player1.facing,
+          {
+            hurt: player1.state === 'hurt',
+            special: player1.state === 'special',
+            color: player1.color
+          }
+        );
+      } catch (error) {
+        console.error('Error drawing player1 sprite:', error);
+        // Fallback rectangle
+        ctx.fillStyle = player1.color;
+        ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+      }
 
       if (player1.attackBox?.active) {
         ctx.fillStyle = 'hsl(0, 100%, 60%, 0.3)';
@@ -827,23 +840,30 @@ export const useEnhancedGameEngine = () => {
     if (player2) {
       ctx.save();
       
-      // Draw fighter sprite instead of rectangle
-      drawFighterSprite(
-        ctx,
-        player2.id,
-        player2.x,
-        player2.y,
-        player2.width,
-        player2.height,
-        player2.state,
-        player2.animation.timer,
-        player2.facing,
-        {
-          hurt: player2.state === 'hurt',
-          special: player2.state === 'special',
-          color: player2.color
-        }
-      );
+      // Draw fighter sprite with fallback
+      try {
+        drawFighterSprite(
+          ctx,
+          player2.id,
+          player2.x,
+          player2.y,
+          player2.width,
+          player2.height,
+          player2.state,
+          player2.animation.timer,
+          player2.facing,
+          {
+            hurt: player2.state === 'hurt',
+            special: player2.state === 'special',
+            color: player2.color
+          }
+        );
+      } catch (error) {
+        console.error('Error drawing player2 sprite:', error);
+        // Fallback rectangle
+        ctx.fillStyle = player2.color;
+        ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+      }
 
       if (player2.attackBox?.active) {
         ctx.fillStyle = 'hsl(0, 100%, 60%, 0.3)';
@@ -1042,7 +1062,12 @@ export const useEnhancedGameEngine = () => {
     if (gameState.screen !== 'fighting') {
       setGameState(prev => ({ ...prev, screen: 'fighting' }));
     }
-  }, []);
+    // Ensure fighters are initialized
+    if (!gameState.fighters.player1 || !gameState.fighters.player2) {
+      console.log('Initializing fighters because they are missing');
+      initializeFighters();
+    }
+  }, [gameState.fighters.player1, gameState.fighters.player2, initializeFighters]);
 
   return {
     canvasRef,
