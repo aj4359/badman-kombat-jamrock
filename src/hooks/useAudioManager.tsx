@@ -149,7 +149,7 @@ export const useAudioManager = () => {
     currentAudioRef.current = null;
   }, []);
 
-  const playEffect = useCallback((effectType: 'hit' | 'block' | 'whoosh' | 'special' | 'round-start' | 'ko') => {
+  const playEffect = useCallback((effectType: 'hit' | 'block' | 'whoosh' | 'special' | 'round-start' | 'ko' | 'specialMove') => {
     if (settings.isMuted) return;
     
     // Create temporary audio elements for sound effects (since we don't have the actual files yet)
@@ -167,6 +167,7 @@ export const useAudioManager = () => {
       block: 150,
       whoosh: 300,
       special: 400,
+      specialMove: 450,
       'round-start': 220,
       ko: 100
     };

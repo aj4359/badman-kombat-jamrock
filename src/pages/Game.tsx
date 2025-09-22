@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAudioManager } from '@/hooks/useAudioManager';
-import GameCanvas from '@/components/game/GameCanvas';
+import EnhancedGameCanvas from '@/components/game/EnhancedGameCanvas';
 
 const Game = () => {
   const { isLoaded, playLayer, currentLayer } = useAudioManager();
@@ -14,7 +14,7 @@ const Game = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <GameCanvas />
+      <EnhancedGameCanvas />
     </div>
   );
 };

@@ -90,6 +90,72 @@ const fighters = [
       { name: 'Babylon Burn', input: '↓↓↓ + P+K', description: 'Ultimate move that calls upon all ancestral spirits' }
     ],
     backstory: 'Born during a lightning storm atop Blue Mountain Peak, Marcus "Blaze" Johnson was marked by the ancestors from birth. Raised by elder Rastafarians who remembered the old ways, he learned to commune with the fire spirits that guided the Maroons in their fight against slavery. When corporate interests began encroaching on sacred Blue Mountain lands in 1980, the spirits awakened his pyrokinetic abilities. His burning dreadlocks are said to contain the souls of every Maroon warrior who died defending Jamaica\'s freedom.'
+  },
+  {
+    id: 'jordan',
+    name: 'Jordan "Sound Master" Johnson',
+    title: 'The Dancehall Digital Warrior',
+    description: 'Kingston\'s premier DJ who discovered he could weaponize sound waves through his cybernetic implants. His rhythm-based attacks sync with the city\'s heartbeat, making him deadlier when the music drops. He fights to preserve authentic Jamaican sound system culture.',
+    origin: 'New Kingston, St. Andrew',
+    age: 22,
+    height: "5'10\"",
+    weight: '165 lbs',
+    color: 'hsl(270, 100%, 60%)',
+    stats: {
+      power: 75,
+      speed: 95,
+      defense: 75
+    },
+    specialMoves: [
+      { name: 'Bass Drop Devastation', input: '↓↘→ + P', description: 'Sound wave that gets stronger with background music tempo' },
+      { name: 'Vinyl Scratch Attack', input: '→↓↘ + K', description: 'Rhythmic combo that builds momentum with perfect timing' },
+      { name: 'Soundclash Supreme', input: '↓↙←→ + P+K', description: 'Ultimate attack that synchronizes with Kingston\'s sound systems' }
+    ],
+    backstory: 'Born during Bob Marley\'s Smile Jamaica concert, Jordan\'s life was always intertwined with music. When corporate interests tried to digitize and control Jamaica\'s sound system culture, he underwent experimental cybernetic enhancement to literally become one with the music. His neural implants can tap into any sound system in Kingston, turning the entire city into his weapon. The better the music, the more devastating his attacks become.'
+  },
+  {
+    id: 'sifu',
+    name: 'Sifu YK Leung',
+    title: 'The Steel Wire Sage',
+    description: 'A mysterious kung fu master who arrived in Kingston in 1978, carrying ancient techniques and futuristic wire weapons. He teaches discipline while fighting against the corruption that threatens both his adopted home and his students in the Chinese community.',
+    origin: 'Barry Street, Chinese Quarter',
+    age: 45,
+    height: "5'7\"",
+    weight: '160 lbs',
+    color: 'hsl(45, 90%, 60%)',
+    stats: {
+      power: 90,
+      speed: 85,
+      defense: 95
+    },
+    specialMoves: [
+      { name: 'Five Point Palm Strike', input: '→→ + P', description: 'Precise pressure point attack that delays damage' },
+      { name: 'Steel Wire Whirlwind', input: '↓↘→ + K', description: 'Spinning wire attack with extended range and multiple hits' },
+      { name: 'Dim Mak Convergence', input: '←↙↓↘→ + P+K', description: 'Ancient death touch that activates all previous pressure points' }
+    ],
+    backstory: 'Master Leung fled Hong Kong in 1978 after his kung fu school was destroyed by Triad violence. Finding refuge in Kingston\'s Chinese community on Barry Street, he opened a small martial arts school while secretly developing cybernetic wire weapons that blend ancient techniques with modern technology. His steel wires are made from reclaimed materials donated by the Chinese shopkeepers he protects. He fights not just with fists, but with the wisdom of generations and the innovation of survival.'
+  },
+  {
+    id: 'rootsman',
+    name: 'Leroy "Rootsman" Zion',
+    title: 'The Tech-Nature Hybrid',
+    description: 'A former UWI engineering student who merged his consciousness with both digital networks and the natural environment. His circuit tattoos pulse with bioluminescent energy as he channels the power of both technology and nature to protect Jamaica\'s future.',
+    origin: 'Mona Heights, St. Andrew',
+    age: 25,
+    height: "6'0\"",
+    weight: '175 lbs',
+    color: 'hsl(150, 80%, 50%)',
+    stats: {
+      power: 85,
+      speed: 90,
+      defense: 80
+    },
+    specialMoves: [
+      { name: 'Digital Root System', input: '↓↙← + P', description: 'Network of energy roots that track and bind opponents' },
+      { name: 'Biomechanical Surge', input: '→↓↘ + K', description: 'Absorbs opponent\'s energy and converts it to power' },
+      { name: 'Gaia-Net Protocol', input: '↓↓↓ + P+K', description: 'Ultimate fusion of natural and digital forces' }
+    ],
+    backstory: 'Leroy studied computer engineering at UWI Mona while secretly developing bio-digital interfaces in the university\'s botanical gardens. During the 1980 power crisis, he connected his experimental technology to the campus\'s root network and electrical grid simultaneously, creating an unprecedented fusion of organic and digital consciousness. His circuit tattoos are living networks that connect him to both Kingston\'s digital infrastructure and Jamaica\'s natural ecosystem. He fights to ensure technology serves to preserve rather than destroy Jamaica\'s natural heritage.'
   }
 ];
 
