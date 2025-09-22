@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAudioManager } from './useAudioManager';
 import { useProjectileSystem } from './useProjectileSystem';
 import { useSuperMoveSystem } from './useSuperMoveSystem';
+import { useSpriteSystem } from './useSpriteSystem';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 import { Projectile, HitSpark, ComboData, FrameData, FighterState } from '@/types/gameTypes';
 
@@ -231,6 +232,11 @@ export const useEnhancedGameEngine = () => {
     createSuperProjectile,
     getVoiceLine
   } = useSuperMoveSystem();
+  
+  const {
+    isLoaded: spritesLoaded,
+    drawFighter: drawFighterSprite
+  } = useSpriteSystem();
   
   const [gameState, setGameState] = useState<GameState>({
     screen: 'fighting',
@@ -636,12 +642,8 @@ export const useEnhancedGameEngine = () => {
       height: updated.height
     };
 
-    // Update animation
+    // Update animation timer for sprite system
     updated.animation.timer += 16;
-    if (updated.animation.timer >= updated.animation.duration) {
-      updated.animation.timer = 0;
-      updated.animation.frame = (updated.animation.frame + 1) % 4;
-    }
 
     return updated;
   }, [keys, checkSpecialMoves, updateInputBuffer, playEffect, createParticles]);
@@ -787,22 +789,23 @@ export const useEnhancedGameEngine = () => {
     if (player1) {
       ctx.save();
       
-      if (player1.state === 'special') {
-        ctx.shadowColor = player1.color;
-        ctx.shadowBlur = 20;
-      }
-      
-      ctx.fillStyle = player1.color;
-      ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
-      
-      ctx.strokeStyle = 'hsl(180, 100%, 70%)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(player1.x, player1.y, player1.width, player1.height);
-
-      if (player1.state === 'hurt') {
-        ctx.fillStyle = 'hsl(0, 100%, 60%, 0.5)';
-        ctx.fillRect(player1.x - 5, player1.y - 5, player1.width + 10, player1.height + 10);
-      }
+      // Draw fighter sprite instead of rectangle
+      drawFighterSprite(
+        ctx,
+        player1.id,
+        player1.x,
+        player1.y,
+        player1.width,
+        player1.height,
+        player1.state,
+        player1.animation.timer,
+        player1.facing,
+        {
+          hurt: player1.state === 'hurt',
+          special: player1.state === 'special',
+          color: player1.color
+        }
+      );
 
       if (player1.attackBox?.active) {
         ctx.fillStyle = 'hsl(0, 100%, 60%, 0.3)';
@@ -824,22 +827,23 @@ export const useEnhancedGameEngine = () => {
     if (player2) {
       ctx.save();
       
-      if (player2.state === 'special') {
-        ctx.shadowColor = player2.color;
-        ctx.shadowBlur = 20;
-      }
-      
-      ctx.fillStyle = player2.color;
-      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-      
-      ctx.strokeStyle = 'hsl(320, 100%, 70%)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(player2.x, player2.y, player2.width, player2.height);
-
-      if (player2.state === 'hurt') {
-        ctx.fillStyle = 'hsl(0, 100%, 60%, 0.5)';
-        ctx.fillRect(player2.x - 5, player2.y - 5, player2.width + 10, player2.height + 10);
-      }
+      // Draw fighter sprite instead of rectangle
+      drawFighterSprite(
+        ctx,
+        player2.id,
+        player2.x,
+        player2.y,
+        player2.width,
+        player2.height,
+        player2.state,
+        player2.animation.timer,
+        player2.facing,
+        {
+          hurt: player2.state === 'hurt',
+          special: player2.state === 'special',
+          color: player2.color
+        }
+      );
 
       if (player2.attackBox?.active) {
         ctx.fillStyle = 'hsl(0, 100%, 60%, 0.3)';

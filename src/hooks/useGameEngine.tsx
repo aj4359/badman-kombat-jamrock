@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAudioManager } from './useAudioManager';
+import { useSpriteSystem } from './useSpriteSystem';
 
 export interface Fighter {
   id: string;
@@ -13,7 +14,7 @@ export interface Fighter {
   width: number;
   height: number;
   facing: 'left' | 'right';
-  state: 'idle' | 'walking' | 'attacking' | 'blocking' | 'hurt' | 'jumping' | 'crouching';
+  state: 'idle' | 'walking' | 'attacking' | 'blocking' | 'hurt' | 'jumping' | 'crouching' | 'special';
   animation: {
     frame: number;
     timer: number;
@@ -68,6 +69,7 @@ export const useGameEngine = () => {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameRef = useRef<number>();
   const { playEffect } = useAudioManager();
+  const { drawFighter: drawFighterSprite } = useSpriteSystem();
   
   const [gameState, setGameState] = useState<GameState>({
     screen: 'fighting',
@@ -322,20 +324,23 @@ export const useGameEngine = () => {
     const { player1, player2 } = gameState.fighters;
     
     if (player1) {
-      // Fighter body
-      ctx.fillStyle = player1.color;
-      ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
-      
-      // Fighter outline
-      ctx.strokeStyle = 'hsl(180, 100%, 70%)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(player1.x, player1.y, player1.width, player1.height);
-
-      // Health indicator
-      if (player1.state === 'hurt') {
-        ctx.fillStyle = 'hsl(0, 100%, 60%, 0.5)';
-        ctx.fillRect(player1.x - 5, player1.y - 5, player1.width + 10, player1.height + 10);
-      }
+      // Draw fighter sprite
+      drawFighterSprite(
+        ctx,
+        player1.id,
+        player1.x,
+        player1.y,
+        player1.width,
+        player1.height,
+        player1.state,
+        player1.animation.timer,
+        player1.facing,
+        {
+          hurt: player1.state === 'hurt',
+          special: player1.state === 'special',
+          color: player1.color
+        }
+      );
 
       // Attack box
       if (player1.attackBox?.active) {
@@ -355,20 +360,23 @@ export const useGameEngine = () => {
     }
 
     if (player2) {
-      // Fighter body
-      ctx.fillStyle = player2.color;
-      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-      
-      // Fighter outline
-      ctx.strokeStyle = 'hsl(320, 100%, 70%)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(player2.x, player2.y, player2.width, player2.height);
-
-      // Health indicator
-      if (player2.state === 'hurt') {
-        ctx.fillStyle = 'hsl(0, 100%, 60%, 0.5)';
-        ctx.fillRect(player2.x - 5, player2.y - 5, player2.width + 10, player2.height + 10);
-      }
+      // Draw fighter sprite
+      drawFighterSprite(
+        ctx,
+        player2.id,
+        player2.x,
+        player2.y,
+        player2.width,
+        player2.height,
+        player2.state,
+        player2.animation.timer,
+        player2.facing,
+        {
+          hurt: player2.state === 'hurt',
+          special: player2.state === 'special',
+          color: player2.color
+        }
+      );
 
       // Attack box
       if (player2.attackBox?.active) {
