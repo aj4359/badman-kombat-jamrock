@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle } from "lucide-react";
+import { useAudioManager } from "@/hooks/useAudioManager";
 
 const GameplayTrailer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -8,7 +9,9 @@ const GameplayTrailer = () => {
   const [showControls, setShowControls] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [trailerStarted, setTrailerStarted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { stopAll, settings } = useAudioManager();
 
   useEffect(() => {
     // Check if video can load
@@ -41,6 +44,9 @@ const GameplayTrailer = () => {
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
+        // Stop all background audio to prevent doubling
+        stopAll();
+        setTrailerStarted(true);
         videoRef.current.play().catch(() => {
           setHasError(true);
           console.warn('Video playback failed');
@@ -93,11 +99,15 @@ const GameplayTrailer = () => {
                 ref={videoRef}
                 className="w-full h-full object-cover"
                 poster="/assets/bmk-reveal.gif"
+                preload="metadata"
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
                 onLoadedData={() => {
                   if (videoRef.current) {
                     videoRef.current.muted = isMuted;
+                    // Better video quality settings
+                    videoRef.current.setAttribute('playsinline', 'true');
                   }
                 }}
               >
@@ -123,8 +133,8 @@ const GameplayTrailer = () => {
               </div>
             )}
 
-            {/* Play Overlay */}
-            {!isPlaying && !hasError && (
+            {/* Play Overlay - Only show if trailer hasn't started */}
+            {!trailerStarted && !isPlaying && !hasError && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                 {isLoading ? (
                   <div className="text-center">
@@ -142,6 +152,21 @@ const GameplayTrailer = () => {
                     WATCH TRAILER
                   </Button>
                 )}
+              </div>
+            )}
+
+            {/* Replay Overlay - Show if trailer ended */}
+            {trailerStarted && !isPlaying && !hasError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+                <Button
+                  variant="cyber"
+                  size="lg"
+                  onClick={togglePlay}
+                  className="text-xl px-6 py-4 rounded-full"
+                >
+                  <Play className="h-6 w-6 mr-2" />
+                  REPLAY
+                </Button>
               </div>
             )}
 

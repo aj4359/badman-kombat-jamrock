@@ -71,8 +71,13 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-neon-cyan/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-xs text-muted-foreground font-body">
-              Made with 🇯🇲 in Kingston, Jamaica • Powered by retro vibes
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+              <div className="text-xs text-muted-foreground font-body">
+                Made with 🇯🇲 in Kingston, Jamaica • Powered by retro vibes
+              </div>
+              <div className="text-xs text-muted-foreground/60 font-body opacity-75">
+                A TA GuruLabs Product
+              </div>
             </div>
             <div className="flex gap-4 text-xs text-muted-foreground font-body">
               <a href="#" className="hover:text-neon-cyan transition-colors">Privacy Policy</a>
