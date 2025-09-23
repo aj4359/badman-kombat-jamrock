@@ -444,6 +444,14 @@ export const useEnhancedGameEngine = () => {
       updated.frameData.blockstun--;
       updated.state = 'blocking';
     }
+    
+    // Update hitbox position to match fighter position
+    updated.hitbox = {
+      x: updated.x,
+      y: updated.y,
+      width: updated.width,
+      height: updated.height
+    };
 
     // Update combo decay
     if (updated.comboDecay > 0) {
@@ -860,7 +868,7 @@ export const useEnhancedGameEngine = () => {
         );
       } catch (error) {
         console.error('Error drawing player2 sprite:', error);
-        // Fallback rectangle
+        // Fallback rectangle for Player 2
         ctx.fillStyle = player2.color;
         ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
       }

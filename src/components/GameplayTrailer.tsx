@@ -49,19 +49,31 @@ const GameplayTrailer = () => {
         setTrailerStarted(true);
         
         try {
-          // Reset video to ensure clean playback
+          // Reset video for clean playback and audio sync
           videoRef.current.currentTime = 0;
+          videoRef.current.playbackRate = 1.0;
           
-          // Configure video for optimal audio sync
-          if (videoRef.current.readyState >= 2) {
-            await videoRef.current.play();
-            setIsPlaying(true);
+          // Enhanced audio sync setup
+          if (videoRef.current.readyState >= 3) { // HAVE_FUTURE_DATA for smoother sync
+            try {
+              // Force immediate audio context activation
+              const playPromise = videoRef.current.play();
+              if (playPromise !== undefined) {
+                await playPromise;
+                setIsPlaying(true);
+                console.log('Video started with audio sync');
+              }
+            } catch (error) {
+              console.warn('Video playback failed:', error);
+              setHasError(true);
+            }
           } else {
-            // Wait for video to be ready
-            videoRef.current.addEventListener('canplay', async () => {
+            // Wait for sufficient buffering for audio sync
+            videoRef.current.addEventListener('canplaythrough', async () => {
               try {
                 await videoRef.current!.play();
                 setIsPlaying(true);
+                console.log('Video started after buffering with audio sync');
               } catch (error) {
                 console.warn('Video playback failed:', error);
                 setHasError(true);
@@ -130,12 +142,15 @@ const GameplayTrailer = () => {
                     // Configure for optimal audio sync
                     videoRef.current.setAttribute('playsinline', 'true');
                     videoRef.current.setAttribute('webkit-playsinline', 'true');
-                    // Reduce audio buffering for better sync
+                    // Enhanced audio sync configuration
                     videoRef.current.preload = 'auto';
-                    // Set audio buffer size for smoother playback
-                    if ('audioTracks' in videoRef.current) {
-                      videoRef.current.volume = 1.0;
-                    }
+                    videoRef.current.volume = 1.0;
+                    // Force audio to sync properly
+                    videoRef.current.defaultPlaybackRate = 1.0;
+                    videoRef.current.playbackRate = 1.0;
+                    // Configure for immediate audio startup
+                    videoRef.current.autoplay = false;
+                    videoRef.current.controls = false;
                   }
                 }}
                 onTimeUpdate={() => {

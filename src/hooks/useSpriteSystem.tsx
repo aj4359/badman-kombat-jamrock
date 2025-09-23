@@ -30,7 +30,7 @@ export interface FighterSprites {
 
 // Sprite frame definitions (8 frames per row, 128x128 per frame for 1024x896 sprite sheets)
 const FRAME_WIDTH = 128;
-const FRAME_HEIGHT = 128;
+const FRAME_HEIGHT = 171; // Updated for proper 640x512 sprite sheets (512/3 rows)
 
 const createSpriteFrames = (row: number, count: number): SpriteFrame[] => {
   const frames: SpriteFrame[] = [];

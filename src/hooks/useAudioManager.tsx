@@ -233,12 +233,16 @@ export const useAudioManager = () => {
       // Clear any previous event listeners
       intro.onended = null;
       
-      // Shaw Brothers intro - play once, then auto-transition to gameplay
-      intro.addEventListener('ended', () => {
+      // Shaw Brothers intro - enhanced auto-transition to gameplay
+      const handleIntroEnd = () => {
         console.log('Shaw Brothers intro ended, transitioning to gameplay');
         setIntroPlaying(false);
-        playLayer('gameplay', true);
-      }, { once: true });
+        setCurrentLayer('gameplay');
+        setTimeout(() => playLayer('gameplay', true), 100); // Small delay for smooth transition
+      };
+      
+      intro.removeEventListener('ended', handleIntroEnd); // Remove any existing
+      intro.addEventListener('ended', handleIntroEnd, { once: true });
     } else {
       setIntroPlaying(false);
     }
