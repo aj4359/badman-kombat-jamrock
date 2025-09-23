@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const FighterShowcase = () => {
+  const navigate = useNavigate();
   const fighters = [
     {
       name: "LEROY",
@@ -95,6 +97,7 @@ const FighterShowcase = () => {
                 <Button 
                   variant="retro" 
                   className="w-full group-hover:scale-105 transition-transform duration-200"
+                  onClick={() => navigate('/character-select')}
                 >
                   SELECT
                 </Button>
@@ -108,7 +111,12 @@ const FighterShowcase = () => {
 
         {/* Call to Action */}
         <div className="text-center">
-          <Button variant="combat" size="lg" className="text-xl px-12 py-6">
+          <Button 
+            variant="combat" 
+            size="lg" 
+            className="text-xl px-12 py-6"
+            onClick={() => navigate('/vs-screen')}
+          >
             ENTER THE KOMBAT ARENA
           </Button>
         </div>
