@@ -46,7 +46,7 @@ const FightingStage: React.FC<FightingStageProps> = ({
     };
   }, [onKeyDown, onKeyUp]);
 
-  // Enhanced visual effects for fighting stage
+  // Street Fighter authentic stage rendering
   const renderStageEffects = useCallback(() => {
     if (!canvasRef.current) return;
     
@@ -54,51 +54,50 @@ const FightingStage: React.FC<FightingStageProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Street Fighter style stage background
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-    gradient.addColorStop(0, 'hsl(240, 30%, 10%)');
-    gradient.addColorStop(0.5, 'hsl(260, 40%, 15%)');
-    gradient.addColorStop(1, 'hsl(240, 30%, 10%)');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.7);
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Ground with Kingston vibes
-    const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.7, 0, canvas.height);
-    groundGradient.addColorStop(0, 'hsl(25, 50%, 20%)');
-    groundGradient.addColorStop(1, 'hsl(25, 40%, 15%)');
+    // Street Fighter-style background
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+    skyGradient.addColorStop(0, 'hsl(210, 40%, 25%)'); // Dark blue sky
+    skyGradient.addColorStop(1, 'hsl(200, 35%, 20%)'); // Slightly lighter
+    
+    ctx.fillStyle = skyGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.6);
+
+    // Kingston street background elements
+    ctx.fillStyle = 'hsl(25, 20%, 15%)'; // Dark buildings silhouette
+    ctx.fillRect(0, canvas.height * 0.4, canvas.width, canvas.height * 0.2);
+
+    // Ground - concrete street
+    const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+    groundGradient.addColorStop(0, 'hsl(30, 15%, 35%)'); // Concrete color
+    groundGradient.addColorStop(1, 'hsl(30, 10%, 25%)'); // Darker at bottom
     
     ctx.fillStyle = groundGradient;
-    ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
+    ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
 
-    // Enhanced grid pattern for cyberpunk feel
-    ctx.strokeStyle = 'hsl(180, 100%, 50%, 0.15)';
-    ctx.lineWidth = 1;
+    // Street Fighter floor markings
+    ctx.strokeStyle = 'hsl(50, 80%, 60%, 0.3)'; // Yellow street lines
+    ctx.lineWidth = 3;
+    ctx.setLineDash([20, 10]);
     
-    // Vertical grid lines
-    for (let i = 0; i < canvas.width; i += 50) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, canvas.height);
-      ctx.stroke();
-    }
-    
-    // Horizontal grid lines
-    for (let i = 0; i < canvas.height; i += 50) {
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(canvas.width, i);
-      ctx.stroke();
-    }
-
-    // Center line for fighting reference
-    ctx.strokeStyle = 'hsl(60, 100%, 50%, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 10]);
+    // Center line
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
+    ctx.moveTo(canvas.width / 2, canvas.height * 0.6);
     ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
+    
+    // Fighting area boundaries
+    ctx.strokeStyle = 'hsl(0, 80%, 50%, 0.2)'; // Red danger zone
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, canvas.height * 0.6);
+    ctx.lineTo(50, canvas.height);
+    ctx.moveTo(canvas.width - 50, canvas.height * 0.6);
+    ctx.lineTo(canvas.width - 50, canvas.height);
+    ctx.stroke();
+    
     ctx.setLineDash([]);
 
   }, [canvasRef]);

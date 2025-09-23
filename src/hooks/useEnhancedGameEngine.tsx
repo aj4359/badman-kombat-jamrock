@@ -129,8 +129,10 @@ const CANVAS_WIDTH = 1024;
 const CANVAS_HEIGHT = 576;
 const GROUND_Y = CANVAS_HEIGHT - 100;
 const GRAVITY = 0.8;
-const JUMP_FORCE = -15;
-const MOVE_SPEED = 4;
+const JUMP_FORCE = -18; // Stronger jump for Street Fighter feel
+const MOVE_SPEED = 3; // Slower, more deliberate movement
+const WALK_SPEED = 2;
+const RUN_SPEED = 4;
 const MAX_COMBO_DECAY = 60;
 const HITSTOP_FRAMES = 8;
 
@@ -370,15 +372,15 @@ export const useEnhancedGameEngine = () => {
       superMeter: 0,
       maxSuperMeter: 100,
       x,
-      y: GROUND_Y - 100,
-      width: 60,
-      height: 100,
+      y: GROUND_Y - 120, // Street Fighter positioning
+      width: 80, // Larger sprites for better visibility
+      height: 120,
       facing: x < CANVAS_WIDTH / 2 ? 'right' : 'left',
       state: 'idle',
       animation: {
         frame: 0,
         timer: 0,
-        duration: 200
+        duration: 150 // Faster animation for responsiveness
       },
       velocity: {
         x: 0,
@@ -386,10 +388,10 @@ export const useEnhancedGameEngine = () => {
       },
       isGrounded: true,
       hitbox: {
-        x: x - 30,
-        y: GROUND_Y - 100,
-        width: 60,
-        height: 100
+        x: x - 40,
+        y: GROUND_Y - 120,
+        width: 80,
+        height: 120
       },
       comboCount: 0,
       comboDecay: 0,
@@ -409,8 +411,9 @@ export const useEnhancedGameEngine = () => {
 
   const initializeFighters = useCallback(() => {
     console.log('Creating fighters...');
-    const player1 = createFighter('leroy', 'Leroy', 200, 'hsl(180, 100%, 50%)');
-    const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH - 200, 'hsl(270, 100%, 60%)');
+    // Street Fighter-style starting positions - closer together
+    const player1 = createFighter('leroy', 'Leroy', 300, 'hsl(180, 100%, 50%)');
+    const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH - 380, 'hsl(270, 100%, 60%)');
     
     console.log('Fighter data:', { player1, player2 });
     
@@ -469,92 +472,126 @@ export const useEnhancedGameEngine = () => {
 
     // Handle input only if not in hitstun/blockstun
     if (updated.frameData.hitstun === 0 && updated.frameData.blockstun === 0) {
-      // Player 1 controls
-      if (isPlayer1) {
-        if (keys['a'] || keys['A']) {
-          updated.velocity.x = -MOVE_SPEED;
-          updated.facing = 'left';
-          updated.state = 'walking';
-          updated = updateInputBuffer(updated, 'left');
-        } else if (keys['d'] || keys['D']) {
-          updated.velocity.x = MOVE_SPEED;
-          updated.facing = 'right';
-          updated.state = 'walking';
-          updated = updateInputBuffer(updated, 'right');
-        } else {
-          updated.velocity.x = 0;
-          if (updated.state === 'walking') updated.state = 'idle';
-        }
-
-        if (keys['w'] || keys['W']) {
-          if (updated.isGrounded) {
-            updated.velocity.y = JUMP_FORCE;
-            updated.isGrounded = false;
-            updated.state = 'jumping';
-          }
-        }
-
-        if (keys['s'] || keys['S']) {
-          if (updated.isGrounded) {
-            updated.state = 'crouching';
-            updated = updateInputBuffer(updated, 'down');
-          }
-        }
-
-        if (keys['j'] || keys['J']) {
-          // Check for super move first (requires both punch and kick)
-          if ((keys['k'] || keys['K']) && updated.superMeter >= updated.maxSuperMeter) {
-            updated = updateInputBuffer(updated, 'punch+kick');
-            const { move: superMove, newFighter } = checkSuperMoves(updated);
-            if (superMove) {
-              updated = newFighter;
-              if (superMove.type === 'projectile') {
-                const projectileX = updated.facing === 'right' ? updated.x + updated.width : updated.x - 80;
-                const projectileY = updated.y + updated.height / 2;
-                const superProjectile = createSuperProjectile(projectileX, projectileY, updated.facing, superMove, 'player1');
-                addProjectile(superProjectile);
-              }
-              playEffect('special');
-              // Voice line will be handled in game canvas
+        // Player 1 controls - Street Fighter style
+        if (isPlayer1) {
+          // Movement with proper facing logic
+          if (keys['a'] || keys['A']) {
+            updated.velocity.x = -WALK_SPEED;
+            updated.state = 'walking';
+            updated = updateInputBuffer(updated, 'left');
+            // Auto-face opponent logic
+            const opponent = gameState.fighters.player2;
+            if (opponent && updated.x > opponent.x) {
+              updated.facing = 'left';
+            }
+          } else if (keys['d'] || keys['D']) {
+            updated.velocity.x = WALK_SPEED;
+            updated.state = 'walking';
+            updated = updateInputBuffer(updated, 'right');
+            // Auto-face opponent logic
+            const opponent = gameState.fighters.player2;
+            if (opponent && updated.x < opponent.x) {
+              updated.facing = 'right';
             }
           } else {
-            // Regular attack
-            if (updated.state !== 'attacking') {
-              playEffect('whoosh');
-            }
-            updated.state = 'attacking';
-            updated.attackBox = {
-              x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
-              y: updated.y + 20,
-              width: 40,
-              height: 30,
-              active: true,
-              damage: 10,
-              type: 'light'
-            };
-            updated = updateInputBuffer(updated, 'punch');
+            updated.velocity.x = 0;
+            if (updated.state === 'walking') updated.state = 'idle';
           }
-        } else {
-          updated.attackBox = undefined;
-        }
 
-        if (keys['k'] || keys['K']) {
-          updated.state = 'blocking';
-          updated = updateInputBuffer(updated, 'kick');
-        }
-      } else {
-        // Player 2 controls
-        if (keys['ArrowLeft']) {
-          updated.velocity.x = -MOVE_SPEED;
-          updated.facing = 'left';
-          updated.state = 'walking';
-          updated = updateInputBuffer(updated, 'left');
-        } else if (keys['ArrowRight']) {
-          updated.velocity.x = MOVE_SPEED;
-          updated.facing = 'right';
-          updated.state = 'walking';
-          updated = updateInputBuffer(updated, 'right');
+          // Jumping - Street Fighter arc
+          if (keys['w'] || keys['W']) {
+            if (updated.isGrounded) {
+              updated.velocity.y = JUMP_FORCE;
+              updated.isGrounded = false;
+              updated.state = 'jumping';
+              updated = updateInputBuffer(updated, 'up');
+            }
+          }
+
+          // Crouching
+          if (keys['s'] || keys['S']) {
+            if (updated.isGrounded) {
+              updated.state = 'crouching';
+              updated = updateInputBuffer(updated, 'down');
+            }
+          }
+
+          // Light Punch (J key)
+          if (keys['j'] || keys['J']) {
+            if (updated.stamina >= 10 && updated.state !== 'attacking') {
+              updated.state = 'attacking';
+              updated.stamina -= 10;
+              updated.superMeter = Math.min(updated.maxSuperMeter, updated.superMeter + 5);
+              updated.animation.timer = 0;
+              
+              const attackRange = 60;
+              updated.attackBox = {
+                x: updated.facing === 'right' ? updated.x + updated.width - 10 : updated.x - attackRange + 10,
+                y: updated.y + 30,
+                width: attackRange,
+                height: 40,
+                active: true,
+                damage: 12,
+                type: 'light'
+              };
+              
+              playEffect('whoosh');
+              updated = updateInputBuffer(updated, 'punch');
+            }
+          }
+
+          // Heavy Attack/Block (K key)
+          if (keys['k'] || keys['K']) {
+            if (updated.isGrounded && updated.state !== 'attacking') {
+              if (keys['s'] || keys['S']) {
+                // Crouching block
+                updated.state = 'blocking';
+                updated = updateInputBuffer(updated, 'block');
+              } else {
+                // Heavy attack
+                if (updated.stamina >= 20) {
+                  updated.state = 'attacking';
+                  updated.stamina -= 20;
+                  updated.superMeter = Math.min(updated.maxSuperMeter, updated.superMeter + 10);
+                  updated.animation.timer = 0;
+                  
+                  const attackRange = 80;
+                  updated.attackBox = {
+                    x: updated.facing === 'right' ? updated.x + updated.width - 15 : updated.x - attackRange + 15,
+                    y: updated.y + 25,
+                    width: attackRange,
+                    height: 50,
+                    active: true,
+                    damage: 25,
+                    type: 'heavy'
+                  };
+                  
+                  playEffect('whoosh');
+                  updated = updateInputBuffer(updated, 'kick');
+                }
+              }
+            }
+          }
+        // Player 2 controls - Street Fighter style
         } else {
+          // Movement with opponent facing logic
+          if (keys['ArrowLeft']) {
+            updated.velocity.x = -WALK_SPEED;
+            updated.state = 'walking';
+            updated = updateInputBuffer(updated, 'left');
+            const opponent = gameState.fighters.player1;
+            if (opponent && updated.x > opponent.x) {
+              updated.facing = 'left';
+            }
+          } else if (keys['ArrowRight']) {
+            updated.velocity.x = WALK_SPEED;
+            updated.state = 'walking';
+            updated = updateInputBuffer(updated, 'right');
+            const opponent = gameState.fighters.player1;
+            if (opponent && updated.x < opponent.x) {
+              updated.facing = 'right';
+            }
+          } else {
           updated.velocity.x = 0;
           if (updated.state === 'walking') updated.state = 'idle';
         }
@@ -574,46 +611,62 @@ export const useEnhancedGameEngine = () => {
           }
         }
 
-        if (keys['1'] || keys['End']) {
-          // Check for super move first (requires both punch and kick)
-          if ((keys['2'] || keys['PageDown']) && updated.superMeter >= updated.maxSuperMeter) {
-            updated = updateInputBuffer(updated, 'punch+kick');
-            const { move: superMove, newFighter } = checkSuperMoves(updated);
-            if (superMove) {
-              updated = newFighter;
-              if (superMove.type === 'projectile') {
-                const projectileX = updated.facing === 'right' ? updated.x + updated.width : updated.x - 80;
-                const projectileY = updated.y + updated.height / 2;
-                const superProjectile = createSuperProjectile(projectileX, projectileY, updated.facing, superMove, 'player2');
-                addProjectile(superProjectile);
-              }
-              playEffect('special');
-            }
-          } else {
-            // Regular attack
-            if (updated.state !== 'attacking') {
+          // Light attack (1 key)
+          if (keys['1']) {
+            if (updated.stamina >= 10 && updated.state !== 'attacking') {
+              updated.state = 'attacking';
+              updated.stamina -= 10;
+              updated.superMeter = Math.min(updated.maxSuperMeter, updated.superMeter + 5);
+              updated.animation.timer = 0;
+              
+              const attackRange = 60;
+              updated.attackBox = {
+                x: updated.facing === 'right' ? updated.x + updated.width - 10 : updated.x - attackRange + 10,
+                y: updated.y + 30,
+                width: attackRange,
+                height: 40,
+                active: true,
+                damage: 12,
+                type: 'light'
+              };
+              
               playEffect('whoosh');
+              updated = updateInputBuffer(updated, 'punch');
             }
-            updated.state = 'attacking';
-            updated.attackBox = {
-              x: updated.facing === 'right' ? updated.x + updated.width : updated.x - 40,
-              y: updated.y + 20,
-              width: 40,
-              height: 30,
-              active: true,
-              damage: 10,
-              type: 'light'
-            };
-            updated = updateInputBuffer(updated, 'punch');
           }
-        } else {
-          updated.attackBox = undefined;
-        }
 
-        if (keys['2']) {
-          updated.state = 'blocking';
-          updated = updateInputBuffer(updated, 'kick');
-        }
+          // Heavy attack/Block (2 key)
+          if (keys['2']) {
+            if (updated.isGrounded && updated.state !== 'attacking') {
+              if (keys['ArrowDown']) {
+                // Crouching block
+                updated.state = 'blocking';
+                updated = updateInputBuffer(updated, 'block');
+              } else {
+                // Heavy attack
+                if (updated.stamina >= 20) {
+                  updated.state = 'attacking';
+                  updated.stamina -= 20;
+                  updated.superMeter = Math.min(updated.maxSuperMeter, updated.superMeter + 10);
+                  updated.animation.timer = 0;
+                  
+                  const attackRange = 80;
+                  updated.attackBox = {
+                    x: updated.facing === 'right' ? updated.x + updated.width - 15 : updated.x - attackRange + 15,
+                    y: updated.y + 25,
+                    width: attackRange,
+                    height: 50,
+                    active: true,
+                    damage: 25,
+                    type: 'heavy'
+                  };
+                  
+                  playEffect('whoosh');
+                  updated = updateInputBuffer(updated, 'kick');
+                }
+              }
+            }
+          }
       }
 
       // Check for special moves
@@ -623,6 +676,17 @@ export const useEnhancedGameEngine = () => {
         createParticles(newFighter.x + newFighter.width / 2, newFighter.y, 'special', 20, newFighter.color);
         updated = newFighter;
       }
+    }
+
+    // Clear attack box if not actively attacking
+    if (updated.state !== 'attacking') {
+      updated.attackBox = undefined;
+    }
+
+    // Reset animation for state changes
+    if (updated.state === 'attacking' && updated.animation.timer > 300) {
+      updated.state = 'idle';
+      updated.attackBox = undefined;
     }
 
     // Apply physics
@@ -644,9 +708,9 @@ export const useEnhancedGameEngine = () => {
       }
     }
 
-    // Boundary collision
-    if (updated.x < 0) updated.x = 0;
-    if (updated.x + updated.width > CANVAS_WIDTH) updated.x = CANVAS_WIDTH - updated.width;
+    // Boundary collision - Street Fighter style corners
+    if (updated.x < 50) updated.x = 50;
+    if (updated.x + updated.width > CANVAS_WIDTH - 50) updated.x = CANVAS_WIDTH - 50 - updated.width;
 
     // Update hitbox
     updated.hitbox = {
