@@ -11,7 +11,7 @@ const GameplayTrailer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [trailerStarted, setTrailerStarted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { stopAll, settings } = useAudioManager();
+  const { stopAll, playLayer, currentLayer } = useAudioManager();
 
   useEffect(() => {
     // Check if video can load
@@ -44,8 +44,9 @@ const GameplayTrailer = () => {
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
-        // Stop all background audio to prevent conflicts
+        // Stop all background audio and switch to gameplay audio
         stopAll();
+        playLayer('gameplay'); // Start gameplay audio for trailer
         setTrailerStarted(true);
         
         try {

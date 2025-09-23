@@ -28,9 +28,9 @@ export interface FighterSprites {
   special: SpriteAnimation;
 }
 
-// Sprite frame definitions (8 frames per row, 128x128 per frame for 1024x896 sprite sheets)
+// Sprite frame definitions for Street Fighter style sprites (8 frames per row, 128x128 per frame)
 const FRAME_WIDTH = 128;
-const FRAME_HEIGHT = 171; // Updated for proper 640x512 sprite sheets (512/3 rows)
+const FRAME_HEIGHT = 128; // Proper square frames for detailed fighter sprites
 
 const createSpriteFrames = (row: number, count: number): SpriteFrame[] => {
   const frames: SpriteFrame[] = [];

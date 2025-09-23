@@ -5,6 +5,7 @@ import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EnhancedMobileControls } from '@/components/game/EnhancedMobileControls';
 import { EnhancedComboDisplay } from '@/components/game/EnhancedComboSystem';
+import FightingStage from '@/components/game/FightingStage';
 
 const EnhancedGameCanvas = () => {
   const { canvasRef, gameState, handleMobileInput } = useEnhancedGameEngine();
@@ -153,18 +154,13 @@ const EnhancedGameCanvas = () => {
           </div>
         </div>
 
-        {/* Enhanced Game Canvas */}
-        <canvas 
-          ref={canvasRef}
-          className="border-2 border-neon-cyan/50 rounded-lg shadow-neon-cyan bg-background touch-none"
-          style={{ 
-            width: '1024px', 
-            height: '576px',
-            maxWidth: '100%',
-            transform: gameState.screenShake.duration > 0 
-              ? `translate(${(Math.random() - 0.5) * gameState.screenShake.intensity}px, ${(Math.random() - 0.5) * gameState.screenShake.intensity}px)`
-              : 'none'
-          }}
+        {/* Fighting Stage with Integrated Canvas */}
+        <FightingStage
+          canvasRef={canvasRef}
+          gameState={gameState}
+          fighterSprites={{}}
+          onKeyDown={(key) => console.log('Key down:', key)}
+          onKeyUp={(key) => console.log('Key up:', key)}
         />
 
         {/* Enhanced Controls Guide */}
