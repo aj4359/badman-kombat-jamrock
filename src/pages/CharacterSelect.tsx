@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useProgressionSystem } from '@/hooks/useProgressionSystem';
 import { Lock } from 'lucide-react';
+import { RastaChatbot } from '@/components/RastaChatbot';
 
 const fighters = [
   {
@@ -374,6 +375,13 @@ const CharacterSelect = () => {
           START KOMBAT!
         </Button>
       </div>
+
+      {/* Rasta Chatbot Navigator */}
+      <RastaChatbot 
+        onNavigateToGame={() => navigate('/game')}
+        onNavigateToCharacterSelect={() => navigate('/character-select')}
+        onNavigateToHome={() => navigate('/')}
+      />
     </div>
   );
 };

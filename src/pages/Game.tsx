@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import EnhancedGameCanvas from '@/components/game/EnhancedGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RastaChatbot } from '@/components/RastaChatbot';
 
 const Game = () => {
+  const navigate = useNavigate();
   const { isLoaded, playLayer, currentLayer, audioErrors } = useAudioManager();
   const [gameReady, setGameReady] = useState(false);
 
@@ -90,6 +93,13 @@ const Game = () => {
       )}
       
       <EnhancedGameCanvas />
+
+      {/* Rasta Chatbot Navigator */}
+      <RastaChatbot 
+        onNavigateToGame={() => navigate('/game')}
+        onNavigateToCharacterSelect={() => navigate('/character-select')}
+        onNavigateToHome={() => navigate('/')}
+      />
     </div>
   );
 };

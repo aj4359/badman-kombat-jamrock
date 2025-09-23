@@ -51,10 +51,11 @@ export const ENHANCED_FIGHTER_DATA: Record<string, FighterData> = {
       }
     ],
     voiceLines: [
-      { trigger: 'special', text: 'DIGITAL CLASH!' },
-      { trigger: 'super', text: 'MAXIMUM FREQUENCY!' },
-      { trigger: 'victory', text: 'Sound system supremacy!' },
-      { trigger: 'ko', text: 'The bass... drops...' }
+      { trigger: 'special', text: 'DIGITAL CLASH! Wah gwaan!' },
+      { trigger: 'super', text: 'MAXIMUM FREQUENCY! Rassclaart!' },
+      { trigger: 'victory', text: 'Sound system supremacy! Big up miself!' },
+      { trigger: 'ko', text: 'The bass... drops... bloodfire...' },
+      { trigger: 'hurt', text: 'Bomboclaart! Dat hurt!' }
     ],
     colors: {
       primary: 'hsl(180, 100%, 50%)',
@@ -112,10 +113,11 @@ export const ENHANCED_FIGHTER_DATA: Record<string, FighterData> = {
       }
     ],
     voiceLines: [
-      { trigger: 'special', text: 'Feel the bass!' },
-      { trigger: 'super', text: 'SONIC BOOM!' },
-      { trigger: 'victory', text: 'That\s how we do it!' },
-      { trigger: 'ko', text: 'The rhythm... stops...' }
+      { trigger: 'special', text: 'Feel the bass! Pussyclaart!' },
+      { trigger: 'super', text: 'SONIC BOOM! Mi corn toe!' },
+      { trigger: 'victory', text: 'That\s how we do it! Irie!' },
+      { trigger: 'ko', text: 'The rhythm... stops... suck ya mudda...' },
+      { trigger: 'hurt', text: 'Woi yoi yoi! Dat a madness!' }
     ],
     colors: {
       primary: 'hsl(270, 100%, 60%)',
@@ -293,10 +295,11 @@ export const ENHANCED_FIGHTER_DATA: Record<string, FighterData> = {
       }
     ],
     voiceLines: [
-      { trigger: 'special', text: 'Feel nature\s power!' },
-      { trigger: 'super', text: 'GAIA\S WRATH!' },
-      { trigger: 'victory', text: 'One with nature.' },
-      { trigger: 'ko', text: 'Return to... earth...' }
+      { trigger: 'special', text: 'Feel nature\s power! Rastafari!' },
+      { trigger: 'super', text: 'GAIA\S WRATH! Bloodfire ting!' },
+      { trigger: 'victory', text: 'One with nature, seen! Jah bless!' },
+      { trigger: 'ko', text: 'Return to... earth... one love...' },
+      { trigger: 'hurt', text: 'Bombo! Nature vex now!' }
     ],
     colors: {
       primary: 'hsl(120, 80%, 40%)',

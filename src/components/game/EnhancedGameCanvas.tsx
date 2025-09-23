@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
+import { useFightCommentary } from '@/hooks/useFightCommentary';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EnhancedMobileControls } from '@/components/game/EnhancedMobileControls';
 import { EnhancedComboDisplay } from '@/components/game/EnhancedComboSystem';
+import { FightCommentary } from '@/components/FightCommentary';
 import FightingStage from '@/components/game/FightingStage';
 
 const EnhancedGameCanvas = () => {
   const { canvasRef, gameState, handleMobileInput } = useEnhancedGameEngine();
   const { playEffect, isLoaded, audioErrors, toggleMute, settings, initializeAudioContext } = useAudioManager();
+  const { commentary, triggerCommentary, hideCommentary } = useFightCommentary();
   const [gameInitialized, setGameInitialized] = useState(false);
 
   useEffect(() => {
@@ -200,6 +203,12 @@ const EnhancedGameCanvas = () => {
             </div>
           </div>
         )}
+
+        {/* Fight Commentary */}
+        <FightCommentary 
+          isVisible={commentary.isVisible}
+          onComplete={hideCommentary}
+        />
 
         {/* Debug Info (only in development) */}
         {process.env.NODE_ENV === 'development' && (
