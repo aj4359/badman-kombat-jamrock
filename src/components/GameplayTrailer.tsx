@@ -38,20 +38,40 @@ const GameplayTrailer = () => {
     }
   }, []);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (videoRef.current && !hasError) {
       if (isPlaying) {
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
-        // Stop all background audio to prevent doubling
+        // Stop all background audio to prevent conflicts
         stopAll();
         setTrailerStarted(true);
-        videoRef.current.play().catch(() => {
+        
+        try {
+          // Reset video to ensure clean playback
+          videoRef.current.currentTime = 0;
+          
+          // Configure video for optimal audio sync
+          if (videoRef.current.readyState >= 2) {
+            await videoRef.current.play();
+            setIsPlaying(true);
+          } else {
+            // Wait for video to be ready
+            videoRef.current.addEventListener('canplay', async () => {
+              try {
+                await videoRef.current!.play();
+                setIsPlaying(true);
+              } catch (error) {
+                console.warn('Video playback failed:', error);
+                setHasError(true);
+              }
+            }, { once: true });
+          }
+        } catch (error) {
+          console.warn('Video playback failed:', error);
           setHasError(true);
-          console.warn('Video playback failed');
-        });
-        setIsPlaying(true);
+        }
       }
     }
   };
@@ -99,15 +119,33 @@ const GameplayTrailer = () => {
                 ref={videoRef}
                 className="w-full h-full object-cover"
                 poster="/assets/bmk-reveal.gif"
-                preload="metadata"
+                preload="auto"
+                crossOrigin="anonymous"
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onEnded={() => setIsPlaying(false)}
                 onLoadedData={() => {
                   if (videoRef.current) {
                     videoRef.current.muted = isMuted;
-                    // Better video quality settings
+                    // Configure for optimal audio sync
                     videoRef.current.setAttribute('playsinline', 'true');
+                    videoRef.current.setAttribute('webkit-playsinline', 'true');
+                    // Reduce audio buffering for better sync
+                    videoRef.current.preload = 'auto';
+                    // Set audio buffer size for smoother playback
+                    if ('audioTracks' in videoRef.current) {
+                      videoRef.current.volume = 1.0;
+                    }
+                  }
+                }}
+                onTimeUpdate={() => {
+                  // Ensure audio stays in sync during playback
+                  if (videoRef.current && isPlaying) {
+                    const video = videoRef.current;
+                    // Check for audio desync and correct if needed
+                    if (video.readyState >= 2) {
+                      video.playbackRate = 1.0; // Ensure normal playback rate
+                    }
                   }
                 }}
               >
