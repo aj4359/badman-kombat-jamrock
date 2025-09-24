@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useProgressionSystem } from '@/hooks/useProgressionSystem';
 import { Lock } from 'lucide-react';
 import { RastaChatbot } from '@/components/RastaChatbot';
+import { FighterGallery } from '@/components/FighterGallery';
 
 const fighters = [
   {
@@ -375,6 +376,9 @@ const CharacterSelect = () => {
           START KOMBAT!
         </Button>
       </div>
+
+      {/* Fighter Gallery */}
+      <FighterGallery />
 
       {/* Rasta Chatbot Navigator */}
       <RastaChatbot 

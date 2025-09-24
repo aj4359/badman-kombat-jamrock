@@ -101,6 +101,8 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
             const y = 35 + Math.sin(angle * Math.PI / 180) * 20;
             const length = 15 + (i % 3) * 5;
             
+            const colors = ['hsl(var(--jamaica-green))', 'hsl(var(--jamaica-yellow))', 'hsl(var(--jamaica-red))'];
+            
             return (
               <g key={i}>
                 <rect
@@ -108,7 +110,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
                   y={y}
                   width="3"
                   height={length}
-                  fill={i % 3 === 0 ? 'hsl(var(--jamaica-green))' : i % 3 === 1 ? 'hsl(var(--jamaica-yellow))' : 'hsl(var(--jamaica-red))'}
+                  fill={colors[i % 3]}
                   rx="1.5"
                   className="animate-pulse"
                   style={{
