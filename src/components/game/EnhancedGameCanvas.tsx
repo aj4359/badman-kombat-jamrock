@@ -157,7 +157,7 @@ const EnhancedGameCanvas = () => {
           </div>
         </div>
 
-        {/* Fighting Stage with Integrated Canvas */}
+        {/* Enhanced Fighting Stage with Street Fighter Rendering */}
         <FightingStage
           canvasRef={canvasRef}
           gameState={gameState}

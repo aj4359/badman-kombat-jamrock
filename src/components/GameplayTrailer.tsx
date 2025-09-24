@@ -44,42 +44,29 @@ const GameplayTrailer = () => {
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
-        // Stop all background audio and switch to gameplay audio
-        stopAll();
-        playLayer('gameplay'); // Start gameplay audio for trailer
-        setTrailerStarted(true);
-        
         try {
-          // Reset video for clean playback and audio sync
+          // Reset video first for clean sync
           videoRef.current.currentTime = 0;
           videoRef.current.playbackRate = 1.0;
           
-          // Enhanced audio sync setup
-          if (videoRef.current.readyState >= 3) { // HAVE_FUTURE_DATA for smoother sync
-            try {
-              // Force immediate audio context activation
-              const playPromise = videoRef.current.play();
-              if (playPromise !== undefined) {
-                await playPromise;
-                setIsPlaying(true);
-                console.log('Video started with audio sync');
-              }
-            } catch (error) {
-              console.warn('Video playback failed:', error);
-              setHasError(true);
-            }
-          } else {
-            // Wait for sufficient buffering for audio sync
-            videoRef.current.addEventListener('canplaythrough', async () => {
-              try {
-                await videoRef.current!.play();
-                setIsPlaying(true);
-                console.log('Video started after buffering with audio sync');
-              } catch (error) {
-                console.warn('Video playback failed:', error);
-                setHasError(true);
-              }
-            }, { once: true });
+          // Start audio and video simultaneously for perfect sync
+          const audioPromise = new Promise<void>((resolve) => {
+            stopAll();
+            setTimeout(() => {
+              playLayer('gameplay');
+              resolve();
+            }, 50); // Small delay to ensure audio context is ready
+          });
+          
+          // Wait for video to be ready and start both together
+          await audioPromise;
+          
+          const playPromise = videoRef.current.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            setIsPlaying(true);
+            setTrailerStarted(true);
+            console.log('Video and audio started in sync');
           }
         } catch (error) {
           console.warn('Video playback failed:', error);
