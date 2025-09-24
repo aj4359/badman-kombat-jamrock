@@ -127,12 +127,12 @@ export interface GameState {
 
 const CANVAS_WIDTH = 1024;
 const CANVAS_HEIGHT = 576;
-const GROUND_Y = CANVAS_HEIGHT - 100;
+const GROUND_Y = CANVAS_HEIGHT - 120; // Higher ground for more fighting space
 const GRAVITY = 0.8;
 const JUMP_FORCE = -18; // Stronger jump for Street Fighter feel
-const MOVE_SPEED = 3; // Slower, more deliberate movement
-const WALK_SPEED = 2;
-const RUN_SPEED = 4;
+const MOVE_SPEED = 4; // Slightly faster for more responsive combat
+const WALK_SPEED = 3; // More responsive movement
+const RUN_SPEED = 5;
 const MAX_COMBO_DECAY = 60;
 const HITSTOP_FRAMES = 8;
 
@@ -372,9 +372,9 @@ export const useEnhancedGameEngine = () => {
       superMeter: 0,
       maxSuperMeter: 100,
       x,
-      y: GROUND_Y - 120, // Street Fighter positioning
-      width: 80, // Larger sprites for better visibility
-      height: 120,
+      y: GROUND_Y - 100, // Street Fighter positioning on new ground level
+      width: 70, // Slightly smaller for better spacing
+      height: 100,
       facing: x < CANVAS_WIDTH / 2 ? 'right' : 'left',
       state: 'idle',
       animation: {
@@ -388,10 +388,10 @@ export const useEnhancedGameEngine = () => {
       },
       isGrounded: true,
       hitbox: {
-        x: x - 40,
-        y: GROUND_Y - 120,
-        width: 80,
-        height: 120
+        x: x - 35,
+        y: GROUND_Y - 100,
+        width: 70,
+        height: 100
       },
       comboCount: 0,
       comboDecay: 0,
@@ -411,9 +411,9 @@ export const useEnhancedGameEngine = () => {
 
   const initializeFighters = useCallback(() => {
     console.log('Creating fighters...');
-    // Street Fighter-style starting positions - closer together
-    const player1 = createFighter('leroy', 'Leroy', 300, 'hsl(180, 100%, 50%)');
-    const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH - 380, 'hsl(270, 100%, 60%)');
+    // Street Fighter-style starting positions - much closer for proper fighting distance
+    const player1 = createFighter('leroy', 'Leroy', CANVAS_WIDTH / 2 - 150, 'hsl(180, 100%, 50%)');
+    const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH / 2 + 70, 'hsl(270, 100%, 60%)');
     
     console.log('Fighter data:', { player1, player2 });
     
@@ -479,19 +479,19 @@ export const useEnhancedGameEngine = () => {
             updated.velocity.x = -WALK_SPEED;
             updated.state = 'walking';
             updated = updateInputBuffer(updated, 'left');
-            // Auto-face opponent logic
+            // Auto-face opponent logic - always face opponent in Street Fighter style
             const opponent = gameState.fighters.player2;
-            if (opponent && updated.x > opponent.x) {
-              updated.facing = 'left';
+            if (opponent) {
+              updated.facing = updated.x < opponent.x ? 'right' : 'left';
             }
           } else if (keys['d'] || keys['D']) {
             updated.velocity.x = WALK_SPEED;
             updated.state = 'walking';
             updated = updateInputBuffer(updated, 'right');
-            // Auto-face opponent logic
+            // Auto-face opponent logic - always face opponent in Street Fighter style
             const opponent = gameState.fighters.player2;
-            if (opponent && updated.x < opponent.x) {
-              updated.facing = 'right';
+            if (opponent) {
+              updated.facing = updated.x < opponent.x ? 'right' : 'left';
             }
           } else {
             updated.velocity.x = 0;
@@ -580,16 +580,16 @@ export const useEnhancedGameEngine = () => {
             updated.state = 'walking';
             updated = updateInputBuffer(updated, 'left');
             const opponent = gameState.fighters.player1;
-            if (opponent && updated.x > opponent.x) {
-              updated.facing = 'left';
+            if (opponent) {
+              updated.facing = updated.x < opponent.x ? 'right' : 'left';
             }
           } else if (keys['ArrowRight']) {
             updated.velocity.x = WALK_SPEED;
             updated.state = 'walking';
             updated = updateInputBuffer(updated, 'right');
             const opponent = gameState.fighters.player1;
-            if (opponent && updated.x < opponent.x) {
-              updated.facing = 'right';
+            if (opponent) {
+              updated.facing = updated.x < opponent.x ? 'right' : 'left';
             }
           } else {
           updated.velocity.x = 0;
@@ -708,9 +708,9 @@ export const useEnhancedGameEngine = () => {
       }
     }
 
-    // Boundary collision - Street Fighter style corners
-    if (updated.x < 50) updated.x = 50;
-    if (updated.x + updated.width > CANVAS_WIDTH - 50) updated.x = CANVAS_WIDTH - 50 - updated.width;
+    // Boundary collision - Street Fighter style corners (tighter boundaries for close combat)
+    if (updated.x < 80) updated.x = 80;
+    if (updated.x + updated.width > CANVAS_WIDTH - 80) updated.x = CANVAS_WIDTH - 80 - updated.width;
 
     // Update hitbox
     updated.hitbox = {
