@@ -63,10 +63,10 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
       {showParticles && (
         <div className="absolute inset-0 pointer-events-none">
           {/* Musical Notes */}
-          <div className="absolute -top-2 -right-1 text-jamaica-yellow animate-bounce delay-100">♪</div>
-          <div className="absolute -top-1 -left-2 text-jamaica-green animate-bounce delay-300">♫</div>
+          <div className="absolute -top-2 -right-1 text-yellow-400 animate-bounce delay-100">♪</div>
+          <div className="absolute -top-1 -left-2 text-green-500 animate-bounce delay-300">♫</div>
           {/* Glow Effect */}
-          <div className="absolute inset-0 bg-gradient-jamaica opacity-20 rounded-full blur-md animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 opacity-20 rounded-full blur-md animate-pulse"></div>
         </div>
       )}
 
@@ -77,7 +77,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
           isSpeaking ? 'animate-bounce' : ''
         }`}
         style={{
-          filter: 'drop-shadow(0 0 8px hsl(var(--jamaica-green) / 0.3))'
+          filter: 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))'
         }}
       >
         {/* Head */}
@@ -86,7 +86,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
           cy="45"
           r="22"
           fill="#8B4513"
-          stroke="hsl(var(--jamaica-yellow))"
+          stroke="#facc15"
           strokeWidth="1"
         />
 
@@ -101,7 +101,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
             const y = 35 + Math.sin(angle * Math.PI / 180) * 20;
             const length = 15 + (i % 3) * 5;
             
-            const colors = ['hsl(var(--jamaica-green))', 'hsl(var(--jamaica-yellow))', 'hsl(var(--jamaica-red))'];
+            const colors = ['#22c55e', '#facc15', '#ef4444'];
             
             return (
               <g key={i}>
@@ -130,12 +130,12 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
           cy="25"
           rx="25"
           ry="8"
-          fill="hsl(var(--jamaica-red))"
-          stroke="hsl(var(--jamaica-yellow))"
+          fill="#ef4444"
+          stroke="#facc15"
           strokeWidth="1"
         />
-        <rect x="25" y="25" width="50" height="4" fill="hsl(var(--jamaica-yellow))" />
-        <rect x="25" y="29" width="50" height="4" fill="hsl(var(--jamaica-green))" />
+        <rect x="25" y="25" width="50" height="4" fill="#facc15" />
+        <rect x="25" y="29" width="50" height="4" fill="#22c55e" />
 
         {/* Eyes */}
         <g>
@@ -223,9 +223,9 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
       {isSpeaking && (
         <div className="absolute -bottom-1 -right-1">
           <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-jamaica-green rounded-full animate-bounce"></div>
-            <div className="w-1 h-1 bg-jamaica-yellow rounded-full animate-bounce delay-100"></div>
-            <div className="w-1 h-1 bg-jamaica-red rounded-full animate-bounce delay-200"></div>
+            <div className="w-1 h-1 bg-green-500 rounded-full animate-bounce"></div>
+            <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-100"></div>
+            <div className="w-1 h-1 bg-red-500 rounded-full animate-bounce delay-200"></div>
           </div>
         </div>
       )}

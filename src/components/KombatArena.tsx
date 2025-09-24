@@ -2,6 +2,9 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Zap } from "lucide-react";
+import kingstonArena from '@/assets/kingston-downtown-arena.jpg';
+import blueMountainsArena from '@/assets/blue-mountains-temple.jpg';
+import negrilArena from '@/assets/negril-beach-arena.jpg';
 
 const KombatArena = () => {
   const arenas = [
@@ -11,23 +14,26 @@ const KombatArena = () => {
       features: ["Neon Lighting", "Moving Platforms", "Sound System Hazards"],
       difficulty: "Medium",
       icon: <MapPin className="h-6 w-6" />,
-      color: "neon-cyan"
+      color: "neon-cyan",
+      image: kingstonArena
     },
     {
-      name: "TRENCH TOWN YARD",
-      description: "Classic ghetto battleground with reggae atmosphere",
-      features: ["Destructible Environment", "Crowd Interactions", "Bob Marley Shrine"],
+      name: "BLUE MOUNTAINS TEMPLE",
+      description: "Mystical ancient temple ruins with spiritual energy",
+      features: ["Sacred Stones", "Waterfall Hazards", "Mystical Powers"],
       difficulty: "Hard",
       icon: <Zap className="h-6 w-6" />,
-      color: "neon-green"
+      color: "neon-green",
+      image: blueMountainsArena
     },
     {
-      name: "SPANISH TOWN SQUARE",
-      description: "Historic setting with modern cyberpunk elements",
-      features: ["Multi-Level Combat", "Weather Effects", "Digital Billboards"],
+      name: "NEGRIL BEACH PIER",
+      description: "Tropical paradise with sunset fighting vibes",
+      features: ["Sand Traps", "Water Splash", "Sunset Power-ups"],
       difficulty: "Expert",
       icon: <Clock className="h-6 w-6" />,
-      color: "neon-pink"
+      color: "neon-pink",
+      image: negrilArena
     }
   ];
 
@@ -68,12 +74,15 @@ const KombatArena = () => {
                 </div>
 
                 {/* Arena Preview */}
-                <div className={`w-full h-32 mb-4 rounded-lg bg-gradient-to-br from-${arena.color}/10 to-${arena.color}/30 flex items-center justify-center relative overflow-hidden`}>
-                  <div className={`text-4xl font-retro font-black text-${arena.color}/60 group-hover:scale-110 transition-transform duration-300`}>
-                    ARENA
-                  </div>
+                <div className="w-full h-32 mb-4 rounded-lg relative overflow-hidden">
+                  <img 
+                    src={arena.image} 
+                    alt={arena.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                   <div className="absolute inset-0 retro-grid opacity-20" />
-                  <div className={`absolute inset-0 bg-${arena.color}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  <div className={`absolute inset-0 bg-${arena.color}/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </div>
 
                 {/* Arena Description */}
