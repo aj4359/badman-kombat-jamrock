@@ -90,68 +90,117 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
     // Navigation responses with emotions
     if (input.includes('game') || input.includes('fight') || input.includes('play')) {
       setTimeout(() => onNavigateToGame?.(), 2000);
+      const gameResponses = [
+        "Big up yuhself! Time fi lick down some opponents pon di street! Ready fi di madness?",
+        "Wah gwaan warrior! Mi a send yuh to di arena now - prepare fi some serious bruk out!",
+        "Bloodfire! Yuh ready fi test yuh skills? Mek wi see if yuh can dominate!",
+        "Seen! Time fi show dem who a di real champion! Go handle yuh business!"
+      ];
       return {
-        text: "Bless up! Mi a guide yuh to di fighting arena now! Get ready fi some wicked kombat action, seen? Jah bless!",
+        text: gameResponses[Math.floor(Math.random() * gameResponses.length)],
         emotion: 'excited'
       };
     }
     
     if (input.includes('character') || input.includes('select') || input.includes('fighter')) {
       setTimeout(() => onNavigateToCharacterSelect?.(), 2000);
+      const selectResponses = [
+        "Irie! Choose yuh champion wisely, seen? Each warrior have dem own style and vibes!",
+        "Big up! Time fi pick yuh fighter! Remember - a not just strength, but technique and heart!",
+        "Wah gwaan selecta! Choose di one weh speak to yuh soul, bredrin!",
+        "Bless! Every fighter have dem own journey and power. Trust yuh instincts!"
+      ];
       return {
-        text: "Irie! Time fi choose yuh warrior! Each fighter have dem own special powers and moves. Pick wisely, bredrin!",
+        text: selectResponses[Math.floor(Math.random() * selectResponses.length)],
         emotion: 'excited'
       };
     }
     
     if (input.includes('home') || input.includes('main')) {
       setTimeout(() => onNavigateToHome?.(), 2000);
+      const homeResponses = [
+        "No worries bredrin! Mi a carry yuh back a yard! One love!",
+        "Easy! Back to di starting point wi go. Jah guide!",
+        "Seen! Home sweet home it is! Mi deh yah fi when yuh ready again!",
+        "Blessed! Back to di foundation wi go. Take yuh time, youth!"
+      ];
       return {
-        text: "No problem mi friend! Mi a take yuh back to di beginning. One love!",
+        text: homeResponses[Math.floor(Math.random() * homeResponses.length)],
         emotion: 'happy'
       };
     }
 
-    // Greeting responses
-    if (input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('yo')) {
+    // Greeting responses with more variety
+    if (input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('yo') || input.includes('wah gwaan') || input.includes('irie')) {
+      const greetings = [
+        "Wah gwaan mi bredrin! Bless up yuhself! Welcome to di digital yard!",
+        "Irie massive! Big up yuhself! Mi glad fi see yuh reach ya so!",
+        "Respect youth! How yuh stay? Ready fi some serious ting?",
+        "Bless up mi friend! Wah yuh seh? Come mek wi reason little bit!",
+        "One love bredrin! Yuh looking well today! Ready fi di vibes?"
+      ];
       return {
-        text: "Wah gwaan my youth! Bless up and welcome to di digital kombat zone! Mi here fi guide yuh through dis irie experience!",
+        text: greetings[Math.floor(Math.random() * greetings.length)],
         emotion: 'greeting'
       };
     }
     
     // Help responses
-    if (input.includes('help') || input.includes('guide') || input.includes('how')) {
+    if (input.includes('help') || input.includes('guide') || input.includes('how') || input.includes('wat') || input.includes('explain')) {
+      const helpResponses = [
+        "Easy now bredrin! Mi deh yah fi guide yuh through everything! Just tell mi wah yuh want do!",
+        "No stress at all! Mi can help yuh reach anywhere - 'game', 'character select', or back 'home'!",
+        "Seen! Mi here fi assist yuh journey. Ask mi anything bout di fighters or di game!",
+        "Blessed! Mi a yuh digital tour guide! Tell mi weh yuh want go and mi sort yuh out!",
+        "Irie! Questions? Mi have all di answers! Just speak yuh mind, bredrin!"
+      ];
       return {
-        text: "Easy now! Mi here fi help yuh navigate dis place. Tell mi if yuh want go to 'game', 'character select', or back to 'home'. Mi can also give yuh tips bout di fighters dem!",
+        text: helpResponses[Math.floor(Math.random() * helpResponses.length)],
         emotion: 'thinking'
       };
     }
     
-    // Cultural responses
-    if (input.includes('rasta') || input.includes('jamaica') || input.includes('reggae')) {
+    // Cultural responses with more depth
+    if (input.includes('rasta') || input.includes('jamaica') || input.includes('reggae') || input.includes('jah') || input.includes('babylon')) {
+      const culturalResponses = [
+        "Seen! Mi represent di culture to di fullest! From di hills of Jamaica to di digital realm!",
+        "Bloodfire! Rasta vibes strong inna dis place! One love and unity through kombat!",
+        "Jah bless! Mi bring di wisdom of di elders to dis new age fighting game!",
+        "Big up! From Bob Marley to Marcus Garvey - di spirit live on inna dis digital space!",
+        "Irie! Babylon system can't stop wi! Wi use technology fi spread di message!"
+      ];
       return {
-        text: "Seen! Mi come from di digital hills of Jamaica, where di bass heavy and di vibes irie! Dis a di place where reggae beats meet martial arts, bredrin! One love!",
+        text: culturalResponses[Math.floor(Math.random() * culturalResponses.length)],
         emotion: 'happy'
       };
     }
     
     // Music responses
-    if (input.includes('music') || input.includes('sound') || input.includes('beat')) {
+    if (input.includes('music') || input.includes('sound') || input.includes('beat') || input.includes('bass') || input.includes('riddim')) {
+      const musicResponses = [
+        "Wah! Di bass line heavy like Sly & Robbie! Every punch land pon di one drop!",
+        "Seen! Dis a where dancehall meet martial arts! Feel di riddim inna every move!",
+        "Bloodfire! Sound system culture meet fighting game! Pure vibes!",
+        "Irie! From ska to dubstep - wi evolve but di essence remain di same!",
+        "Big up! Music a di universal language, and kombat a di universal conversation!"
+      ];
       return {
-        text: "Ah yes! Di sound system powerful here! Dis a di place where digital reggae meet street fighting! Feel di rhythm in every punch and kick, seen?",
+        text: musicResponses[Math.floor(Math.random() * musicResponses.length)],
         emotion: 'excited'
       };
     }
 
-    // Fighter tips
-    if (input.includes('tip') || input.includes('strategy') || input.includes('combo')) {
+    // Fighter tips with more authentic language
+    if (input.includes('tip') || input.includes('strategy') || input.includes('combo') || input.includes('skill') || input.includes('train')) {
       const tips = [
-        "Listen mi now - timing is everything! Watch yuh opponent movements and strike when dem guard down!",
-        "Remember bredrin - each fighter have dem own style. Learn di combos and master di flow!",
-        "Patience grasshopper! Don't rush in like a mad man. Observe, adapt, then dominate!",
-        "Block and counter, dat's di key! Let dem attack first, then show dem who is boss!",
-        "Special moves powerful, but don't rely on dem too much. Basic attacks can be deadly too!"
+        "Listen mi now youth - patience a di master key! Watch yuh opponent like hawk and strike like lightning!",
+        "Bredrin, every champion know dis - practice mek perfect! Master di basics before yuh try di fancy moves!",
+        "Seen! Timing more important than power. Study yuh opponent pattern and exploit dem weakness!",
+        "Big up! Block and counter a deadly combination! Let dem attack first, den punish dem fi it!",
+        "Wicked! Special moves flashy, but basic attacks a di bread and butter! Master both fi total domination!",
+        "Remember dis - mind over matter! Stay calm under pressure and yuh decisions will be sharp!",
+        "Real talk - every loss a lesson! Learn from defeat and come back stronger!",
+        "Bloodfire! Distance management crucial! Know when fi stay close and when fi keep space!"
       ];
       return {
         text: tips[Math.floor(Math.random() * tips.length)],
@@ -159,22 +208,65 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       };
     }
 
-    // Positive responses
-    if (input.includes('thanks') || input.includes('thank you') || input.includes('cool') || input.includes('awesome')) {
+    // Positive responses with more expressions
+    if (input.includes('thanks') || input.includes('thank you') || input.includes('cool') || input.includes('awesome') || input.includes('wicked') || input.includes('bless')) {
+      const positiveResponses = [
+        "Bless up yuhself! Mi honor fi help out! Dat's what family do fi each other!",
+        "No problem at all bredrin! Mi glad yuh appreciate di vibes! One love!",
+        "Seen! Positive energy always welcome! Keep dat good spirit flowing!",
+        "Big up yuhself! Gratitude a beautiful ting! Respect!",
+        "Irie! Mi blessed fi be here fi yuh! Anytime yuh need guidance, just holla!",
+        "Wicked! Good manners never go out of style! Jah bless yuh spirit!"
+      ];
       return {
-        text: "Bless up! Mi glad fi help yuh out! Dat's what mi here for - fi guide and support mi bredrin dem!",
+        text: positiveResponses[Math.floor(Math.random() * positiveResponses.length)],
         emotion: 'happy'
       };
     }
 
-    // Default responses with varied emotions
+    // Combat-specific responses
+    if (input.includes('punch') || input.includes('kick') || input.includes('block') || input.includes('attack') || input.includes('defend')) {
+      const combatResponses = [
+        "Seen! Every warrior have dem own style! Find yuh rhythm and flow with it!",
+        "Bloodfire! Timing and precision beat brute force every time! Train smart!",
+        "Irie! Defense win championship! Master di art of protection first!",
+        "Big up! Attack with purpose, not just aggression! Every move must have meaning!",
+        "Wicked! Balance a everything - offense and defense must work together!"
+      ];
+      return {
+        text: combatResponses[Math.floor(Math.random() * combatResponses.length)],
+        emotion: 'thinking'
+      };
+    }
+
+    // Motivational responses
+    if (input.includes('hard') || input.includes('difficult') || input.includes('lose') || input.includes('losing') || input.includes('frustrated')) {
+      const motivationalResponses = [
+        "Easy youth! Every champion face defeat! What matter is how yuh bounce back!",
+        "Seen bredrin! Hard times don't last, but strong people do! Keep pushing!",
+        "Bloodfire! Frustration a part of di journey! Channel dat energy into improvement!",
+        "Irie! Remember - even di great Bob Marley face struggle! Perseverance a di key!",
+        "Big up! When di going get tough, di tough get going! Yuh stronger than yuh think!",
+        "Bless! Every master was once a disaster! Keep training and yuh will excel!"
+      ];
+      return {
+        text: motivationalResponses[Math.floor(Math.random() * motivationalResponses.length)],
+        emotion: 'happy'
+      };
+    }
+
+    // Default responses with more variety and authentic expressions
     const responses = [
-      { text: "Irie! Tell mi more bout dat, bredrin!", emotion: 'cool' as const },
-      { text: "Bless up! Yuh speaking truth deh!", emotion: 'happy' as const },
-      { text: "Seen! Mi understand yuh vibe completely!", emotion: 'thinking' as const },
-      { text: "Wicked! Keep di energy flowing like dat!", emotion: 'excited' as const },
-      { text: "One love! Dat sound proper bredrin!", emotion: 'happy' as const },
-      { text: "Respect! Yuh know di way fi sure!", emotion: 'cool' as const }
+      { text: "Irie! Tell mi more bout dat, bredrin! Mi ears dem open!", emotion: 'cool' as const },
+      { text: "Seen! Yuh speaking pure facts deh! Big up yuhself!", emotion: 'happy' as const },
+      { text: "Bloodfire! Dat sound interesting! Explain it to mi proper!", emotion: 'excited' as const },
+      { text: "Wicked! Mi feel yuh vibes completely! Continue di reasoning!", emotion: 'thinking' as const },
+      { text: "Bless up! Yuh always have good insights! Share more wisdom!", emotion: 'happy' as const },
+      { text: "Respect youth! Yuh definitely know wah yuh talking bout!", emotion: 'cool' as const },
+      { text: "One love! Dat sound like pure conscious reasoning to mi!", emotion: 'thinking' as const },
+      { text: "Big up! Mi learn something new from yuh every time!", emotion: 'excited' as const },
+      { text: "Easy now! Yuh have mi full attention! Speak yuh mind!", emotion: 'cool' as const },
+      { text: "Jah know! Dis conversation getting deeper by di minute!", emotion: 'thinking' as const }
     ];
     
     return responses[Math.floor(Math.random() * responses.length)];
