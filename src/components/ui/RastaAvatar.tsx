@@ -62,11 +62,17 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
       {/* Particle Effects */}
       {showParticles && (
         <div className="absolute inset-0 pointer-events-none">
-          {/* Musical Notes */}
-          <div className="absolute -top-2 -right-1 text-yellow-400 animate-bounce delay-100">♪</div>
-          <div className="absolute -top-1 -left-2 text-green-500 animate-bounce delay-300">♫</div>
-          {/* Glow Effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-yellow-400 to-red-500 opacity-20 rounded-full blur-md animate-pulse"></div>
+        {/* Musical Notes */}
+        <div className="absolute -top-2 -right-1 animate-bounce delay-100" style={{ color: '#facc15' }}>♪</div>
+        <div className="absolute -top-1 -left-2 animate-bounce delay-300" style={{ color: '#22c55e' }}>♫</div>
+        {/* Glow Effect */}
+        <div 
+          className="absolute inset-0 rounded-full blur-md animate-pulse" 
+          style={{ 
+            background: 'linear-gradient(to right, #22c55e, #facc15, #ef4444)',
+            opacity: 0.2 
+          }}
+        ></div>
         </div>
       )}
 
@@ -223,9 +229,9 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
       {isSpeaking && (
         <div className="absolute -bottom-1 -right-1">
           <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-green-500 rounded-full animate-bounce"></div>
-            <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-100"></div>
-            <div className="w-1 h-1 bg-red-500 rounded-full animate-bounce delay-200"></div>
+            <div className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: '#22c55e' }}></div>
+            <div className="w-1 h-1 rounded-full animate-bounce delay-100" style={{ backgroundColor: '#facc15' }}></div>
+            <div className="w-1 h-1 rounded-full animate-bounce delay-200" style={{ backgroundColor: '#ef4444' }}></div>
           </div>
         </div>
       )}
@@ -233,7 +239,14 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
       {/* Thinking indicator */}
       {isThinking && (
         <div className="absolute -top-2 -right-2">
-          <div className="bg-background/80 backdrop-blur border border-primary/30 rounded-full px-2 py-1 text-xs">
+          <div 
+            className="backdrop-blur rounded-full px-2 py-1 text-xs border"
+            style={{ 
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              borderColor: 'rgba(34, 197, 94, 0.3)',
+              color: '#fff'
+            }}
+          >
             💭
           </div>
         </div>

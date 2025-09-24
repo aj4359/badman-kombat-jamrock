@@ -27,11 +27,11 @@ export interface UnlockCondition {
 const DEFAULT_FIGHTERS: FighterProgress[] = [
   { id: 'leroy', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'easy' },
   { id: 'jordan', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'easy' },
-  { id: 'razor', unlocked: false, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' },
-  { id: 'voltage', unlocked: false, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' },
-  { id: 'blaze', unlocked: false, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
-  { id: 'sifu', unlocked: false, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
-  { id: 'rootsman', unlocked: false, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'expert' }
+  { id: 'razor', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' },
+  { id: 'voltage', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' },
+  { id: 'blaze', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
+  { id: 'sifu', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
+  { id: 'rootsman', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'expert' }
 ];
 
 const DEFAULT_MODES: GameMode[] = [

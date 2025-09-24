@@ -272,7 +272,11 @@ const CharacterSelect = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    className="flex-1 text-xs border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10"
+                    className="flex-1 text-xs hover:bg-cyan-500/10"
+                    style={{ 
+                      borderColor: 'hsl(180 100% 50% / 0.5)',
+                      color: 'hsl(180 100% 50%)'
+                    }}
                     onClick={() => toggleDetails(fighter.id)}
                   >
                     {showDetails === fighter.id ? 'Hide' : 'Details'}
@@ -280,7 +284,11 @@ const CharacterSelect = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    className="flex-1 text-xs border-neon-pink/50 text-neon-pink hover:bg-neon-pink/10"
+                    className="flex-1 text-xs hover:bg-pink-500/10"
+                    style={{ 
+                      borderColor: 'hsl(320 100% 60% / 0.5)',
+                      color: 'hsl(320 100% 60%)'
+                    }}
                     onClick={() => handleFighterSelect(fighter.id, 1)}
                     disabled={selectedP2 === fighter.id || !isUnlocked}
                   >
@@ -289,7 +297,11 @@ const CharacterSelect = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    className="flex-1 text-xs border-neon-green/50 text-neon-green hover:bg-neon-green/10"
+                    className="flex-1 text-xs hover:bg-green-500/10"
+                    style={{ 
+                      borderColor: 'hsl(120 100% 50% / 0.5)',
+                      color: 'hsl(120 100% 50%)'
+                    }}
                     onClick={() => handleFighterSelect(fighter.id, 2)}
                     disabled={selectedP1 === fighter.id || !isUnlocked}
                   >
