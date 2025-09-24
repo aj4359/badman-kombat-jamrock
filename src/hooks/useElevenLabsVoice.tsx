@@ -17,7 +17,7 @@ export const useElevenLabsVoice = (options: UseElevenLabsVoiceOptions = {}) => {
   const {
     voiceId = 'N2lVS1w4EtoT3dr4eOWO', // Callum - good for Jamaican accent
     model = 'eleven_multilingual_v2',
-    apiKey = process.env.VITE_ELEVENLABS_API_KEY
+    apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY
   } = options;
 
   const [voiceState, setVoiceState] = useState<VoiceState>({
