@@ -8,6 +8,7 @@ interface FightCommentaryProps {
 const JAMAICAN_SHOUTS = [
   "RASSCLAART!",
   "BOMBOCLAART!",
+  "BUMBACLAART!",
   "PUSSYCLAART!", 
   "MI CORN TOE!",
   "SUCK YA MUDDA!",
