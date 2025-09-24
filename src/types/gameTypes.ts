@@ -80,6 +80,33 @@ export interface VoiceLine {
   audioFile?: string;
 }
 
+export interface Fighter {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  health: number;
+  maxHealth: number;
+  meter: number;
+  facing: 'left' | 'right';
+  velocityX: number;
+  velocityY: number;
+  grounded: boolean;
+  state: FighterState;
+  combatState: any;
+  inputBuffer: any;
+  specialMoves: SpecialMove[];
+  superMoves: SuperMove[];
+  voiceLines: VoiceLine[];
+  colors: {
+    primary: string;
+    secondary: string;
+    aura: string;
+  };
+}
+
 export interface FighterData {
   id: string;
   name: string;
