@@ -137,6 +137,14 @@ const Hero = () => {
           >
             SELECT FIGHTER
           </Button>
+          <Button 
+            variant="retro" 
+            size="lg" 
+            className="text-lg px-8 py-4"
+            onClick={() => navigate('/teaser')}
+          >
+            CREATE TEASER
+          </Button>
         </div>
 
         {/* Game Features */}
