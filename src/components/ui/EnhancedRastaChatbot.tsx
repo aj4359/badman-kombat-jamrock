@@ -308,12 +308,12 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-jamaica hover:scale-110 transition-all duration-300 shadow-neon-green border-2 border-jamaica-yellow animate-pulse"
+          className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg border-2 border-yellow-400 animate-pulse"
           size="icon"
         >
-          <div className="relative">
-            <RastaAvatar size="sm" emotion="cool" showParticles={false} />
-            <MessageCircle className="absolute -bottom-1 -right-1 w-4 h-4 text-background" />
+          <div className="relative flex items-center justify-center w-full h-full">
+            <RastaAvatar size="sm" emotion="cool" showParticles={true} />
+            <MessageCircle className="absolute -bottom-1 -right-1 w-4 h-4 text-white bg-blue-500 rounded-full p-0.5" />
           </div>
         </Button>
       )}
