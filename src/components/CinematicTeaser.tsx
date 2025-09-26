@@ -37,7 +37,8 @@ export const CinematicTeaser: React.FC = () => {
     { type: 'title', duration: 2000 },
     { type: 'fighters', duration: 4000 },
     { type: 'action', duration: 3000 },
-    { type: 'coming-soon', duration: 2000 }
+    { type: 'coming-soon', duration: 2000 },
+    { type: 'credits', duration: 1500 }
   ];
 
   useEffect(() => {
@@ -88,6 +89,9 @@ export const CinematicTeaser: React.FC = () => {
         break;
       case 'coming-soon':
         renderComingSoonScene(ctx, width, height);
+        break;
+      case 'credits':
+        renderCreditsScene(ctx, width, height);
         break;
     }
 
@@ -247,11 +251,39 @@ export const CinematicTeaser: React.FC = () => {
     ctx.shadowColor = '#FFFF00';
     ctx.shadowBlur = 10;
     ctx.fillText('The Ultimate Street Fighter Experience', width / 2, height / 2 + 100);
+  };
+
+  const renderCreditsScene = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    // Dark background with subtle glow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    ctx.fillRect(0, 0, width, height);
+
+    // TA GuruLabs branding
+    ctx.font = 'bold 24px "Orbitron", monospace';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#FFFFFF';
+    ctx.shadowBlur = 15;
+    ctx.fillText('A TA GURULABS', width / 2, height / 2 - 20);
     
-    ctx.font = 'bold 16px "Rajdhani", sans-serif';
+    ctx.font = 'bold 28px "Orbitron", monospace';
+    ctx.fillStyle = '#00FFFF';
+    ctx.shadowColor = '#00FFFF';
+    ctx.fillText('PRODUCTION', width / 2, height / 2 + 20);
+
+    // Copyright notice
+    ctx.font = 'bold 14px "Rajdhani", sans-serif';
+    ctx.fillStyle = '#FFFF00';
+    ctx.shadowColor = '#FFFF00';
+    ctx.shadowBlur = 8;
+    ctx.fillText('© 2024 TA GuruLabs. All Rights Reserved.', width / 2, height / 2 + 80);
+
+    // Built with Lovable
+    ctx.font = 'bold 12px "Rajdhani", sans-serif';
     ctx.fillStyle = '#FF0080';
     ctx.shadowColor = '#FF0080';
-    ctx.fillText('Built with Lovable.dev', width / 2, height / 2 + 140);
+    ctx.shadowBlur = 5;
+    ctx.fillText('Built with Lovable.dev', width / 2, height / 2 + 120);
   };
 
   const startRecording = () => {
@@ -293,7 +325,7 @@ export const CinematicTeaser: React.FC = () => {
         setIsRecording(false);
         setIsPlaying(false);
       }
-    }, 11000); // Total duration of all scenes
+    }, 12500); // Total duration of all scenes including credits
   };
 
   const togglePlayback = () => {
@@ -358,7 +390,8 @@ export const CinematicTeaser: React.FC = () => {
         <p className="text-sm text-foreground/60">
           Creates a cinematic teaser video optimized for TikTok/LinkedIn. 
           Features all your fighters with John Wick-style effects and transitions.
-          Video duration: ~11 seconds, perfect for social media.
+          Video duration: ~12.5 seconds, perfect for social media.
+          © 2024 TA GuruLabs Production.
         </p>
       </div>
     </div>
