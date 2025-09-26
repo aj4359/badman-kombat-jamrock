@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Play, Pause } from 'lucide-react';
+import { Download, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { useAudioManager } from '@/hooks/useAudioManager';
 
 // Import fighter images
 import leroySprite from '@/assets/leroy-sprite.png';
@@ -32,6 +33,10 @@ export const CinematicTeaser: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  
+  // Audio integration
+  const audioManager = useAudioManager();
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const scenes = [
     { type: 'title', duration: 2000 },
@@ -41,15 +46,55 @@ export const CinematicTeaser: React.FC = () => {
     { type: 'credits', duration: 1500 }
   ];
 
+  // Initialize audio context
+  useEffect(() => {
+    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioManager.initializeAudioContext();
+  }, [audioManager]);
+
+  // Scene progression with audio synchronization
   useEffect(() => {
     if (!isPlaying) return;
 
+    const scene = scenes[currentScene];
+    
+    // Trigger scene-specific audio
+    if (scene && audioManager.isLoaded) {
+      switch (scene.type) {
+        case 'title':
+          console.log('Starting Shaw Brothers intro audio');
+          audioManager.playLayer('intro', true);
+          break;
+        case 'fighters':
+        case 'action':
+          console.log('Starting BMK Champion Loop');
+          audioManager.playLayer('gameplay', true);
+          break;
+        case 'coming-soon':
+          console.log('Starting ambient soundtrack');
+          audioManager.playLayer('ambient', true);
+          break;
+        case 'credits':
+          // Fade out audio for credits
+          audioManager.updateSettings({ musicVolume: 0.3 });
+          break;
+      }
+    }
+
     const timer = setTimeout(() => {
-      setCurrentScene((prev) => (prev + 1) % scenes.length);
-    }, scenes[currentScene]?.duration || 2000);
+      if (currentScene < scenes.length - 1) {
+        setCurrentScene((prev) => prev + 1);
+      } else {
+        // End of sequence
+        setIsPlaying(false);
+        setCurrentScene(0);
+        audioManager.stopAll();
+        audioManager.updateSettings({ musicVolume: 0.8 }); // Reset volume
+      }
+    }, scene?.duration || 2000);
 
     return () => clearTimeout(timer);
-  }, [currentScene, isPlaying]);
+  }, [currentScene, isPlaying, audioManager]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -286,46 +331,87 @@ export const CinematicTeaser: React.FC = () => {
     ctx.fillText('Built with Lovable.dev', width / 2, height / 2 + 120);
   };
 
-  const startRecording = () => {
+  const startRecording = async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !audioContextRef.current) return;
 
-    const stream = canvas.captureStream(30); // 30 FPS
-    mediaRecorderRef.current = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9'
-    });
-
-    chunksRef.current = [];
-
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunksRef.current.push(event.data);
+    try {
+      // Create canvas stream
+      const canvasStream = canvas.captureStream(30); // 30 FPS
+      
+      // Create audio stream from audio manager
+      const audioDestination = audioContextRef.current.createMediaStreamDestination();
+      const audioStream = audioDestination.stream;
+      
+      // Connect audio elements to the stream
+      if (audioManager.audioRefs.intro) {
+        const introSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.intro);
+        introSource.connect(audioDestination);
       }
-    };
-
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'badman-kombat-teaser.webm';
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    mediaRecorderRef.current.start();
-    setIsRecording(true);
-    setIsPlaying(true);
-    setCurrentScene(0);
-
-    // Stop recording after full cycle
-    setTimeout(() => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-        setIsRecording(false);
-        setIsPlaying(false);
+      if (audioManager.audioRefs.gameplay) {
+        const gameplaySource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.gameplay);
+        gameplaySource.connect(audioDestination);
       }
-    }, 12500); // Total duration of all scenes including credits
+      if (audioManager.audioRefs.ambient) {
+        const ambientSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.ambient);
+        ambientSource.connect(audioDestination);
+      }
+      
+      // Combine video and audio streams
+      const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...audioStream.getAudioTracks()
+      ]);
+      
+      mediaRecorderRef.current = new MediaRecorder(combinedStream, {
+        mimeType: 'video/webm;codecs=vp9,opus'
+      });
+
+      chunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'badman-kombat-teaser-with-audio.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        // Reset audio settings
+        audioManager.updateSettings({ musicVolume: 0.8 });
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setIsPlaying(true);
+      setCurrentScene(0);
+
+      // Stop recording after full cycle
+      setTimeout(() => {
+        if (mediaRecorderRef.current) {
+          mediaRecorderRef.current.stop();
+          setIsRecording(false);
+          setIsPlaying(false);
+          audioManager.stopAll();
+        }
+      }, 12500); // Total duration of all scenes including credits
+      
+    } catch (error) {
+      console.error('Failed to start recording with audio:', error);
+      // Fallback to video-only recording
+      const stream = canvas.captureStream(30);
+      mediaRecorderRef.current = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9'
+      });
+      // ... rest of fallback logic
+    }
   };
 
   const togglePlayback = () => {
@@ -333,10 +419,16 @@ export const CinematicTeaser: React.FC = () => {
     
     if (isPlaying) {
       setIsPlaying(false);
+      audioManager.stopAll();
     } else {
       setIsPlaying(true);
       setCurrentScene(0);
+      audioManager.initializeAudioContext(); // Ensure audio context is ready
     }
+  };
+
+  const toggleMute = () => {
+    audioManager.toggleMute();
   };
 
   return (
@@ -367,7 +459,7 @@ export const CinematicTeaser: React.FC = () => {
       <div className="flex gap-4">
         <Button 
           onClick={togglePlayback}
-          disabled={isRecording}
+          disabled={isRecording || !audioManager.isLoaded}
           variant="neon"
           className="flex items-center gap-2"
         >
@@ -376,23 +468,45 @@ export const CinematicTeaser: React.FC = () => {
         </Button>
         
         <Button 
-          onClick={startRecording}
+          onClick={toggleMute}
           disabled={isRecording}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          {audioManager.settings.isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </Button>
+        
+        <Button 
+          onClick={startRecording}
+          disabled={isRecording || !audioManager.isLoaded}
           variant="combat"
           className="flex items-center gap-2"
         >
           <Download className="h-4 w-4" />
-          {isRecording ? 'Recording...' : 'Download Teaser'}
+          {isRecording ? 'Recording...' : 'Download with Audio'}
         </Button>
       </div>
 
       <div className="mt-6 text-center max-w-md">
         <p className="text-sm text-foreground/60">
-          Creates a cinematic teaser video optimized for TikTok/LinkedIn. 
-          Features all your fighters with John Wick-style effects and transitions.
+          Creates a cinematic teaser video with synchronized audio, optimized for TikTok/LinkedIn. 
+          Features Shaw Brothers intro, fighter showcase with BMK Champion Loop, and ambient credits.
           Video duration: ~12.5 seconds, perfect for social media.
           © 2024 TA GuruLabs Production.
         </p>
+        
+        {!audioManager.isLoaded && (
+          <div className="mt-2 text-xs text-yellow-400">
+            Loading audio tracks... Preview will be available once audio loads.
+          </div>
+        )}
+        
+        {audioManager.audioErrors.length > 0 && (
+          <div className="mt-2 text-xs text-red-400">
+            Some audio tracks failed to load: {audioManager.audioErrors.join(', ')}
+          </div>
+        )}
       </div>
     </div>
   );
