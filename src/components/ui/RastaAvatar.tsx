@@ -73,10 +73,10 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
         <div className="absolute -top-1 -left-2 animate-bounce delay-300 text-green-500">♫</div>
         {/* Glow Effect */}
         <div 
-          className="absolute inset-0 rounded-full blur-md animate-pulse" 
+          className="absolute inset-0 rounded-full blur-md" 
           style={{ 
             background: 'linear-gradient(to right, #22c55e, #facc15, #ef4444)',
-            opacity: 0.2 
+            opacity: 0.1 
           }}
         ></div>
         </div>
@@ -124,7 +124,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
                   height={length}
                   fill={colors[i % 3]}
                   rx="1.5"
-                  className="animate-pulse"
+                  className=""
                   style={{
                     animationDelay: `${i * 0.2}s`,
                     transformOrigin: `${x}px ${y}px`,
@@ -185,7 +185,7 @@ export const RastaAvatar: React.FC<RastaAvatarProps> = ({
               rx="4" 
               ry="3" 
               fill="#333"
-              className="animate-pulse"
+              className=""
             />
           )}
           {getMouthState() === 'smile' && (

@@ -6,6 +6,17 @@ import { Lock } from 'lucide-react';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { FighterGallery } from '@/components/FighterGallery';
 
+// Import fighter images
+import leroySprite from '@/assets/leroy-sprite.png';
+import razorSprite from '@/assets/razor-sprite.png';
+import voltageSprite from '@/assets/voltage-sprite.png';
+import blazeSprite from '@/assets/blaze-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite.png';
+import sifuSprite from '@/assets/sifu-sprite.png';
+import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import elderZionSprite from '@/assets/elder-zion-sprite.png';
+import marcusSprite from '@/assets/marcus-sprite.png';
+
 const fighters = [
   {
     id: 'leroy',
@@ -17,6 +28,7 @@ const fighters = [
     height: "6'1\"",
     weight: '180 lbs',
     color: 'hsl(180, 100%, 50%)',
+    image: leroySprite,
     stats: {
       power: 85,
       speed: 90,
@@ -39,6 +51,7 @@ const fighters = [
     height: "5'8\"",
     weight: '145 lbs',
     color: 'hsl(320, 100%, 60%)',
+    image: razorSprite,
     stats: {
       power: 95,
       speed: 80,
@@ -61,6 +74,7 @@ const fighters = [
     height: "5'6\"",
     weight: '135 lbs',
     color: 'hsl(120, 100%, 50%)',
+    image: voltageSprite,
     stats: {
       power: 80,
       speed: 95,
@@ -83,6 +97,7 @@ const fighters = [
     height: "6'3\"",
     weight: '195 lbs',
     color: 'hsl(30, 100%, 60%)',
+    image: blazeSprite,
     stats: {
       power: 90,
       speed: 75,
@@ -105,6 +120,7 @@ const fighters = [
     height: "5'10\"",
     weight: '165 lbs',
     color: 'hsl(270, 100%, 60%)',
+    image: jordanSprite,
     stats: {
       power: 75,
       speed: 95,
@@ -127,6 +143,7 @@ const fighters = [
     height: "5'7\"",
     weight: '160 lbs',
     color: 'hsl(45, 90%, 60%)',
+    image: sifuSprite,
     stats: {
       power: 90,
       speed: 85,
@@ -149,6 +166,7 @@ const fighters = [
     height: "6'0\"",
     weight: '175 lbs',
     color: 'hsl(150, 80%, 50%)',
+    image: rootsmanSprite,
     stats: {
       power: 85,
       speed: 90,
@@ -160,6 +178,52 @@ const fighters = [
       { name: 'Gaia-Net Protocol', input: '↓↓↓ + P+K', description: 'Ultimate fusion of natural and digital forces' }
     ],
     backstory: 'Leroy studied computer engineering at UWI Mona while secretly developing bio-digital interfaces in the university\'s botanical gardens. During the 1980 power crisis, he connected his experimental technology to the campus\'s root network and electrical grid simultaneously, creating an unprecedented fusion of organic and digital consciousness. His circuit tattoos are living networks that connect him to both Kingston\'s digital infrastructure and Jamaica\'s natural ecosystem. He fights to ensure technology serves to preserve rather than destroy Jamaica\'s natural heritage.'
+  },
+  {
+    id: 'elder-zion',
+    name: 'Elder Zion',
+    title: 'The Spiritual Warrior',
+    description: 'An ancient Rastafarian elder who has mastered the mystical arts passed down through generations. His spiritual energy can manifest as powerful attacks that honor the ancestors.',
+    origin: 'Blue Mountains, St. Andrew',
+    age: 65,
+    height: "5'9\"",
+    weight: '170 lbs',
+    color: 'hsl(60, 80%, 50%)',
+    image: elderZionSprite,
+    stats: {
+      power: 95,
+      speed: 70,
+      defense: 85
+    },
+    specialMoves: [
+      { name: 'Ancestral Blessing', input: '↓↙← + P', description: 'Channels the power of Rastafarian ancestors' },
+      { name: 'Jah Lightning', input: '→→ + K', description: 'Divine energy strikes from above' },
+      { name: 'Spiritual Awakening', input: '↓↓ + P+K', description: 'Ultimate move that calls upon Jah\'s power' }
+    ],
+    backstory: 'Elder Zion has spent decades in meditation and spiritual practice in the Blue Mountains. When darkness threatens Jamaica, his spiritual power awakens to protect the island and its people.'
+  },
+  {
+    id: 'marcus',
+    name: 'Marcus "Iron Fist"',
+    title: 'The Street Champion',
+    description: 'A street fighter from downtown Kingston who uses his raw power and determination to protect his community from those who would exploit it.',
+    origin: 'Downtown Kingston',
+    age: 28,
+    height: "6'2\"",
+    weight: '190 lbs',
+    color: 'hsl(15, 80%, 50%)',
+    image: marcusSprite,
+    stats: {
+      power: 90,
+      speed: 80,
+      defense: 85
+    },
+    specialMoves: [
+      { name: 'Kingston Crusher', input: '↓↘→ + P', description: 'Devastating punch with street fighting power' },
+      { name: 'Iron Will', input: '→↓↘ + K', description: 'Defensive stance that absorbs and counters attacks' },
+      { name: 'Community Pride', input: '↓↙←→ + P+K', description: 'Ultimate combo inspired by protecting his neighborhood' }
+    ],
+    backstory: 'Marcus grew up fighting in the streets of downtown Kingston, learning to defend his community from gangs and corruption. His iron fists represent the unbreakable spirit of the Jamaican people.'
   }
 ];
 
@@ -234,10 +298,14 @@ const CharacterSelect = () => {
                   : 'border-neon-cyan/30'
               }`}>
                 <div 
-                  className="w-full h-40 rounded mb-3 border-2 border-neon-cyan/50 relative overflow-hidden"
-                  style={{ backgroundColor: fighter.color }}
+                  className="w-full h-40 rounded mb-3 border-2 border-neon-cyan/50 relative overflow-hidden bg-black"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <img 
+                    src={fighter.image} 
+                    alt={fighter.name}
+                    className="w-full h-full object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <div className="absolute bottom-2 left-2 text-white font-bold text-sm">
                     {fighter.origin}
                   </div>

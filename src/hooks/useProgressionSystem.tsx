@@ -31,7 +31,9 @@ const DEFAULT_FIGHTERS: FighterProgress[] = [
   { id: 'voltage', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' },
   { id: 'blaze', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
   { id: 'sifu', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'hard' },
-  { id: 'rootsman', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'expert' }
+  { id: 'rootsman', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'expert' },
+  { id: 'elder-zion', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'expert' },
+  { id: 'marcus', unlocked: true, wins: 0, bestTime: null, battlesWon: 0, specialMovesUsed: 0, difficulty: 'medium' }
 ];
 
 const DEFAULT_MODES: GameMode[] = [
