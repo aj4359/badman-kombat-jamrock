@@ -10,7 +10,7 @@ import { FightCommentary } from '@/components/FightCommentary';
 import FightingStage from '@/components/game/FightingStage';
 
 const EnhancedGameCanvas = () => {
-  const { canvasRef, gameState, handleMobileInput } = useEnhancedGameEngine();
+  const { canvasRef, gameState, handleMobileInput, initializeFighters } = useEnhancedGameEngine();
   const { playEffect, isLoaded, audioErrors, toggleMute, settings, initializeAudioContext } = useAudioManager();
   const { commentary, triggerCommentary, hideCommentary } = useFightCommentary();
   const [gameInitialized, setGameInitialized] = useState(false);
@@ -21,6 +21,9 @@ const EnhancedGameCanvas = () => {
     console.log('Game state:', gameState);
     console.log('Audio errors:', audioErrors);
     
+    // Initialize fighters first
+    initializeFighters();
+    
     // Mark game as initialized after a brief delay
     const initTimer = setTimeout(() => {
       setGameInitialized(true);
@@ -28,7 +31,7 @@ const EnhancedGameCanvas = () => {
     }, 500);
 
     return () => clearTimeout(initTimer);
-  }, [isLoaded, gameState, audioErrors]);
+  }, [isLoaded, initializeFighters]);
 
   // iOS audio initialization
   useEffect(() => {

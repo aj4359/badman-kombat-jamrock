@@ -232,6 +232,7 @@ export const useEnhancedGameEngine = () => {
       height: 100,
       facing: x < CANVAS_WIDTH / 2 ? 'right' : 'left',
       state: { current: 'idle', timer: 0, canCancel: true, frameAdvantage: 0 },
+      animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
       animationTimer: 0,
       velocityX: 0,
       velocityY: 0,
@@ -256,6 +257,9 @@ export const useEnhancedGameEngine = () => {
     console.log('Creating fighters...');
     const player1 = createFighter('leroy', 'Leroy', CANVAS_WIDTH / 2 - 150);
     const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH / 2 + 70);
+    
+    console.log('Player 1:', player1);
+    console.log('Player 2:', player2);
     
     setGameState(prev => ({
       ...prev,
