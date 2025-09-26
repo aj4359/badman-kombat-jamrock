@@ -1,23 +1,18 @@
 import React from 'react';
+import { KingstonStageBackground } from './KingstonStageBackground';
 
 interface StageBackgroundProps {
-  stage: 'trench-town' | 'spanish-town' | 'kingston-harbor';
+  stage: 'trench-town' | 'spanish-town' | 'kingston-harbor' | 'kingston-street';
 }
 
 export const StageBackground: React.FC<StageBackgroundProps> = ({ stage }) => {
+  // Use authentic Kingston images for Kingston-related stages
+  if (stage === 'kingston-street' || stage === 'trench-town') {
+    return <KingstonStageBackground variant={stage === 'trench-town' ? 'alley' : 'street'} />;
+  }
+
   const getStageConfig = () => {
     switch (stage) {
-      case 'trench-town':
-        return {
-          name: 'TRENCH TOWN YARD',
-          gradient: 'from-jamaica-green via-background to-jamaica-yellow',
-          pattern: 'retro-grid',
-          elements: [
-            { type: 'building', x: 10, y: 60, width: 80, height: 40, color: 'muted' },
-            { type: 'palm', x: 75, y: 40, width: 15, height: 60, color: 'jamaica-green' },
-            { type: 'sound-system', x: 5, y: 80, width: 25, height: 20, color: 'neon-cyan' },
-          ]
-        };
       case 'spanish-town':
         return {
           name: 'SPANISH TOWN SQUARE',
@@ -77,9 +72,6 @@ export const StageBackground: React.FC<StageBackgroundProps> = ({ stage }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
       
       {/* Stage-specific animated elements */}
-      {stage === 'trench-town' && (
-        <div className="absolute bottom-10 left-5 w-6 h-6 bg-neon-green rounded-full animate-pulse opacity-70" />
-      )}
       {stage === 'kingston-harbor' && (
         <div className="absolute top-20 right-10 w-4 h-4 bg-neon-cyan rounded-full animate-ping opacity-50" />
       )}

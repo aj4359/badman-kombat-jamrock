@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Zap } from "lucide-react";
 import kingstonArena from '@/assets/kingston-downtown-arena.jpg';
+import kingstonStreetScene from '@/assets/kingston-street-scene-1.jpg';
+import kingstonAlleyScene from '@/assets/kingston-alley-scene.jpg';
+import kingstonCommunityScene from '@/assets/kingston-community-scene.jpg';
 import blueMountainsArena from '@/assets/blue-mountains-temple.jpg';
 import negrilArena from '@/assets/negril-beach-arena.jpg';
 
@@ -10,12 +13,13 @@ const KombatArena = () => {
   const arenas = [
     {
       name: "DOWNTOWN KINGSTON",
-      description: "Fight among the neon-lit streets and dancehall vibes",
-      features: ["Neon Lighting", "Moving Platforms", "Sound System Hazards"],
+      description: "Fight among the authentic streets of Jamaica's capital",
+      features: ["Street Culture", "Community Vibes", "Real Kingston Energy"],
       difficulty: "Medium",
       icon: <MapPin className="h-6 w-6" />,
       color: "neon-cyan",
-      image: kingstonArena
+      image: kingstonStreetScene,
+      additionalImages: [kingstonAlleyScene, kingstonCommunityScene]
     },
     {
       name: "BLUE MOUNTAINS TEMPLE",
