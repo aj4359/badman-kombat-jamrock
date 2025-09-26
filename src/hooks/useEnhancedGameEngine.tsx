@@ -77,6 +77,7 @@ export interface GameState {
   winner: string | null;
   stage: string;
   particles: Particle[];
+  projectiles: any[];
   backgroundLayers: {
     parallax1: number;
     parallax2: number;
@@ -118,6 +119,7 @@ export const useEnhancedGameEngine = () => {
     winner: null,
     stage: 'kingston-street',
     particles: [],
+    projectiles: [],
     backgroundLayers: { parallax1: 0, parallax2: 0, parallax3: 0 }
   });
 
@@ -147,6 +149,26 @@ export const useEnhancedGameEngine = () => {
       ...prev,
       particles: [...prev.particles, ...newParticles]
     }));
+  }, []);
+
+  // Create projectile helper function
+  const createProjectile = useCallback((x: number, y: number, vx: number, vy: number, damage: number) => {
+    return {
+      id: `proj_${Date.now()}`,
+      x,
+      y,
+      velocityX: vx,
+      velocityY: vy,
+      damage,
+      owner: 'player',
+      color: 'hsl(60, 100%, 50%)',
+      type: 'fireball' as const,
+      life: 120,
+      maxLife: 120,
+      width: 20,
+      height: 20,
+      hitbox: { x, y, width: 20, height: 20 }
+    };
   }, []);
 
   // Input buffer system for special moves
@@ -182,7 +204,7 @@ export const useEnhancedGameEngine = () => {
             stamina: fighter.stamina - move.cost,
             superMeter: Math.min(fighter.maxSuperMeter, fighter.superMeter + 10),
             inputBuffer: [],
-            state: { current: 'special', timer: 30 },
+            state: { current: 'special', timer: 30, canCancel: false, frameAdvantage: 0 },
             animationTimer: 0
           }
         };
@@ -209,10 +231,11 @@ export const useEnhancedGameEngine = () => {
       width: 70,
       height: 100,
       facing: x < CANVAS_WIDTH / 2 ? 'right' : 'left',
-      state: { current: 'idle', timer: 0 },
+      state: { current: 'idle', timer: 0, canCancel: true, frameAdvantage: 0 },
       animationTimer: 0,
-      velocity: { x: 0, y: 0 },
-      isGrounded: true,
+      velocityX: 0,
+      velocityY: 0,
+      grounded: true,
       hitbox: { x: x - 35, y: GROUND_Y - 100, width: 70, height: 100 },
       comboCount: 0,
       comboDecay: 0,
@@ -220,6 +243,10 @@ export const useEnhancedGameEngine = () => {
       frameData: { hitstun: 0, blockstun: 0, invulnerable: 0 },
       colors: data.colors,
       specialMoves: data.specialMoves,
+      superMoves: data.superMoves || [],
+      voiceLines: data.voiceLines || [],
+      meter: 0,
+      combatState: {},
       inputBuffer: [],
       lastInputTime: 0
     };
@@ -248,47 +275,40 @@ export const useEnhancedGameEngine = () => {
   const updateFighter = useCallback((fighter: Fighter, isPlayer1: boolean): Fighter => {
     let newFighter = { ...fighter };
     const keys = isPlayer1 ? player1Keys.current : player2Keys.current;
+    const fighterData = ENHANCED_FIGHTER_DATA[fighter.id] || ENHANCED_FIGHTER_DATA.leroy;
+    
+    // Update frame data timers
+    newFighter.frameData.hitstun = Math.max(0, newFighter.frameData.hitstun - 1);
+    newFighter.frameData.blockstun = Math.max(0, newFighter.frameData.blockstun - 1);
+    newFighter.frameData.invulnerable = Math.max(0, newFighter.frameData.invulnerable - 1);
     
     // Update animation timer
-    newFighter.animationTimer = (newFighter.animationTimer || 0) + 16;
+    newFighter.animationTimer++;
     
-    // Check if animation is complete for non-looping animations
-    const animationComplete = isAnimationComplete(fighter.id, fighter.state.current, newFighter.animationTimer);
-    
-    // Reset to idle if attack/hurt animation is complete
-    if (animationComplete && (fighter.state.current === 'attacking' || fighter.state.current === 'hurt' || fighter.state.current === 'special')) {
-      newFighter.state.current = 'idle';
-      newFighter.animationTimer = 0;
-    }
-
-    // Update frame data
-    if (newFighter.frameData.hitstun > 0) {
-      newFighter.frameData.hitstun--;
-      newFighter.state.current = 'hurt';
-    }
-    if (newFighter.frameData.blockstun > 0) {
-      newFighter.frameData.blockstun--;
-      newFighter.state.current = 'blocking';
+    // Update combo decay
+    if (newFighter.comboCount > 0) {
+      newFighter.comboDecay++;
+      if (newFighter.comboDecay > MAX_COMBO_DECAY) {
+        newFighter.comboCount = 0;
+        newFighter.comboDamage = 0;
+        newFighter.comboDecay = 0;
+      }
     }
     
-    // Update hitbox position
-    newFighter.hitbox = {
-      x: newFighter.x,
-      y: newFighter.y,
-      width: newFighter.width,
-      height: newFighter.height
-    };
-
-    // Regenerate stamina
-    if (newFighter.stamina < newFighter.maxStamina) {
-      newFighter.stamina = Math.min(newFighter.maxStamina, newFighter.stamina + 0.5);
+    // State management
+    if (newFighter.state.timer > 0) {
+      newFighter.state.timer--;
+      if (newFighter.state.timer === 0) {
+        if (newFighter.state.current === 'attacking' || newFighter.state.current === 'special') {
+          newFighter.state.current = 'idle';
+          newFighter.animationTimer = 0;
+        }
+      }
     }
-
-    // Handle input only if not in hitstun/blockstun
+    
+    // Only allow new actions if not in hitstun/blockstun
     if (newFighter.frameData.hitstun === 0 && newFighter.frameData.blockstun === 0) {
-      const fighterData = ENHANCED_FIGHTER_DATA[fighter.id];
-      
-      // Horizontal movement with walking animation
+      // Movement
       if (keys.left && newFighter.x > 50) {
         newFighter.x -= fighterData.stats.walkSpeed;
         newFighter.facing = 'left';
@@ -307,22 +327,22 @@ export const useEnhancedGameEngine = () => {
       }
 
       // Jumping
-      if (keys.up && newFighter.isGrounded) {
-        newFighter.velocity.y = fighterData.stats.jumpForce;
-        newFighter.isGrounded = false;
+      if (keys.up && newFighter.grounded) {
+        newFighter.velocityY = fighterData.stats.jumpForce;
+        newFighter.grounded = false;
         newFighter.state.current = 'jumping';
         newFighter.animationTimer = 0;
       }
 
       // Apply gravity and ground collision
-      if (!newFighter.isGrounded) {
-        newFighter.velocity.y += GRAVITY;
-        newFighter.y += newFighter.velocity.y;
+      if (!newFighter.grounded) {
+        newFighter.velocityY += GRAVITY;
+        newFighter.y += newFighter.velocityY;
         
         if (newFighter.y >= GROUND_Y - newFighter.height) {
           newFighter.y = GROUND_Y - newFighter.height;
-          newFighter.velocity.y = 0;
-          newFighter.isGrounded = true;
+          newFighter.velocityY = 0;
+          newFighter.grounded = true;
           if (newFighter.state.current === 'jumping') {
             newFighter.state.current = 'idle';
             newFighter.animationTimer = 0;
@@ -335,8 +355,7 @@ export const useEnhancedGameEngine = () => {
         newFighter.state.current = 'attacking';
         newFighter.animationTimer = 0;
         newFighter.state.timer = 20;
-        const audioKey = Math.random() > 0.5 ? 'punch1' : 'punch2';
-        audioManager.playSound(audioKey);
+        audioManager.playEffect('hit');
         
         // Add visual effects
         visualEffects.addScreenShake(3, 100);
@@ -393,425 +412,163 @@ export const useEnhancedGameEngine = () => {
           let newFighter1 = updateFighter(newState.fighters.player1, true);
           let newFighter2 = updateFighter(newState.fighters.player2, false);
 
-          // Check fighter vs fighter collision
-          const collision = checkCollision(
-            newFighter1.hitbox,
-            newFighter2.hitbox
-          );
+          // Basic collision detection
+          const fighter1Hitbox = newFighter1.hitbox || { x: newFighter1.x, y: newFighter1.y, width: newFighter1.width, height: newFighter1.height };
+          const fighter2Hitbox = newFighter2.hitbox || { x: newFighter2.x, y: newFighter2.y, width: newFighter2.width, height: newFighter2.height };
 
-          if (collision && newFighter1.state.current === 'attacking' && newFighter2.state.current !== 'hurt') {
-            const damage = newFighter2.state.current === 'blocking' ? 5 : 15;
-            newFighter2.health = Math.max(0, newFighter2.health - damage);
-            
-            if (newFighter2.state.current === 'blocking') {
-              audioManager.playSound('block');
-              visualEffects.addHitSpark(newFighter2.x + newFighter2.width/2, newFighter2.y + newFighter2.height/2, 'block');
-              visualEffects.addScreenShake(2, 100);
-            } else {
-              newFighter2.state.current = 'hurt';
-              newFighter2.animationTimer = 0;
-              newFighter2.state.timer = 15;
-              audioManager.playSound('hit1');
-              visualEffects.addHitSpark(newFighter2.x + newFighter2.width/2, newFighter2.y + newFighter2.height/2, 'impact');
-              visualEffects.addScreenShake(5, 150);
+          if (checkCollision(fighter1Hitbox, fighter2Hitbox)) {
+            // Handle collision
+            if (newFighter1.state.current === 'attacking' && newFighter2.state.current !== 'blocking') {
+              newFighter2.health = Math.max(0, newFighter2.health - 10);
+              audioManager.playEffect('hit');
+              visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
+            } else if (newFighter1.state.current === 'attacking' && newFighter2.state.current === 'blocking') {
+              audioManager.playEffect('block');
+              visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'block');
             }
-          } else if (collision && newFighter2.state.current === 'attacking' && newFighter1.state.current !== 'hurt') {
-            const damage = newFighter1.state.current === 'blocking' ? 5 : 15;
-            newFighter1.health = Math.max(0, newFighter1.health - damage);
-            
-            if (newFighter1.state.current === 'blocking') {
-              audioManager.playSound('block');
-              visualEffects.addHitSpark(newFighter1.x + newFighter1.width/2, newFighter1.y + newFighter1.height/2, 'block');
-              visualEffects.addScreenShake(2, 100);
-            } else {
-              newFighter1.state.current = 'hurt';
-              newFighter1.animationTimer = 0;
-              newFighter1.state.timer = 15;
-              audioManager.playSound('hit1');
-              visualEffects.addHitSpark(newFighter1.x + newFighter1.width/2, newFighter1.y + newFighter1.height/2, 'impact');
-              visualEffects.addScreenShake(5, 150);
+
+            if (newFighter2.state.current === 'attacking' && newFighter1.state.current !== 'blocking') {
+              newFighter1.health = Math.max(0, newFighter1.health - 10);
+              audioManager.playEffect('hit');
+              visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
             }
           }
-
-          // Handle special moves with projectiles
-          const player1SpecialResult = checkSpecialMoves(newFighter1);
-          if (player1SpecialResult.move) {
-            newFighter1.state.current = 'special';
-            newFighter1.animationTimer = 0;
-            newFighter1.state.timer = 30;
-            audioManager.playSound('special1');
-            visualEffects.addFlashEffect(newFighter1.colors.aura, 0.4, 200);
-            
-            if (player1SpecialResult.move.type === 'projectile' && player1SpecialResult.move.projectile) {
-              const projectileX = newFighter1.facing === 'right' ? 
-                newFighter1.x + newFighter1.width : 
-                newFighter1.x - player1SpecialResult.move.projectile.size;
-              const projectileY = newFighter1.y + newFighter1.height / 2;
-              
-              addProjectile(projectileX, projectileY, newFighter1.facing, player1SpecialResult.move, 'player1');
-            }
-          }
-
-          const player2SpecialResult = checkSpecialMoves(newFighter2);
-          if (player2SpecialResult.move) {
-            newFighter2.state.current = 'special';
-            newFighter2.animationTimer = 0;
-            newFighter2.state.timer = 30;
-            audioManager.playSound('special1');
-            visualEffects.addFlashEffect(newFighter2.colors.aura, 0.4, 200);
-            
-            if (player2SpecialResult.move.type === 'projectile' && player2SpecialResult.move.projectile) {
-              const projectileX = newFighter2.facing === 'right' ? 
-                newFighter2.x + newFighter2.width : 
-                newFighter2.x - player2SpecialResult.move.projectile.size;
-              const projectileY = newFighter2.y + newFighter2.height / 2;
-              
-              addProjectile(projectileX, projectileY, newFighter2.facing, player2SpecialResult.move, 'player2');
-            }
-          }
-
-          // Check projectile hits
-          const hitProjectiles = checkProjectileHits(projectiles, [newFighter1, newFighter2]);
-          
-          hitProjectiles.forEach(hit => {
-            if (hit.target === 'player1') {
-              const damage = newFighter1.state.current === 'blocking' ? hit.damage * 0.3 : hit.damage;
-              newFighter1.health = Math.max(0, newFighter1.health - damage);
-              
-              if (newFighter1.state.current === 'blocking') {
-                audioManager.playSound('block');
-                visualEffects.addHitSpark(newFighter1.x + newFighter1.width/2, newFighter1.y + newFighter1.height/2, 'block');
-                visualEffects.addScreenShake(3, 150);
-              } else {
-                newFighter1.state.current = 'hurt';
-                newFighter1.animationTimer = 0;
-                newFighter1.state.timer = 20;
-                audioManager.playSound('hit2');
-                visualEffects.addHitSpark(newFighter1.x + newFighter1.width/2, newFighter1.y + newFighter1.height/2, 'impact');
-                visualEffects.addScreenShake(8, 200);
-              }
-            } else if (hit.target === 'player2') {
-              const damage = newFighter2.state.current === 'blocking' ? hit.damage * 0.3 : hit.damage;
-              newFighter2.health = Math.max(0, newFighter2.health - damage);
-              
-              if (newFighter2.state.current === 'blocking') {
-                audioManager.playSound('block');
-                visualEffects.addHitSpark(newFighter2.x + newFighter2.width/2, newFighter2.y + newFighter2.height/2, 'block');
-                visualEffects.addScreenShake(3, 150);
-              } else {
-                newFighter2.state.current = 'hurt';
-                newFighter2.animationTimer = 0;
-                newFighter2.state.timer = 20;
-                audioManager.playSound('hit2');
-                visualEffects.addHitSpark(newFighter2.x + newFighter2.width/2, newFighter2.y + newFighter2.height/2, 'impact');
-                visualEffects.addScreenShake(8, 200);
-              }
-            }
-          });
 
           newState.fighters.player1 = newFighter1;
           newState.fighters.player2 = newFighter2;
         }
-        
-        // Update projectiles
-        updateProjectiles();
-        
-        // Update particles
-        updateParticles();
-        
-        // Check for winner
-        if (newState.fighters.player1 && newState.fighters.player1.health <= 0) {
-          newState.fighters.player1.state.current = 'ko';
-          newState.fighters.player1.animationTimer = 0;
-          if (newState.fighters.player2) {
-            newState.fighters.player2.state.current = 'victory';
-            newState.fighters.player2.animationTimer = 0;
-          }
-          newState.winner = 'Player 2';
-          newState.screen = 'gameOver';
-          audioManager.playSound('victory');
-        } else if (newState.fighters.player2 && newState.fighters.player2.health <= 0) {
-          newState.fighters.player2.state.current = 'ko';
-          newState.fighters.player2.animationTimer = 0;
-          if (newState.fighters.player1) {
-            newState.fighters.player1.state.current = 'victory';
-            newState.fighters.player1.animationTimer = 0;
-          }
-          newState.winner = 'Player 1';
-          newState.screen = 'gameOver';
-          audioManager.playSound('victory');
+
+        // Update timer
+        if (newState.timer > 0) {
+          newState.timer -= 0.016; // 60 FPS
         }
-        
+
+        // Check for round end
+        if (newState.fighters.player1?.health === 0) {
+          newState.fighters.player1.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
+          newState.winner = 'player2';
+          audioManager.playEffect('ko');
+        } else if (newState.fighters.player2?.health === 0) {
+          newState.fighters.player2.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
+          newState.winner = 'player1';
+          audioManager.playEffect('ko');
+        } else if (newState.timer <= 0) {
+          // Time up
+          if (newState.fighters.player1.health > newState.fighters.player2.health) {
+            newState.winner = 'player1';
+          } else if (newState.fighters.player2.health > newState.fighters.player1.health) {
+            newState.winner = 'player2';
+          } else {
+            newState.winner = 'draw';
+          }
+          audioManager.playEffect('round-start');
+        }
+
         return newState;
       });
     }
-    
-    render();
-    
-    if (gameState.screen === 'fighting') {
-      requestAnimationFrame(gameLoop);
-    }
-  }, [gameState.screen, updateFighter, updateProjectiles, updateParticles, checkCollision, checkSpecialMoves, audioManager, visualEffects, addProjectile, checkProjectileHits, projectiles]);
 
-  const render = useCallback(() => {
-    if (!canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    updateParticles();
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
+  }, [gameState.screen, updateFighter, updateParticles, checkCollision, audioManager, visualEffects]);
 
-    // Get screen shake offset
-    const shakeOffset = visualEffects.getShakeOffset();
-    
-    ctx.save();
-    ctx.translate(shakeOffset.x, shakeOffset.y);
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Enhanced background with atmospheric effects
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#16213e');
-    gradient.addColorStop(1, '#0f1419');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Enhanced ground with texture
-    const groundGradient = ctx.createLinearGradient(0, canvas.height - 100, 0, canvas.height);
-    groundGradient.addColorStop(0, '#3a3a3a');
-    groundGradient.addColorStop(1, '#2a2a2a');
-    ctx.fillStyle = groundGradient;
-    ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
-
-    // Fighting arena markings
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([10, 5]);
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, canvas.height - 100);
-    ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Draw projectiles with enhanced effects
-    projectiles.forEach(projectile => {
-      // Draw projectile trail
-      visualEffects.drawProjectileTrail(ctx, projectile);
-      
-      // Draw main projectile
-      ctx.fillStyle = projectile.color;
-      ctx.shadowColor = projectile.color;
-      ctx.shadowBlur = 15;
-      ctx.fillRect(projectile.x, projectile.y, projectile.width, projectile.height);
-      ctx.shadowBlur = 0;
-    });
-
-    // Draw fighters using enhanced sprite system with visual effects
-    if (gameState.fighters.player1 && gameState.fighters.player2) {
-      const shakeEffects = {
-        screenShake: shakeOffset,
-        hurt: false,
-        special: false,
-        blocking: false,
-        glow: undefined,
-        alpha: 1
-      };
-
-      // Player 1 effects
-      const p1Effects = { ...shakeEffects };
-      p1Effects.hurt = gameState.fighters.player1.state.current === 'hurt';
-      p1Effects.special = gameState.fighters.player1.state.current === 'special';
-      p1Effects.blocking = gameState.fighters.player1.state.current === 'blocking';
-      if (p1Effects.special) p1Effects.glow = gameState.fighters.player1.colors.aura;
-
-      // Player 2 effects
-      const p2Effects = { ...shakeEffects };
-      p2Effects.hurt = gameState.fighters.player2.state.current === 'hurt';
-      p2Effects.special = gameState.fighters.player2.state.current === 'special';
-      p2Effects.blocking = gameState.fighters.player2.state.current === 'blocking';
-      if (p2Effects.special) p2Effects.glow = gameState.fighters.player2.colors.aura;
-
-      drawEnhancedFighter(ctx, gameState.fighters.player1, gameState.fighters.player1.animationTimer || 0, p1Effects);
-      drawEnhancedFighter(ctx, gameState.fighters.player2, gameState.fighters.player2.animationTimer || 0, p2Effects);
-    }
-
-    // Draw hit sparks and visual effects
-    visualEffects.drawHitSparks(ctx);
-
-    // Draw particles with enhanced rendering
-    gameState.particles.forEach((particle, index) => {
-      const alpha = particle.life / particle.maxLife;
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = particle.color;
-      ctx.shadowColor = particle.color;
-      ctx.shadowBlur = particle.size;
-      ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
-      ctx.shadowBlur = 0;
-    });
-    ctx.globalAlpha = 1;
-
-    ctx.restore();
-
-    // Draw flash effect overlay (outside of shake transform)
-    const flashOpacity = visualEffects.getFlashOpacity();
-    if (flashOpacity > 0) {
-      ctx.save();
-      ctx.globalAlpha = flashOpacity;
-      ctx.fillStyle = visualEffects.flashEffect.color;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-    }
-
-  }, [gameState, drawEnhancedFighter, projectiles, visualEffects]);
-
-  // Initialize fighters when component mounts
+  // Initialize game
   useEffect(() => {
     initializeFighters();
-    
-    // Register animation callbacks for sound effects
-    registerAnimationCallback('player1', (event: string) => {
-      if (event === 'footstep') audioManager.playSound('footstep');
-      if (event === 'impact') audioManager.playSound('impact');
-    });
-    
-    registerAnimationCallback('player2', (event: string) => {
-      if (event === 'footstep') audioManager.playSound('footstep');
-      if (event === 'impact') audioManager.playSound('impact');
-    });
-  }, [initializeFighters, registerAnimationCallback, audioManager]);
+  }, [initializeFighters]);
 
-  // Keyboard event handlers
+  // Start game loop
+  useEffect(() => {
+    if (gameState.screen === 'fighting') {
+      animationFrameRef.current = requestAnimationFrame(gameLoop);
+    }
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [gameLoop]);
+
+  // Keyboard input handling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Player 1 controls (WASD + JK)
-      switch(e.key.toLowerCase()) {
-        case 'a':
-          player1Keys.current.left = true;
-          break;
-        case 'd':
-          player1Keys.current.right = true;
-          break;
-        case 'w':
-          player1Keys.current.up = true;
-          break;
-        case 's':
-          player1Keys.current.down = true;
-          break;
-        case 'j':
-          player1Keys.current.punch = true;
-          break;
-        case 'k':
-          player1Keys.current.block = true;
-          break;
+      const key = e.key.toLowerCase();
+      
+      // Player 1 controls
+      if (['w', 'a', 's', 'd', 'j', 'k'].includes(key)) {
+        const mapping: Record<string, string> = {
+          'w': 'up',
+          'a': 'left', 
+          's': 'down',
+          'd': 'right',
+          'j': 'punch',
+          'k': 'block'
+        };
+        player1Keys.current[mapping[key]] = true;
       }
 
-      // Player 2 controls (Arrow keys + 1,2)
-      switch(e.key) {
-        case 'ArrowLeft':
-          player2Keys.current.left = true;
-          break;
-        case 'ArrowRight':
-          player2Keys.current.right = true;
-          break;
-        case 'ArrowUp':
-          player2Keys.current.up = true;
-          break;
-        case 'ArrowDown':
-          player2Keys.current.down = true;
-          break;
-        case '1':
-          player2Keys.current.punch = true;
-          break;
-        case '2':
-          player2Keys.current.block = true;
-          break;
+      // Player 2 controls
+      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2'].includes(key)) {
+        const mapping: Record<string, string> = {
+          'arrowup': 'up',
+          'arrowleft': 'left',
+          'arrowdown': 'down', 
+          'arrowright': 'right',
+          '1': 'punch',
+          '2': 'block'
+        };
+        player2Keys.current[mapping[key]] = true;
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      
       // Player 1 controls
-      switch(e.key.toLowerCase()) {
-        case 'a':
-          player1Keys.current.left = false;
-          break;
-        case 'd':
-          player1Keys.current.right = false;
-          break;
-        case 'w':
-          player1Keys.current.up = false;
-          break;
-        case 's':
-          player1Keys.current.down = false;
-          break;
-        case 'j':
-          player1Keys.current.punch = false;
-          break;
-        case 'k':
-          player1Keys.current.block = false;
-          break;
+      if (['w', 'a', 's', 'd', 'j', 'k'].includes(key)) {
+        const mapping: Record<string, string> = {
+          'w': 'up',
+          'a': 'left',
+          's': 'down',
+          'd': 'right',
+          'j': 'punch',
+          'k': 'block'
+        };
+        player1Keys.current[mapping[key]] = false;
       }
 
       // Player 2 controls
-      switch(e.key) {
-        case 'ArrowLeft':
-          player2Keys.current.left = false;
-          break;
-        case 'ArrowRight':
-          player2Keys.current.right = false;
-          break;
-        case 'ArrowUp':
-          player2Keys.current.up = false;
-          break;
-        case 'ArrowDown':
-          player2Keys.current.down = false;
-          break;
-        case '1':
-          player2Keys.current.punch = false;
-          break;
-        case '2':
-          player2Keys.current.block = false;
-          break;
+      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2'].includes(key)) {
+        const mapping: Record<string, string> = {
+          'arrowup': 'up',
+          'arrowleft': 'left',
+          'arrowdown': 'down',
+          'arrowright': 'right', 
+          '1': 'punch',
+          '2': 'block'
+        };
+        player2Keys.current[mapping[key]] = false;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-
+    
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
-  // Start the game loop
-  useEffect(() => {
-    if (gameState.screen === 'fighting') {
-      const loop = () => {
-        gameLoop();
-        if (gameState.screen === 'fighting') {
-          animationFrameRef.current = requestAnimationFrame(loop);
-        }
-      };
-      animationFrameRef.current = requestAnimationFrame(loop);
-    }
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [gameState.screen, gameLoop]);
-
   const handleMobileInput = useCallback((player: number, input: string, pressed: boolean) => {
-    const keys = player === 1 ? player1Keys.current : player2Keys.current;
-    keys[input] = pressed;
+    const targetKeys = player === 1 ? player1Keys.current : player2Keys.current;
+    targetKeys[input] = pressed;
   }, []);
 
   return {
     canvasRef,
     gameState,
-    setGameState,
     initializeFighters,
     handleMobileInput
   };

@@ -50,7 +50,7 @@ export interface FrameData {
 }
 
 export interface FighterState {
-  current: 'idle' | 'walking' | 'attacking' | 'blocking' | 'hurt' | 'jumping' | 'crouching' | 'special' | 'stunned' | 'ko';
+  current: 'idle' | 'walking' | 'attacking' | 'blocking' | 'hurt' | 'jumping' | 'crouching' | 'special' | 'stunned' | 'ko' | 'victory';
   timer: number;
   canCancel: boolean;
   frameAdvantage: number;
@@ -105,6 +105,25 @@ export interface Fighter {
     secondary: string;
     aura: string;
   };
+  // Enhanced animation and collision system
+  animation?: {
+    currentFrame: number;
+    frameTimer: number;
+    sequence: string;
+    currentMove?: string;
+  };
+  hitbox?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  // Combat enhancement properties
+  superMeter?: number;
+  maxSuperMeter?: number;
+  comboCount?: number;
+  comboDamage?: number;
+  comboDecay?: number;
 }
 
 export interface FighterData {

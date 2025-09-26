@@ -188,18 +188,18 @@ const EnhancedGameCanvas = () => {
         </div>
 
         {/* Special Move Indicators */}
-        {gameState.fighters.player1?.state === 'special' && (
+        {gameState.fighters.player1?.state.current === 'special' && (
           <div className="absolute top-1/2 left-8 transform -translate-y-1/2 z-20">
             <div className="text-neon-cyan font-retro text-xl font-bold animate-pulse">
-              {gameState.fighters.player1.animation.currentMove}
+              {gameState.fighters.player1.animation?.currentMove || 'SPECIAL MOVE'}
             </div>
           </div>
         )}
         
-        {gameState.fighters.player2?.state === 'special' && (
+        {gameState.fighters.player2?.state.current === 'special' && (
           <div className="absolute top-1/2 right-8 transform -translate-y-1/2 z-20">
             <div className="text-neon-pink font-retro text-xl font-bold animate-pulse">
-              {gameState.fighters.player2.animation.currentMove}
+              {gameState.fighters.player2.animation?.currentMove || 'SPECIAL MOVE'}
             </div>
           </div>
         )}
@@ -221,17 +221,17 @@ const EnhancedGameCanvas = () => {
 
         {/* Mobile Controls */}
       <EnhancedMobileControls 
-        onTouch={handleMobileInput}
+        onTouch={(action, pressed) => handleMobileInput(1, action, pressed)}
         onGesture={(gesture) => {
           // Map gestures to actions
           switch (gesture) {
-            case 'swipe-left': handleMobileInput('left', true); break;
-            case 'swipe-right': handleMobileInput('right', true); break;
-            case 'swipe-up': handleMobileInput('up', true); break;
-            case 'swipe-down': handleMobileInput('down', true); break;
-            case 'tap': handleMobileInput('punch', true); break;
-            case 'double-tap': handleMobileInput('kick', true); break;
-            case 'hold': handleMobileInput('block', true); break;
+            case 'swipe-left': handleMobileInput(1, 'left', true); break;
+            case 'swipe-right': handleMobileInput(1, 'right', true); break;
+            case 'swipe-up': handleMobileInput(1, 'up', true); break;
+            case 'swipe-down': handleMobileInput(1, 'down', true); break;
+            case 'tap': handleMobileInput(1, 'punch', true); break;
+            case 'double-tap': handleMobileInput(1, 'kick', true); break;
+            case 'hold': handleMobileInput(1, 'block', true); break;
           }
         }}
       />

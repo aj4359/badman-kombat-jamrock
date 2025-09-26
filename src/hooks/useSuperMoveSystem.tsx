@@ -24,16 +24,16 @@ export const useSuperMoveSystem = () => {
             ...fighter,
             superMeter: 0, // Consume full super meter
             inputBuffer: [], // Clear buffer
-            state: 'special',
+            state: { current: 'special', timer: 60, canCancel: false, frameAdvantage: 0 },
             frameData: {
               ...fighter.frameData,
               invulnerable: superMove.invulnerable ? superMove.frames.startup : 0
             },
             animation: { 
-              ...fighter.animation, 
-              currentMove: superMove.name,
-              timer: 0,
-              duration: superMove.frames.startup + superMove.frames.active + superMove.frames.recovery
+              currentFrame: 0,
+              frameTimer: 0,
+              sequence: 'super',
+              currentMove: superMove.name
             }
           }
         };
