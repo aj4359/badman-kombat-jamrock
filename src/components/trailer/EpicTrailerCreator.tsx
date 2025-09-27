@@ -885,17 +885,24 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     animateScene();
   };
 
+  const previewAnimationRef = useRef<boolean>(false);
+  const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const previewTrailer = () => {
     if (!canvasRef.current) return;
 
-    setIsPreviewPlaying(!isPreviewPlaying);
+    const wasPlaying = isPreviewPlaying;
+    setIsPreviewPlaying(!wasPlaying);
     
-    if (!isPreviewPlaying) {
+    if (!wasPlaying) {
       // Start preview animation
+      previewAnimationRef.current = true;
       let sceneIndex = 0;
+      
       const previewAnimation = () => {
-        if (sceneIndex >= TRAILER_SCRIPT.length || !isPreviewPlaying) {
+        if (sceneIndex >= TRAILER_SCRIPT.length || !previewAnimationRef.current) {
           setIsPreviewPlaying(false);
+          previewAnimationRef.current = false;
           return;
         }
 
@@ -903,16 +910,21 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
         renderScene(scene, canvasRef.current!, 0);
         setCurrentScene(sceneIndex);
 
-        setTimeout(() => {
+        previewTimeoutRef.current = setTimeout(() => {
           sceneIndex++;
           previewAnimation();
         }, 1000); // Faster preview
       };
       previewAnimation();
     } else {
-      // Stop preview and stop all audio
+      // Stop preview immediately
+      previewAnimationRef.current = false;
+      if (previewTimeoutRef.current) {
+        clearTimeout(previewTimeoutRef.current);
+        previewTimeoutRef.current = null;
+      }
       audioManager.stopAllAudio();
-      console.log('Trailer preview stopped - all audio stopped');
+      console.log('Trailer preview stopped - all audio stopped, timeouts cleared');
     }
   };
 
