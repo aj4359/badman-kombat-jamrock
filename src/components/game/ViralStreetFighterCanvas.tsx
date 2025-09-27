@@ -29,13 +29,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     initializeFighters
   } = useEnhancedGameEngine();
 
-  // Single initialization to prevent loops
+  // Single initialization to prevent loops - FIXED DEPENDENCIES
   useEffect(() => {
-    if (!initializationRef.current && !gameState.fighters?.player1) {
+    if (!initializationRef.current) {
       initializationRef.current = true;
       initializeFighters();
     }
-  }, [initializeFighters, gameState.fighters?.player1]);
+  }, []); // Empty dependency array - initialize only once on mount
   
   const { processAudioEvent } = useEnhancedAudioSystem();
   const { 
@@ -253,7 +253,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       {/* Debug Panel - Remove this once fighters are working */}
       <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
         <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
-        <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✗' : '✗'} P2</div>
+        <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✓' : '✗'} P2</div>
         <div>Sprites: ✓ Direct Rendering</div>
         <div>Game State: {gameState.screen}</div>
         <div className="text-xs mt-1">
