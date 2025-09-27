@@ -7,7 +7,7 @@ import { EpicTrailerCreator } from '@/components/trailer/EpicTrailerCreator';
 import { useEnhancedInputSystem } from '@/components/gameplay/EnhancedInputSystem';
 import { cn } from '@/lib/utils';
 
-export const ProfessionalGameCanvas: React.FC = () => {
+const ProfessionalGameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioManager = useAudioManager();
   const [showDebug, setShowDebug] = useState(false);
