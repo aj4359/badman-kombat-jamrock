@@ -1,155 +1,90 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-
-interface CrowdAudioState {
-  isLoaded: boolean;
-  isPlaying: boolean;
-  volume: number;
-  intensity: 'low' | 'medium' | 'high';
-}
+import { useCallback, useRef, useEffect } from 'react';
 
 export const useCrowdAudio = () => {
-  const [state, setState] = useState<CrowdAudioState>({
-    isLoaded: false,
-    isPlaying: false,
-    volume: 0.3,
-    intensity: 'low'
-  });
+  const crowdCheer = useRef<HTMLAudioElement | null>(null);
+  const crowdBoo = useRef<HTMLAudioElement | null>(null);
+  const crowdGasp = useRef<HTMLAudioElement | null>(null);
 
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-  const crowdSourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const bufferRef = useRef<AudioBuffer | null>(null);
-
-  // Initialize audio context and load crowd sounds
   useEffect(() => {
-    const initAudio = async () => {
-      try {
-        audioContextRef.current = new AudioContext();
-        gainNodeRef.current = audioContextRef.current.createGain();
-        gainNodeRef.current.connect(audioContextRef.current.destination);
-        gainNodeRef.current.gain.value = state.volume;
+    // Initialize crowd audio elements
+    crowdCheer.current = new Audio('/assets/audio/crowd-cheer.mp3');
+    crowdBoo.current = new Audio('/assets/audio/crowd-boo.mp3');
+    crowdGasp.current = new Audio('/assets/audio/crowd-gasp.mp3');
 
-        // Create synthetic crowd noise using white noise and filtering
-        const bufferSize = audioContextRef.current.sampleRate * 2; // 2 seconds
-        const buffer = audioContextRef.current.createBuffer(2, bufferSize, audioContextRef.current.sampleRate);
-        
-        for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-          const channelData = buffer.getChannelData(channel);
-          for (let i = 0; i < bufferSize; i++) {
-            // Create crowd-like noise with varying intensity
-            channelData[i] = (Math.random() * 2 - 1) * 0.1 * (1 + Math.sin(i / 1000) * 0.5);
-          }
-        }
-        
-        bufferRef.current = buffer;
-        setState(prev => ({ ...prev, isLoaded: true }));
-      } catch (error) {
-        console.error('Failed to initialize crowd audio:', error);
+    // Set volume and loop for ambient crowd
+    [crowdCheer.current, crowdBoo.current, crowdGasp.current].forEach(audio => {
+      if (audio) {
+        audio.volume = 0.3;
+        audio.preload = 'auto';
       }
-    };
-
-    initAudio();
+    });
 
     return () => {
-      if (crowdSourceRef.current) {
-        crowdSourceRef.current.stop();
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
+      // Cleanup audio on unmount
+      [crowdCheer.current, crowdBoo.current, crowdGasp.current].forEach(audio => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
     };
   }, []);
 
-  const playCrowdReaction = useCallback((type: 'cheer' | 'gasp' | 'boo' | 'silence', duration: number = 2000) => {
-    if (!audioContextRef.current || !gainNodeRef.current || !bufferRef.current) return;
-
-    // Stop current sound
-    if (crowdSourceRef.current) {
-      crowdSourceRef.current.stop();
-    }
-
-    if (type === 'silence') {
-      setState(prev => ({ ...prev, isPlaying: false }));
-      return;
-    }
-
-    const source = audioContextRef.current.createBufferSource();
-    const filter = audioContextRef.current.createBiquadFilter();
-    const compressor = audioContextRef.current.createDynamicsCompressor();
-    
-    source.buffer = bufferRef.current;
-    source.loop = true;
-
-    // Configure filter based on crowd reaction type
-    switch (type) {
-      case 'cheer':
-        filter.type = 'highpass';
-        filter.frequency.value = 200;
-        gainNodeRef.current.gain.value = state.volume * 0.8;
-        setState(prev => ({ ...prev, intensity: 'high' }));
-        break;
-      case 'gasp':
-        filter.type = 'bandpass';
-        filter.frequency.value = 800;
-        filter.Q.value = 5;
-        gainNodeRef.current.gain.value = state.volume * 0.4;
-        setState(prev => ({ ...prev, intensity: 'medium' }));
-        break;
-      case 'boo':
-        filter.type = 'lowpass';
-        filter.frequency.value = 400;
-        gainNodeRef.current.gain.value = state.volume * 0.6;
-        setState(prev => ({ ...prev, intensity: 'medium' }));
-        break;
-    }
-
-    // Connect audio nodes
-    source.connect(filter);
-    filter.connect(compressor);
-    compressor.connect(gainNodeRef.current);
-
-    crowdSourceRef.current = source;
-    source.start();
-    setState(prev => ({ ...prev, isPlaying: true }));
-
-    // Auto-stop after duration
-    setTimeout(() => {
-      if (source === crowdSourceRef.current) {
-        source.stop();
-        setState(prev => ({ ...prev, isPlaying: false, intensity: 'low' }));
-        crowdSourceRef.current = null;
-      }
-    }, duration);
-  }, [state.volume]);
-
-  const setIntensity = useCallback((intensity: 'low' | 'medium' | 'high') => {
-    setState(prev => ({ ...prev, intensity }));
-    if (gainNodeRef.current) {
-      const volumeMap = { low: 0.2, medium: 0.5, high: 0.8 };
-      gainNodeRef.current.gain.value = state.volume * volumeMap[intensity];
-    }
-  }, [state.volume]);
-
-  const setVolume = useCallback((volume: number) => {
-    setState(prev => ({ ...prev, volume }));
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = volume;
+  const playCheer = useCallback(() => {
+    if (crowdCheer.current) {
+      crowdCheer.current.currentTime = 0;
+      crowdCheer.current.play().catch(console.warn);
     }
   }, []);
 
-  const stopCrowd = useCallback(() => {
-    if (crowdSourceRef.current) {
-      crowdSourceRef.current.stop();
-      crowdSourceRef.current = null;
+  const playBoo = useCallback(() => {
+    if (crowdBoo.current) {
+      crowdBoo.current.currentTime = 0;
+      crowdBoo.current.play().catch(console.warn);
     }
-    setState(prev => ({ ...prev, isPlaying: false }));
+  }, []);
+
+  const playGasp = useCallback(() => {
+    if (crowdGasp.current) {
+      crowdGasp.current.currentTime = 0;
+      crowdGasp.current.play().catch(console.warn);
+    }
+  }, []);
+
+  const playCrowdReaction = useCallback((type: 'cheer' | 'boo' | 'gasp', duration?: number) => {
+    switch (type) {
+      case 'cheer': playCheer(); break;
+      case 'boo': playBoo(); break;  
+      case 'gasp': playGasp(); break;
+    }
+    // Duration parameter is for future implementation of timed reactions
+  }, [playCheer, playBoo, playGasp]);
+
+  const setIntensity = useCallback((intensity: string | number) => {
+    // Adjust crowd volume based on fight intensity
+    let volume = 0.3;
+    if (typeof intensity === 'string') {
+      switch (intensity) {
+        case 'low': volume = 0.2; break;
+        case 'medium': volume = 0.4; break;
+        case 'high': volume = 0.6; break;
+      }
+    } else {
+      volume = Math.min(0.6, 0.2 + intensity * 0.4);
+    }
+    
+    [crowdCheer.current, crowdBoo.current, crowdGasp.current].forEach(audio => {
+      if (audio) {
+        audio.volume = volume;
+      }
+    });
   }, []);
 
   return {
-    ...state,
+    playCheer,
+    playBoo,
+    playGasp,
     playCrowdReaction,
-    setIntensity,
-    setVolume,
-    stopCrowd
+    setIntensity
   };
 };

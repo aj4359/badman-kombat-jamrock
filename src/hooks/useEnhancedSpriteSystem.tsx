@@ -35,9 +35,9 @@ export interface FighterSprites {
   ko: EnhancedSpriteAnimation;
 }
 
-// Define frame dimensions
-const FRAME_WIDTH = 64;
-const FRAME_HEIGHT = 64;
+// Define frame dimensions - increased for Street Fighter detail
+const FRAME_WIDTH = 128;
+const FRAME_HEIGHT = 96;
 
 // Helper function to create sprite frames
 const createSpriteFrames = (row: number, count: number): SpriteFrame[] => {

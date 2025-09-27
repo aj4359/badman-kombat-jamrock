@@ -3,6 +3,7 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useEnhancedSpriteSystem } from '@/hooks/useEnhancedSpriteSystem';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { useFightCommentary } from '@/hooks/useFightCommentary';
+import { useCrowdAudio } from '@/hooks/useCrowdAudio';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EnhancedMobileControls } from '@/components/game/EnhancedMobileControls';
@@ -15,6 +16,7 @@ const EnhancedGameCanvas = () => {
   const { drawEnhancedFighter, isLoaded: spritesLoaded } = useEnhancedSpriteSystem();
   const { playEffect, isLoaded, audioErrors, toggleMute, settings, initializeAudioContext } = useAudioManager();
   const { commentary, triggerCommentary, hideCommentary } = useFightCommentary();
+  const { playCheer, playBoo, playGasp } = useCrowdAudio();
   const [gameInitialized, setGameInitialized] = useState(false);
 
   // Enhanced game rendering
@@ -36,7 +38,10 @@ const EnhancedGameCanvas = () => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw ground
+    // Draw crowd in background
+    renderCrowdBackground(ctx, canvas.width, canvas.height);
+    
+    // Draw fighting arena ground
     ctx.fillStyle = 'hsl(30, 15%, 25%)';
     ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
 
@@ -69,6 +74,39 @@ const EnhancedGameCanvas = () => {
       drawEnhancedFighter(ctx, gameState.fighters.player2, effects);
     }
   }, [canvasRef, spritesLoaded, drawEnhancedFighter, gameState]);
+
+  // Render crowd background
+  const renderCrowdBackground = useCallback((ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) => {
+    // Stadium background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight * 0.6);
+    gradient.addColorStop(0, 'hsl(240, 30%, 8%)');
+    gradient.addColorStop(1, 'hsl(200, 25%, 12%)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight * 0.6);
+    
+    // Crowd silhouettes
+    ctx.fillStyle = 'hsl(0, 0%, 5%)';
+    for (let i = 0; i < 20; i++) {
+      const x = (canvasWidth / 20) * i;
+      const height = 40 + Math.random() * 20;
+      // Left side crowd
+      ctx.fillRect(x, canvasHeight * 0.3, canvasWidth / 20, height);
+      // Right side crowd
+      ctx.fillRect(x, canvasHeight * 0.35, canvasWidth / 20, height);
+    }
+    
+    // Stadium lights
+    ctx.fillStyle = 'hsl(60, 100%, 80%)';
+    ctx.shadowColor = 'hsl(60, 100%, 50%)';
+    ctx.shadowBlur = 20;
+    for (let i = 0; i < 4; i++) {
+      const x = (canvasWidth / 4) * i + canvasWidth / 8;
+      ctx.beginPath();
+      ctx.arc(x, canvasHeight * 0.15, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+  }, []);
 
   useEffect(() => {
     console.log('Game Canvas mounted');

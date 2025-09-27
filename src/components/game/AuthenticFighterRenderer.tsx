@@ -127,30 +127,30 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   const w = fighter.width;
   const h = fighter.height;
   
-  // Street Fighter proportions - larger head, muscular build
-  const headSize = h * 0.25;
-  const torsoSize = h * 0.45;
-  const legSize = h * 0.3;
+  // Enhanced Street Fighter proportions - bigger, more muscular build
+  const headSize = h * 0.35; // Larger head like Street Fighter
+  const torsoSize = h * 0.5;  // Bigger torso
+  const legSize = h * 0.35;   // Thicker legs
   
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
   ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
   
-  // Legs with Street Fighter stance
+  // Thicker muscular legs with Street Fighter stance
   ctx.fillStyle = 'hsl(220, 50%, 30%)'; // Jeans
-  // Left leg
-  ctx.fillRect(w * 0.25, h * 0.7, w * 0.18, legSize);
-  // Right leg (fighting stance)
-  ctx.fillRect(w * 0.57, h * 0.7, w * 0.18, legSize);
+  // Left leg - thicker and more muscular
+  ctx.fillRect(w * 0.2, h * 0.65, w * 0.25, legSize);
+  // Right leg - fighting stance, bigger
+  ctx.fillRect(w * 0.55, h * 0.65, w * 0.25, legSize);
   
-  // Sneakers
+  // Street Fighter style sneakers - bigger
   ctx.fillStyle = 'hsl(0, 0%, 15%)';
-  ctx.fillRect(w * 0.2, h * 0.92, w * 0.25, h * 0.08);
-  ctx.fillRect(w * 0.55, h * 0.92, w * 0.25, h * 0.08);
+  ctx.fillRect(w * 0.15, h * 0.9, w * 0.35, h * 0.1);
+  ctx.fillRect(w * 0.5, h * 0.9, w * 0.35, h * 0.1);
   
-  // Torso - DJ shirt with sound waves
+  // Muscular torso - DJ shirt with sound waves, Street Fighter style
   ctx.fillStyle = profile.colors.shirt;
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, torsoSize);
+  ctx.fillRect(w * 0.15, h * 0.15, w * 0.7, torsoSize);
   
   // Sound wave graphics on shirt
   ctx.strokeStyle = profile.colors.aura;
@@ -161,22 +161,22 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
     ctx.stroke();
   }
   
-  // Arms in DJ pose
+  // Muscular arms in DJ fighting pose - Street Fighter proportions
   ctx.fillStyle = profile.colors.skin;
-  // Left arm reaching for turntable
-  ctx.fillRect(w * 0.05, h * 0.35, w * 0.15, h * 0.25);
-  // Right arm raised (DJ style)
-  ctx.fillRect(w * 0.8, h * 0.2, w * 0.15, h * 0.3);
+  // Left arm - bigger and more muscular
+  ctx.fillRect(w * 0.0, h * 0.25, w * 0.2, h * 0.35);
+  // Right arm - raised fighting stance, bigger
+  ctx.fillRect(w * 0.8, h * 0.15, w * 0.2, h * 0.4);
   
-  // Head with proper Street Fighter proportions
+  // Larger head with Street Fighter proportions
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, headSize);
+  ctx.fillRect(w * 0.25, h * 0.0, w * 0.5, headSize);
   
-  // Dreadlocks
+  // Flowing dreadlocks - Street Fighter style
   ctx.fillStyle = profile.colors.dreadlocks;
-  for (let i = 0; i < 6; i++) {
-    const x = w * (0.25 + i * 0.08);
-    ctx.fillRect(x, h * 0.02, w * 0.04, h * 0.35);
+  for (let i = 0; i < 8; i++) {
+    const x = w * (0.2 + i * 0.075);
+    ctx.fillRect(x, h * 0.0, w * 0.06, h * 0.45);
   }
   
   // Headphones (iconic DJ element)
@@ -222,39 +222,44 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   const w = fighter.width;
   const h = fighter.height;
   
+  // Enhanced Street Fighter proportions
+  const headSize = h * 0.35;
+  const torsoSize = h * 0.5;
+  const legSize = h * 0.35;
+  
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
   ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
   
-  // Legs in kung fu stance
+  // Muscular legs in wide kung fu stance - Street Fighter style
   ctx.fillStyle = profile.colors.gi;
-  // Wide kung fu stance
-  ctx.fillRect(w * 0.15, h * 0.7, w * 0.25, h * 0.3);
-  ctx.fillRect(w * 0.6, h * 0.7, w * 0.25, h * 0.3);
+  // Wider, more muscular stance
+  ctx.fillRect(w * 0.1, h * 0.65, w * 0.3, legSize);
+  ctx.fillRect(w * 0.6, h * 0.65, w * 0.3, legSize);
   
   // Kung fu shoes
   ctx.fillStyle = 'hsl(0, 0%, 10%)';
   ctx.fillRect(w * 0.1, h * 0.92, w * 0.3, h * 0.08);
   ctx.fillRect(w * 0.6, h * 0.92, w * 0.3, h * 0.08);
   
-  // Traditional gi (martial arts uniform)
+  // Muscular torso in traditional gi - Street Fighter proportions
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.45);
+  ctx.fillRect(w * 0.15, h * 0.15, w * 0.7, torsoSize);
   
   // Black belt
   ctx.fillStyle = profile.colors.belt;
   ctx.fillRect(w * 0.15, h * 0.55, w * 0.7, h * 0.08);
   
-  // Arms in kung fu fighting pose
+  // Powerful muscular arms in kung fu fighting pose
   ctx.fillStyle = profile.colors.skin;
-  // Left arm in defensive position
-  ctx.fillRect(w * 0.05, h * 0.3, w * 0.15, h * 0.3);
-  // Right arm extended (attacking pose)
-  ctx.fillRect(w * 0.8, h * 0.35, w * 0.15, h * 0.25);
+  // Left arm - defensive, bigger and stronger
+  ctx.fillRect(w * 0.0, h * 0.25, w * 0.2, h * 0.35);
+  // Right arm - attacking, Street Fighter proportions
+  ctx.fillRect(w * 0.8, h * 0.2, w * 0.2, h * 0.4);
   
-  // Head
+  // Larger head with wise master features
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, h * 0.25);
+  ctx.fillRect(w * 0.25, h * 0.0, w * 0.5, headSize);
   
   // Traditional hair
   ctx.fillStyle = profile.colors.hair;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { useIntegratedGameSystem } from '@/hooks/useIntegratedGameSystem';
-import ProfessionalGameCanvas from '@/components/game/ProfessionalGameCanvas';
+import EnhancedGameCanvas from '@/components/game/EnhancedGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RastaChatbot } from '@/components/RastaChatbot';
@@ -129,17 +129,17 @@ const Game = () => {
       {/* Enhanced Game Integration Wrapper */}
       {integratedMode ? (
         <div className="relative">
-          <ProfessionalGameCanvas />
+          <EnhancedGameCanvas />
           <div className="fixed bottom-4 left-4 z-50 bg-neon-cyan/10 border border-neon-cyan/30 
                          rounded-lg px-3 py-2 backdrop-blur-sm">
             <div className="flex items-center gap-2 text-xs text-neon-cyan">
               <div className="w-2 h-2 bg-neon-cyan rounded-full animate-pulse" />
-              INTEGRATED MODE ACTIVE
+              STREET FIGHTER MODE ACTIVE
             </div>
           </div>
         </div>
       ) : (
-        <ProfessionalGameCanvas />
+        <EnhancedGameCanvas />
       )}
 
       {/* Enhanced Rasta Chatbot Navigator */}
