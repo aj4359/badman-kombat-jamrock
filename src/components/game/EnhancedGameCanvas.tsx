@@ -50,13 +50,23 @@ const EnhancedGameCanvas = () => {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Draw fighters
+    // Draw fighters with enhanced Street Fighter styling
     if (gameState.fighters.player1) {
-      drawEnhancedFighter(ctx, gameState.fighters.player1, gameState.fighters.player1.animationTimer || 0);
+      const effects = {
+        special: gameState.fighters.player1.state.current === 'special',
+        hurt: gameState.fighters.player1.state.current === 'hurt',
+        alpha: gameState.fighters.player1.state.current === 'hurt' ? 0.7 : 1.0
+      };
+      drawEnhancedFighter(ctx, gameState.fighters.player1, effects);
     }
     
     if (gameState.fighters.player2) {
-      drawEnhancedFighter(ctx, gameState.fighters.player2, gameState.fighters.player2.animationTimer || 0);
+      const effects = {
+        special: gameState.fighters.player2.state.current === 'special',
+        hurt: gameState.fighters.player2.state.current === 'hurt',
+        alpha: gameState.fighters.player2.state.current === 'hurt' ? 0.7 : 1.0
+      };
+      drawEnhancedFighter(ctx, gameState.fighters.player2, effects);
     }
   }, [canvasRef, spritesLoaded, drawEnhancedFighter, gameState]);
 
