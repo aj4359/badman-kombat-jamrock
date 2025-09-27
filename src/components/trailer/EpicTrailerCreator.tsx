@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Download, Play, Pause, Film, Mic } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Play, Pause, Film, Mic, Share2, Smartphone, Monitor, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWebSpeechAPI } from '@/hooks/useWebSpeechAPI';
 import { useCrowdAudio } from '@/hooks/useCrowdAudio';
@@ -100,6 +102,50 @@ const TRAILER_SCRIPT: TrailerScene[] = [
   }
 ];
 
+interface SocialFormat {
+  id: string;
+  name: string;
+  aspectRatio: string;
+  width: number;
+  height: number;
+  duration: number;
+  description: string;
+  icon: any;
+}
+
+const SOCIAL_FORMATS: SocialFormat[] = [
+  {
+    id: 'youtube',
+    name: 'YouTube/Facebook',
+    aspectRatio: '16:9',
+    width: 1920,
+    height: 1080,
+    duration: 30000,
+    description: 'Full cinematic trailer',
+    icon: Monitor
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram/TikTok',
+    aspectRatio: '9:16',
+    width: 1080,
+    height: 1920,
+    duration: 15000,
+    description: 'Vertical story format',
+    icon: Smartphone
+  },
+  {
+    id: 'twitter',
+    name: 'Twitter/Square',
+    aspectRatio: '1:1',
+    width: 1080,
+    height: 1080,
+    duration: 20000,
+    description: 'Square format',
+    icon: Square
+  }
+];
+
 interface EpicTrailerCreatorProps {
   className?: string;
 }
@@ -111,8 +157,10 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [currentScene, setCurrentScene] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadUrls, setDownloadUrls] = useState<Record<string, string>>({});
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>('youtube');
+  const [isCreatingAll, setIsCreatingAll] = useState(false);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -141,13 +189,14 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
   }, []);
 
   // Render trailer scene on canvas with cinematic effects
-  const renderScene = (scene: TrailerScene, canvas: HTMLCanvasElement, time: number = 0) => {
+  const renderScene = (scene: TrailerScene, canvas: HTMLCanvasElement, time: number = 0, format?: SocialFormat) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions for 4K cinema quality
-    canvas.width = 1920;
-    canvas.height = 1080;
+    // Set canvas dimensions based on selected format
+    const currentFormat = format || SOCIAL_FORMATS.find(f => f.id === selectedFormat) || SOCIAL_FORMATS[0];
+    canvas.width = currentFormat.width;
+    canvas.height = currentFormat.height;
 
     // Clear canvas with pure black
     ctx.fillStyle = '#000000';
@@ -710,20 +759,55 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
   };
 
 
-  const createTrailer = async () => {
+
+  const downloadTrailer = (formatId: string = selectedFormat) => {
+    const url = downloadUrls[formatId];
+    if (url) {
+      const format = SOCIAL_FORMATS.find(f => f.id === formatId);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `badman-kombat-${format?.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-trailer-${Date.now()}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  const createAllFormats = async () => {
+    setIsCreatingAll(true);
+    
+    for (const format of SOCIAL_FORMATS) {
+      setSelectedFormat(format.id);
+      await new Promise(resolve => {
+        const originalOnStop = () => {
+          setIsCreatingAll(false);
+          resolve(void 0);
+        };
+        createTrailerForFormat(format, originalOnStop);
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Brief pause between formats
+    }
+    
+    setIsCreatingAll(false);
+  };
+
+  const createTrailerForFormat = async (format: SocialFormat, onComplete?: () => void) => {
     if (!canvasRef.current) return;
 
     setIsCreating(true);
     setProgress(0);
     recordedChunks.current = [];
 
-    // Start background music
     playLayer('intro', false);
 
     const canvas = canvasRef.current;
-    const stream = canvas.captureStream(30); // 30 FPS
     
-    // Try different codec options for better compatibility
+    // Adjust canvas for this format
+    canvas.width = format.width;
+    canvas.height = format.height;
+    
+    const stream = canvas.captureStream(30);
+    
     let mimeType = 'video/webm;codecs=vp9';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'video/webm;codecs=vp8';
@@ -743,71 +827,60 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     mediaRecorderRef.current.onstop = () => {
       const blob = new Blob(recordedChunks.current, { type: mimeType });
       const url = URL.createObjectURL(blob);
-      setDownloadUrl(url);
+      setDownloadUrls(prev => ({ ...prev, [format.id]: url }));
       setIsCreating(false);
+      onComplete?.();
     };
 
-    mediaRecorderRef.current.start(100); // Record in 100ms chunks
+    mediaRecorderRef.current.start(100);
 
-    // Animate through all scenes
+    // Create optimized scene selection based on format duration
+    const scenesToUse = format.duration < 20000 
+      ? TRAILER_SCRIPT.filter(s => ['studio', 'hero-intro', 'action-sequence', 'title-drop'].includes(s.id))
+      : TRAILER_SCRIPT;
+
     let sceneIndex = 0;
-    const totalDuration = TRAILER_SCRIPT.reduce((sum, scene) => sum + scene.duration, 0);
+    const totalDuration = scenesToUse.reduce((sum, scene) => sum + (scene.duration * format.duration / 30000), 0);
     let elapsedTime = 0;
 
     const animateScene = () => {
-      if (sceneIndex >= TRAILER_SCRIPT.length) {
+      if (sceneIndex >= scenesToUse.length) {
         mediaRecorderRef.current?.stop();
         return;
       }
 
-      const scene = TRAILER_SCRIPT[sceneIndex];
+      const scene = scenesToUse[sceneIndex];
+      const adjustedDuration = scene.duration * (format.duration / 30000);
       setCurrentScene(sceneIndex);
       
-      // Add crowd reactions for fight scenes
       if (scene.title.toLowerCase().includes('combat') || scene.title.toLowerCase().includes('battle')) {
-        playCrowdReaction('cheer', scene.duration);
+        playCrowdReaction('cheer', adjustedDuration);
       }
       
-      // Speak the voiceover for this scene (only if there's text)
       if (scene.voiceover && scene.voiceover.trim()) {
         speak(scene.voiceover);
       }
       
-      // Animate the scene with time progression
       let sceneStartTime = Date.now();
       const animateFrame = () => {
         const currentTime = Date.now() - sceneStartTime;
-        if (currentTime < scene.duration) {
-          renderScene(scene, canvas, currentTime);
+        if (currentTime < adjustedDuration) {
+          renderScene(scene, canvas, currentTime, format);
           requestAnimationFrame(animateFrame);
         }
       };
       animateFrame();
       
-      // Update progress
-      elapsedTime += scene.duration;
+      elapsedTime += adjustedDuration;
       setProgress((elapsedTime / totalDuration) * 100);
 
-      // Move to next scene after duration
       setTimeout(() => {
         sceneIndex++;
         animateScene();
-      }, scene.duration);
+      }, adjustedDuration);
     };
 
     animateScene();
-  };
-
-  const downloadTrailer = () => {
-    if (downloadUrl) {
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = `badman-kombat-epic-trailer-${Date.now()}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(downloadUrl); // Clean up memory
-    }
   };
 
   const previewTrailer = () => {
@@ -905,11 +978,37 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
               </div>
             )}
 
+            {/* Format Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Social Media Format</label>
+              <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SOCIAL_FORMATS.map((format) => (
+                    <SelectItem key={format.id} value={format.id}>
+                      <div className="flex items-center gap-2">
+                        <format.icon className="w-4 h-4" />
+                        <span>{format.name}</span>
+                        <Badge variant="outline" className="ml-auto">
+                          {format.aspectRatio}
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-400">
+                {SOCIAL_FORMATS.find(f => f.id === selectedFormat)?.description}
+              </p>
+            </div>
+
             {/* Controls */}
             <div className="flex gap-2">
               <Button
                 onClick={previewTrailer}
-                disabled={isCreating}
+                disabled={isCreating || isCreatingAll}
                 variant="outline"
                 className="flex-1"
               >
@@ -918,8 +1017,8 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
               </Button>
               
               <Button
-                onClick={createTrailer}
-                disabled={isCreating || voiceLoading}
+                onClick={() => createTrailerForFormat(SOCIAL_FORMATS.find(f => f.id === selectedFormat)!)}
+                disabled={isCreating || voiceLoading || isCreatingAll}
                 className="flex-1 bg-red-600 hover:bg-red-700"
               >
                 <Mic className="w-4 h-4 mr-2" />
@@ -927,16 +1026,34 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
               </Button>
             </div>
 
-            {/* Download */}
-            {downloadUrl && (
-              <Button
-                onClick={downloadTrailer}
-                className="w-full"
-                variant="secondary"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download Epic Trailer (.webm)
-              </Button>
+            {/* Create All Formats Button */}
+            <Button
+              onClick={createAllFormats}
+              disabled={isCreating || isCreatingAll || voiceLoading}
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              {isCreatingAll ? 'Creating All Formats...' : 'Create All Social Media Formats'}
+            </Button>
+
+            {/* Download Buttons */}
+            {Object.keys(downloadUrls).length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-white">Download Trailers</h4>
+                {SOCIAL_FORMATS.map((format) => (
+                  downloadUrls[format.id] && (
+                    <Button
+                      key={format.id}
+                      onClick={() => downloadTrailer(format.id)}
+                      className="w-full"
+                      variant="secondary"
+                    >
+                      <format.icon className="w-4 h-4 mr-2" />
+                      Download {format.name} ({format.aspectRatio})
+                    </Button>
+                  )
+                ))}
+              </div>
             )}
 
             {/* Trailer Script Preview */}
