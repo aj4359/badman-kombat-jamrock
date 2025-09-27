@@ -38,6 +38,8 @@ export const CinematicTeaser: React.FC = () => {
   const audioManager = useAudioManager();
   const audioContextRef = useRef<AudioContext | null>(null);
   const [audioReady, setAudioReady] = useState(false);
+  const animationFrameRef = useRef<number | null>(null);
+  const sceneTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const scenes = [
     { type: 'title', duration: 2000 },
@@ -51,10 +53,23 @@ export const CinematicTeaser: React.FC = () => {
   useEffect(() => {
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      // Set audio ready regardless of files
       setAudioReady(true);
     }
-  }, []);
+    
+    return () => {
+      // Cleanup on unmount
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (sceneTimerRef.current) {
+        clearTimeout(sceneTimerRef.current);
+      }
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
+      audioManager.emergencyAudioKillSwitch();
+    };
+  }, [audioManager]);
 
   // Scene progression (visual-first, audio optional)
   useEffect(() => {
@@ -86,7 +101,7 @@ export const CinematicTeaser: React.FC = () => {
       }
     }
 
-    const timer = setTimeout(() => {
+    sceneTimerRef.current = setTimeout(() => {
       if (currentScene < scenes.length - 1) {
         setCurrentScene((prev) => prev + 1);
       } else {
@@ -94,13 +109,17 @@ export const CinematicTeaser: React.FC = () => {
         setIsPlaying(false);
         setCurrentScene(0);
         if (audioManager.isLoaded) {
-          audioManager.stopAll();
+          audioManager.stopAllAudio();
           audioManager.updateSettings({ musicVolume: 0.8 });
         }
       }
     }, scene?.duration || 2000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (sceneTimerRef.current) {
+        clearTimeout(sceneTimerRef.current);
+      }
+    };
   }, [currentScene, isPlaying, audioReady]);
 
   useEffect(() => {
@@ -454,13 +473,16 @@ export const CinematicTeaser: React.FC = () => {
     
     if (isPlaying) {
       setIsPlaying(false);
-      if (audioManager.isLoaded) {
-        audioManager.stopAll();
+      if (sceneTimerRef.current) {
+        clearTimeout(sceneTimerRef.current);
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      audioManager.emergencyAudioKillSwitch();
     } else {
       setIsPlaying(true);
       setCurrentScene(0);
-      // Audio context is already initialized, no need to call again
     }
   };
 

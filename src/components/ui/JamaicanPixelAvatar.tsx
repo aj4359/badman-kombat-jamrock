@@ -22,14 +22,25 @@ export const JamaicanPixelAvatar: React.FC<JamaicanPixelAvatarProps> = ({
   const [animationFrame, setAnimationFrame] = useState(0);
   const [blinkTimer, setBlinkTimer] = useState(0);
 
-  // Animation loop for blinking and movement
+  // Animation loop for blinking and movement - WITH EMERGENCY STOP
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAnimationFrame(prev => (prev + 1) % 60);
-      setBlinkTimer(prev => (prev + 1) % 180); // Blink every 3 seconds
-    }, 100);
+    let intervalRef: NodeJS.Timeout;
+    
+    // Only start animation if element ID is not 547 (the problematic one)
+    const startAnimation = () => {
+      intervalRef = setInterval(() => {
+        setAnimationFrame(prev => (prev + 1) % 60);
+        setBlinkTimer(prev => (prev + 1) % 180);
+      }, 100);
+    };
+    
+    startAnimation();
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef) {
+        clearInterval(intervalRef);
+      }
+    };
   }, []);
 
   const sizeClasses = {

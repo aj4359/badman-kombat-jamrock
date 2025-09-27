@@ -887,6 +887,7 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
 
   const previewAnimationRef = useRef<boolean>(false);
   const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const allPreviewTimers = useRef<Set<NodeJS.Timeout>>(new Set());
 
   const previewTrailer = () => {
     if (!canvasRef.current) return;
@@ -903,6 +904,9 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
         if (sceneIndex >= TRAILER_SCRIPT.length || !previewAnimationRef.current) {
           setIsPreviewPlaying(false);
           previewAnimationRef.current = false;
+          // Clear all preview timers
+          allPreviewTimers.current.forEach(timer => clearTimeout(timer));
+          allPreviewTimers.current.clear();
           return;
         }
 
@@ -910,21 +914,42 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
         renderScene(scene, canvasRef.current!, 0);
         setCurrentScene(sceneIndex);
 
-        previewTimeoutRef.current = setTimeout(() => {
+        const timer = setTimeout(() => {
           sceneIndex++;
           previewAnimation();
-        }, 1000); // Faster preview
+        }, 1000);
+        
+        allPreviewTimers.current.add(timer);
+        previewTimeoutRef.current = timer;
       };
       previewAnimation();
     } else {
-      // Stop preview immediately
+      // EMERGENCY STOP - Clear everything immediately
       previewAnimationRef.current = false;
+      
+      // Clear all timers
       if (previewTimeoutRef.current) {
         clearTimeout(previewTimeoutRef.current);
         previewTimeoutRef.current = null;
       }
-      audioManager.stopAllAudio();
-      console.log('Trailer preview stopped - all audio stopped, timeouts cleared');
+      allPreviewTimers.current.forEach(timer => clearTimeout(timer));
+      allPreviewTimers.current.clear();
+      
+      // Emergency audio kill switch
+      audioManager.emergencyAudioKillSwitch();
+      
+      // Clear canvas
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      
+      console.log('🛑 TRAILER PREVIEW EMERGENCY STOPPED - All systems cleared');
     }
   };
 

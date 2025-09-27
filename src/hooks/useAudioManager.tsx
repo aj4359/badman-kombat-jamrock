@@ -249,6 +249,31 @@ export const useAudioManager = () => {
     setSettings(prev => ({ ...prev, isMuted: !prev.isMuted }));
   }, []);
 
+  const emergencyAudioKillSwitch = useCallback(() => {
+    console.log('🚨 EMERGENCY AUDIO KILL SWITCH ACTIVATED');
+    
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+    
+    const { intro, gameplay, ambient } = audioRefs.current;
+    
+    // Immediately stop and mute all audio
+    [intro, gameplay, ambient].forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = true;
+      audio.volume = 0;
+    });
+    
+    setIsPlaying(false);
+    setIntroPlaying(false);
+    currentAudioRef.current = null;
+    
+    console.log('✅ All audio systems terminated');
+  }, []);
+
   const initializeAudioContext = useCallback(() => {
     try {
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -275,6 +300,7 @@ export const useAudioManager = () => {
     playEffect,
     updateSettings,
     toggleMute,
-    initializeAudioContext
+    initializeAudioContext,
+    emergencyAudioKillSwitch
   };
 };
