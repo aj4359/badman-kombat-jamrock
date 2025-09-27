@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Send, Minimize2, Volume2, VolumeX, Settings, Navigation, Gamepad2, Users, Trophy } from 'lucide-react';
 import { JamaicanPixelAvatar } from '@/components/ui/JamaicanPixelAvatar';
-import { useElevenLabsVoice } from '@/hooks/useElevenLabsVoice';
+import { useWebSpeechAPI } from '@/hooks/useWebSpeechAPI';
 
 interface ChatMessage {
   id: string;
@@ -125,9 +125,11 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const [quickTips, setQuickTips] = useState<GameplayTip[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { speak, stopSpeaking, isLoading, isSpeaking, error } = useElevenLabsVoice({
-    voiceId: 'N2lVS1w4EtoT3dr4eOWO', // Callum - good Caribbean accent
-    model: 'eleven_multilingual_v2'
+  const { speak, stopSpeaking, isLoading, isSpeaking, error } = useWebSpeechAPI({
+    voiceName: 'male', // Prefer deep male voices for Jamaican accent
+    rate: 0.75, // Slower, more authentic Caribbean pace
+    pitch: 0.7, // Lower pitch for that authentic deep voice
+    volume: 1
   });
 
   // Initialize with contextual welcome message
