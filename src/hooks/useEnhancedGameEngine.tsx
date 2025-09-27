@@ -126,6 +126,12 @@ export const useEnhancedGameEngine = () => {
   const [keys, setKeys] = useState<Record<string, boolean>>({});
   const player1Keys = useRef<Record<string, boolean>>({});
   const player2Keys = useRef<Record<string, boolean>>({});
+  
+  // Enhanced input system for 60fps performance
+  const inputSystemRef = useRef({
+    buffer: new Map<number, Array<{ action: string; timestamp: number }>>(),
+    lastInputTime: new Map<number, number>()
+  });
 
   // Create particle effect
   const createParticles = useCallback((x: number, y: number, type: 'impact' | 'special' | 'energy', count: number = 5, color: string = 'hsl(180, 100%, 50%)') => {
@@ -284,6 +290,9 @@ export const useEnhancedGameEngine = () => {
     const keys = isPlayer1 ? player1Keys.current : player2Keys.current;
     const fighterData = ENHANCED_FIGHTER_DATA[fighter.id] || ENHANCED_FIGHTER_DATA.leroy;
     
+    // Enhanced frame-perfect timing for 60fps gameplay
+    const deltaTime = 16.67; // Target 60fps frame time
+    
     // Update frame data timers
     newFighter.frameData.hitstun = Math.max(0, newFighter.frameData.hitstun - 1);
     newFighter.frameData.blockstun = Math.max(0, newFighter.frameData.blockstun - 1);
@@ -315,15 +324,16 @@ export const useEnhancedGameEngine = () => {
     
     // Only allow new actions if not in hitstun/blockstun
     if (newFighter.frameData.hitstun === 0 && newFighter.frameData.blockstun === 0) {
-      // Movement
+      // Enhanced Movement with frame-perfect responsiveness
+      const moveSpeed = fighterData.stats.walkSpeed * (deltaTime / 16.67); // Normalize to 60fps
       if (keys.left && newFighter.x > 50) {
-        newFighter.x -= fighterData.stats.walkSpeed;
+        newFighter.x -= moveSpeed;
         newFighter.facing = 'left';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
         }
-      } else if (keys.right && newFighter.x < 1024 - 50 - newFighter.width) {
-        newFighter.x += fighterData.stats.walkSpeed;
+      } else if (keys.right && newFighter.x < CANVAS_WIDTH - 50 - newFighter.width) {
+        newFighter.x += moveSpeed;
         newFighter.facing = 'right';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
@@ -357,15 +367,19 @@ export const useEnhancedGameEngine = () => {
         }
       }
 
-      // Attacking
+      // Enhanced Attacking with combo system
       if (keys.punch && (newFighter.state.current === 'idle' || newFighter.state.current === 'walking')) {
         newFighter.state.current = 'attacking';
         newFighter.animationTimer = 0;
-        newFighter.state.timer = 20;
+        newFighter.state.timer = 15; // Faster recovery for fluid combos
         audioManager.playEffect('hit');
         
-        // Add visual effects
-        visualEffects.addScreenShake(3, 100);
+        // Enhanced visual effects
+        visualEffects.addScreenShake(4, 80);
+        visualEffects.addHitSpark(newFighter.x + newFighter.width / 2, newFighter.y + 30, 'impact');
+        
+        // Build super meter
+        newFighter.superMeter = Math.min(newFighter.maxSuperMeter, newFighter.superMeter + 5);
       }
 
       // Blocking

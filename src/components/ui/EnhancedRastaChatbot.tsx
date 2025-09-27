@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Minimize2, Volume2, VolumeX, Settings } from 'lucide-react';
-import { RastaAvatar } from '@/components/ui/RastaAvatar';
+import { JamaicanPixelAvatar } from '@/components/ui/JamaicanPixelAvatar';
 import { useElevenLabsVoice } from '@/hooks/useElevenLabsVoice';
 
 interface ChatMessage {
@@ -312,7 +312,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
           size="icon"
         >
           <div className="relative flex items-center justify-center w-full h-full">
-            <RastaAvatar size="sm" emotion="cool" showParticles={true} />
+            <JamaicanPixelAvatar size="sm" emotion="cool" showParticles={true} />
             <MessageCircle className="absolute -bottom-1 -right-1 w-4 h-4 text-white bg-blue-500 rounded-full p-0.5" />
           </div>
         </Button>
@@ -324,7 +324,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
           <CardHeader className="bg-gradient-jamaica text-background p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <RastaAvatar 
+                <JamaicanPixelAvatar 
                   size="sm" 
                   emotion={currentEmotion}
                   isSpeaking={isSpeaking}
@@ -370,11 +370,11 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
                 >
                   {message.sender === 'rasta' && (
                     <div className="mr-2 flex-shrink-0">
-                      <RastaAvatar 
-                        size="sm" 
-                        emotion={message.emotion || 'cool'}
-                        showParticles={false}
-                      />
+                    <JamaicanPixelAvatar 
+                      size="sm" 
+                      emotion={message.emotion || 'cool'}
+                      showParticles={false}
+                    />
                     </div>
                   )}
                   <div
@@ -391,7 +391,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
               {isThinking && (
                 <div className="flex justify-start">
                   <div className="mr-2 flex-shrink-0">
-                    <RastaAvatar size="sm" emotion="thinking" isThinking={true} showParticles={false} />
+                    <JamaicanPixelAvatar size="sm" emotion="thinking" isThinking={true} showParticles={false} />
                   </div>
                   <div className="bg-muted/50 text-muted-foreground p-3 rounded-lg text-sm animate-pulse">
                     <div className="flex space-x-1">
