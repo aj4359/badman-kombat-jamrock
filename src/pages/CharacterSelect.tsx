@@ -326,12 +326,12 @@ const CharacterSelect = () => {
                   : 'border-neon-cyan/30'
               }`}>
                 <div 
-                  className="w-full h-40 rounded mb-3 border-2 border-neon-cyan/50 relative overflow-hidden bg-black"
+                  className="w-full h-48 rounded mb-3 border-2 border-neon-cyan/50 relative overflow-hidden bg-black"
                 >
                   <img 
                     src={fighter.image} 
                     alt={fighter.name}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-top"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <div className="absolute bottom-2 left-2 text-white font-bold text-sm">
