@@ -37,6 +37,12 @@ export const useAudioManager = () => {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialized = useRef(false);
+  
+  // Single shared AudioContext and oscillator tracking for complete cleanup
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const activeOscillatorsRef = useRef<Set<OscillatorNode>>(new Set());
+  const activeGainNodesRef = useRef<Set<GainNode>>(new Set());
+  const allAudioContextsRef = useRef<Set<AudioContext>>(new Set());
 
   // Initialize audio elements with error handling
   useEffect(() => {
@@ -201,9 +207,25 @@ export const useAudioManager = () => {
   const playEffect = useCallback((effectType: string) => {
     if (!isLoaded || settings.isMuted) return;
     
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // COMPLETELY DISABLE ALL SOUND EFFECTS TO ELIMINATE BELL
+    if (effectType === 'round-start' || effectType === 'special' || effectType === 'hit' || effectType === 'block' || effectType === 'whoosh') {
+      console.log(`🔇 Effect "${effectType}" silenced to prevent bell sound`);
+      return;
+    }
+    
+    // Use shared AudioContext to prevent context leaks
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      allAudioContextsRef.current.add(audioContextRef.current);
+    }
+    
+    const audioContext = audioContextRef.current;
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    
+    // Track oscillators for proper cleanup
+    activeOscillatorsRef.current.add(oscillator);
+    activeGainNodesRef.current.add(gainNode);
     
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
@@ -211,31 +233,15 @@ export const useAudioManager = () => {
     let frequency = 440;
     let duration = 0.2;
     
-    switch (effectType) {
-      case 'hit':
-        frequency = 200;
-        duration = 0.15;
-        break;
-      case 'block':
-        frequency = 150;
-        duration = 0.1;
-        break;
-      case 'whoosh':
-        frequency = 300;
-        duration = 0.3;
-        break;
-      case 'special':
-        frequency = 500;
-        duration = 0.5;
-        break;
-      case 'round-start':
-        // NO ROUND START SOUND - SILENCE THE BELL
-        return;
-    }
-    
     oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
     gainNode.gain.setValueAtTime(0.3 * settings.effectsVolume * settings.masterVolume, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+    
+    // Clean up oscillator when it ends
+    oscillator.addEventListener('ended', () => {
+      activeOscillatorsRef.current.delete(oscillator);
+      activeGainNodesRef.current.delete(gainNode);
+    });
     
     oscillator.start();
     oscillator.stop(audioContext.currentTime + duration);
@@ -250,16 +256,16 @@ export const useAudioManager = () => {
   }, []);
 
   const emergencyAudioKillSwitch = useCallback(() => {
-    console.log('🚨 EMERGENCY AUDIO KILL SWITCH ACTIVATED');
+    console.log('🚨 NUCLEAR AUDIO KILL SWITCH ACTIVATED - ELIMINATING ALL AUDIO');
     
+    // Clear all timers and intervals
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
     }
     
+    // Stop all HTML audio elements
     const { intro, gameplay, ambient } = audioRefs.current;
-    
-    // Immediately stop and mute all audio
     [intro, gameplay, ambient].forEach(audio => {
       audio.pause();
       audio.currentTime = 0;
@@ -267,11 +273,43 @@ export const useAudioManager = () => {
       audio.volume = 0;
     });
     
+    // STOP ALL WEB AUDIO API OSCILLATORS
+    activeOscillatorsRef.current.forEach(oscillator => {
+      try {
+        oscillator.stop();
+        oscillator.disconnect();
+      } catch (e) {
+        // Oscillator might already be stopped
+      }
+    });
+    activeOscillatorsRef.current.clear();
+    
+    // DISCONNECT ALL GAIN NODES
+    activeGainNodesRef.current.forEach(gainNode => {
+      try {
+        gainNode.disconnect();
+      } catch (e) {
+        // Gain node might already be disconnected
+      }
+    });
+    activeGainNodesRef.current.clear();
+    
+    // CLOSE ALL AUDIO CONTEXTS
+    allAudioContextsRef.current.forEach(context => {
+      try {
+        context.close();
+      } catch (e) {
+        // Context might already be closed
+      }
+    });
+    allAudioContextsRef.current.clear();
+    audioContextRef.current = null;
+    
     setIsPlaying(false);
     setIntroPlaying(false);
     currentAudioRef.current = null;
     
-    console.log('✅ All audio systems terminated');
+    console.log('✅ ALL AUDIO SYSTEMS COMPLETELY DESTROYED - BELL ELIMINATED');
   }, []);
 
   const initializeAudioContext = useCallback(() => {

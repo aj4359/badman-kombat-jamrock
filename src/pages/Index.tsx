@@ -8,7 +8,6 @@ import KombatArena from '@/components/KombatArena';
 import Footer from '@/components/Footer';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { AdvancedAudioMixer } from '@/components/audio/AdvancedAudioMixer';
-import { EpicTrailerCreator } from '@/components/trailer/EpicTrailerCreator';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,9 +39,6 @@ const Index = () => {
 
       {/* Advanced Audio Controls */}
       <AdvancedAudioMixer />
-
-      {/* Epic Trailer Creator */}
-      <EpicTrailerCreator />
 
       {/* Rasta Chatbot Navigator */}
       <RastaChatbot 

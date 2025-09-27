@@ -3,7 +3,6 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { EnhancedMobileControls } from './EnhancedMobileControls';
 import { AdvancedAudioMixer } from '@/components/audio/AdvancedAudioMixer';
-import { EpicTrailerCreator } from '@/components/trailer/EpicTrailerCreator';
 import { useEnhancedInputSystem } from '@/components/gameplay/EnhancedInputSystem';
 import { cn } from '@/lib/utils';
 
@@ -448,9 +447,6 @@ const ProfessionalGameCanvas: React.FC = () => {
           // In a real implementation, this would change the background music
         }}
       />
-
-      {/* Epic Trailer Creator */}
-      <EpicTrailerCreator />
 
       {/* Debug Panel (Development only) */}
       {showDebug && (
