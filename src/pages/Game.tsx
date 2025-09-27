@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudioManager } from '@/hooks/useAudioManager';
-import EnhancedGameCanvas from '@/components/game/EnhancedGameCanvas';
+import ProfessionalGameCanvas from '@/components/game/ProfessionalGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RastaChatbot } from '@/components/RastaChatbot';
@@ -92,7 +92,7 @@ const Game = () => {
         </div>
       )}
       
-      <EnhancedGameCanvas />
+      <ProfessionalGameCanvas />
 
       {/* Rasta Chatbot Navigator */}
       <RastaChatbot 

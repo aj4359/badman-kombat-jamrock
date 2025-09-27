@@ -419,3 +419,5 @@ export const ProfessionalGameCanvas: React.FC = () => {
     </div>
   );
 };
+
+export default ProfessionalGameCanvas;
