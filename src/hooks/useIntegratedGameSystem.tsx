@@ -80,8 +80,8 @@ export const useIntegratedGameSystem = () => {
       attacker, defender, attackType
     );
     
-    // BELL ELIMINATION: Audio processing disabled
-    console.log('Integrated audio disabled to prevent bell sounds');
+    // BELL ELIMINATION: All audio processing completely disabled
+    console.log('🔇 PHASE 1: Integrated audio completely disabled to prevent bell sounds');
     
     // Update match statistics
     if (attackType === 'special' || attackType === 'super') {
@@ -102,8 +102,8 @@ export const useIntegratedGameSystem = () => {
     fighter: IntegratedFighter,
     comboCount: number
   ) => {
-    // BELL ELIMINATION: Audio feedback disabled
-    console.log('Combo audio disabled to prevent bell sounds');
+    // BELL ELIMINATION: All combo audio completely disabled  
+    console.log('🔇 PHASE 1: Combo audio completely disabled to prevent bell sounds');
     
     // Update match stats
     setIntegrationState(prev => ({
@@ -136,8 +136,8 @@ export const useIntegratedGameSystem = () => {
       }));
     }
     
-    // BELL ELIMINATION: Victory audio disabled
-    console.log('Victory audio disabled to prevent bell sounds');
+    // BELL ELIMINATION: All victory audio completely disabled
+    console.log('🔇 PHASE 1: Victory audio completely disabled to prevent bell sounds');
     
     console.log('Victory processed:', { winner, isPerfect, stats: integrationState.matchStats });
   }, [audioSystem, integrationState, gameEngine.gameState]);

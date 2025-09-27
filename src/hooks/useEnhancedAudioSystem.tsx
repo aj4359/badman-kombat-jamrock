@@ -18,37 +18,11 @@ export const useEnhancedAudioSystem = () => {
   const lastAudioEventRef = useRef<{ type: string; timestamp: number } | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Initialize audio context for iOS compatibility
+  // PHASE 1: EMERGENCY AUDIO SILENCE - All AudioContext creation completely disabled
   useEffect(() => {
-    const initAudioContext = () => {
-      try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        audioContextRef.current = new AudioContext();
-        
-        if (audioContextRef.current.state === 'suspended') {
-          audioContextRef.current.resume();
-        }
-      } catch (error) {
-        console.warn('Audio context initialization failed:', error);
-      }
-    };
-
-    // Initialize on first user interaction
-    const handleFirstInteraction = () => {
-      initAudioContext();
-      audioManager.initializeAudioContext();
-      document.removeEventListener('touchstart', handleFirstInteraction);
-      document.removeEventListener('mousedown', handleFirstInteraction);
-    };
-
-    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
-    document.addEventListener('mousedown', handleFirstInteraction, { once: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleFirstInteraction);
-      document.removeEventListener('mousedown', handleFirstInteraction);
-    };
-  }, [audioManager]);
+    console.log('🔇 BELL ELIMINATION: AudioContext initialization completely disabled');
+    return;
+  }, []);
 
   const processAudioEvent = useCallback((event: AudioEvent) => {
     // BELL ELIMINATION: All audio event processing disabled

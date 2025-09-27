@@ -23,11 +23,7 @@ const Game = () => {
   const integratedMode = location.state?.integratedMode || false;
 
   useEffect(() => {
-    console.log('Game page mounted with integration mode:', integratedMode);
-    console.log('Audio loaded:', isLoaded, 'Current layer:', currentLayer);
-    console.log('Fighter data:', fighterData);
-    
-    const shouldStartFight = location.state?.startFight;
+    console.log('🔇 PHASE 3: SIMPLIFIED GAME INITIALIZATION - No audio delays');
     
     // Initialize integrated system if in integrated mode
     if (integratedMode && fighterData.player1 && fighterData.player2) {
@@ -39,31 +35,11 @@ const Game = () => {
       );
     }
     
-    // Only start Champion audio after Shaw Brothers intro completes
-    // Check if we're transitioning from VS screen with startFight flag
-    if (isLoaded && shouldStartFight && currentLayer !== 'gameplay') {
-      console.log('Waiting for Shaw Brothers intro to complete before starting Champion audio...');
-      // Wait longer to allow Shaw Brothers intro to complete properly
-      setTimeout(() => {
-        console.log('Now starting Champion audio for fight...');
-        playLayer('gameplay');
-      }, 3000); // Extended delay to ensure Shaw Brothers plays completely
-    }
+    // PHASE 3: INSTANT LOADING - No audio layer management, immediate game ready
+    setGameReady(true);
+    console.log('✅ Game marked as ready INSTANTLY');
 
-    // Mark game as ready after brief delay to allow full initialization
-    const readyTimer = setTimeout(() => {
-      setGameReady(true);
-      console.log('Game marked as ready');
-      
-      // Only start gameplay music if no other audio is playing and we're not waiting for transition
-      if (isLoaded && !shouldStartFight && currentLayer !== 'gameplay' && currentLayer !== 'intro') {
-        console.log('Starting gameplay music (fallback - no active audio detected)...');
-        playLayer('gameplay');
-      }
-    }, shouldStartFight ? 2000 : 1000); // Longer delay when transitioning from VS screen
-
-    return () => clearTimeout(readyTimer);
-  }, [isLoaded, currentLayer, playLayer, integratedMode, fighterData, integratedSystem, location.state]);
+  }, [integratedMode, fighterData, integratedSystem]);
 
   const handleRetry = () => {
     console.log('Retrying game initialization...');

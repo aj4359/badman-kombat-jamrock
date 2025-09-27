@@ -129,14 +129,27 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     renderProfessionalArena(ctx, canvas.width, canvas.height);
     
-    // Debug: Show fighter initialization status
+    // PHASE 4: EMERGENCY FALLBACK FIGHTERS - Always render something visible
     if (!gameState.fighters.player1 || !gameState.fighters.player2) {
       ctx.fillStyle = '#ff0000';
       ctx.font = '24px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('FIGHTERS INITIALIZING...', canvas.width / 2, canvas.height / 2);
+      ctx.fillText('RENDERING EMERGENCY FALLBACK FIGHTERS...', canvas.width / 2, canvas.height / 2);
       ctx.textAlign = 'start';
-      console.log('ViralStreetFighterCanvas: Fighters not ready yet', gameState.fighters);
+      
+      // PHASE 4: Render bright emergency fighters that can't be missed
+      ctx.fillStyle = '#00FF00'; // Bright green
+      ctx.fillRect(200, 300, 80, 120); // Emergency Player 1
+      ctx.fillStyle = '#FF0080'; // Bright magenta  
+      ctx.fillRect(600, 300, 80, 120); // Emergency Player 2
+      
+      // Labels
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '16px Arial';
+      ctx.fillText('EMERGENCY P1', 190, 290);
+      ctx.fillText('EMERGENCY P2', 590, 290);
+      
+      console.log('🚨 EMERGENCY: Rendering fallback fighters');
       return;
     }
 
@@ -151,17 +164,33 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       player2Pos: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y }
     });
     
-    // DIRECT FIGHTER RENDERING - No sprite complications, guaranteed to work
-    renderAuthenticFighter({
-      ctx,
-      fighter: gameState.fighters.player1,
-      effects: {}
-    });
+    // PHASE 2: BRIGHT DEBUG FIGHTERS - Impossible to miss
+    const p1 = gameState.fighters.player1;
+    const p2 = gameState.fighters.player2;
     
-    renderAuthenticFighter({
-      ctx,
-      fighter: gameState.fighters.player2,
-      effects: {}
+    // Player 1 - Bright cyan fighter
+    ctx.fillStyle = '#00FFFF';
+    ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(p1.x, p1.y, p1.width, p1.height);
+    ctx.fillStyle = '#000000';
+    ctx.font = '16px Arial';
+    ctx.fillText(p1.name, p1.x, p1.y - 10);
+    
+    // Player 2 - Bright magenta fighter  
+    ctx.fillStyle = '#FF00FF';
+    ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
+    ctx.strokeStyle = '#FFFFFF';  
+    ctx.lineWidth = 3;
+    ctx.strokeRect(p2.x, p2.y, p2.width, p2.height);
+    ctx.fillStyle = '#000000';
+    ctx.font = '16px Arial';
+    ctx.fillText(p2.name, p2.x, p2.y - 10);
+    
+    console.log('✅ PHASE 2: Rendering BRIGHT fighters:', { 
+      p1: { x: p1.x, y: p1.y, health: p1.health },
+      p2: { x: p2.x, y: p2.y, health: p2.health }
     });
     
     // Render projectiles (Hadoken-style)
