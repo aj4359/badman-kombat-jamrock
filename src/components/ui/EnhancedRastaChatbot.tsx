@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, Minimize2, Volume2, VolumeX, Settings } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { MessageCircle, Send, Minimize2, Volume2, VolumeX, Settings, Navigation, Gamepad2, Users, Trophy } from 'lucide-react';
 import { JamaicanPixelAvatar } from '@/components/ui/JamaicanPixelAvatar';
 import { useElevenLabsVoice } from '@/hooks/useElevenLabsVoice';
 
@@ -11,7 +13,15 @@ interface ChatMessage {
   text: string;
   sender: 'user' | 'rasta';
   timestamp: number;
-  emotion?: 'happy' | 'excited' | 'thinking' | 'greeting' | 'cool';
+  emotion?: 'happy' | 'excited' | 'thinking' | 'greeting' | 'cool' | 'speaking';
+  type?: 'guidance' | 'navigation' | 'gameplay' | 'general';
+}
+
+interface GameplayTip {
+  category: string;
+  title: string;
+  description: string;
+  keyCombos?: string[];
 }
 
 interface EnhancedRastaChatbotProps {
@@ -20,31 +30,131 @@ interface EnhancedRastaChatbotProps {
   onNavigateToHome?: () => void;
 }
 
+// Comprehensive gameplay guidance database
+const GAMEPLAY_TIPS: GameplayTip[] = [
+  {
+    category: "Basic Controls",
+    title: "Movement & Basic Attacks",
+    description: "Use WASD or Arrow Keys fi move yuh fighter. Punch with J/Numpad 4, Kick with K/Numpad 5, Block with L/Numpad 6. Bredrin, practice dem basics first!",
+    keyCombos: ["WASD/Arrows", "J/Num4=Punch", "K/Num5=Kick", "L/Num6=Block"]
+  },
+  {
+    category: "Special Moves",
+    title: "Quarter Circle Motions",
+    description: "Fi execute special moves, use quarter circle motions: Down, Down-Right, Right + Punch/Kick. Each fighter got different special moves, seen?",
+    keyCombos: ["↓→ + Punch", "↓← + Kick", "→↓→ + Punch"]
+  },
+  {
+    category: "Combat System",
+    title: "Combos & Frame Data",
+    description: "Link yuh attacks fi create combos! Light attacks start faster, heavy attacks do more damage. Watch di frame advantage, rude boy!",
+    keyCombos: ["Light→Medium→Heavy", "Special Cancel", "Block at right time"]
+  },
+  {
+    category: "Advanced Techniques",
+    title: "Super Moves & Meter Management",
+    description: "Build yuh super meter by attacking and taking damage. When full, unleash devastating super moves with complex inputs!",
+    keyCombos: ["Full 360° + Punch", "←→←→ + Kick", "Complex inputs"]
+  }
+];
+
+const NAVIGATION_GUIDE = {
+  "/": {
+    location: "Home Page",
+    guidance: "Welcome to Badman Kombat Jamrock! From here yuh can select characters, view fighters, or jump straight inna di game. Check out di trailers fi get hyped!",
+    actions: ["Character Select", "View Fighters", "Start Game", "Watch Trailers"]
+  },
+  "/character-select": {
+    location: "Character Selection",
+    guidance: "Time fi choose yuh warrior! Each fighter got unique abilities, special moves, and fighting styles. Take time fi learn dem backstories and movesets, seen?",
+    actions: ["Pick Fighter", "View Stats", "Practice Mode", "Start Battle"]
+  },
+  "/game": {
+    location: "Fighting Arena",
+    guidance: "Dis a di real deal! Use everything yuh learned. Watch yuh health, manage yuh meter, and show dem yuh skills. Remember - respect yuh opponent!",
+    actions: ["Fight", "Pause", "Special Moves", "Super Attacks"]
+  },
+  "/vs-screen": {
+    location: "VS Screen",
+    guidance: "Get ready fi di showdown! Dis where yuh see who facing who. Take a deep breath and prepare fi battle, champion!",
+    actions: ["Ready Up", "Change Fighter", "View Moves"]
+  }
+};
+
+const JAMAICAN_RESPONSES = {
+  greetings: [
+    "Irie, bredrin! How mi can help yuh today?",
+    "Wah gwaan, champion! Ready fi some guidance?",
+    "Big up yuhself! What yuh need fi know?",
+    "Respect, warrior! Mi here fi guide yuh journey."
+  ],
+  gameplay: [
+    "Seen! Let mi break down di combat system fi yuh...",
+    "No worry yuhself, mi teach yuh proper fighting techniques!",
+    "Listen carefully, dis knowledge crucial fi victory!",
+    "Mi show yuh how fi dominate di ring, bredrin!"
+  ],
+  navigation: [
+    "No problem! Mi guide yuh through every section.",
+    "Easy navigation coming right up, champion!",
+    "Let mi show yuh around di place properly.",
+    "Follow mi lead, we explore together!"
+  ],
+  encouragement: [
+    "Yuh doing great, keep practicing!",
+    "Respect! Yuh learning fast, seen?",
+    "Dat's di spirit! Victory soon come!",
+    "Big up yuhself, champion! Keep fighting!"
+  ]
+};
+
 export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   onNavigateToGame,
   onNavigateToCharacterSelect,
   onNavigateToHome
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   const [isOpen, setIsOpen] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [isThinking, setIsThinking] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<'happy' | 'excited' | 'thinking' | 'greeting' | 'cool'>('cool');
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      text: "Irie! Mi name Rasta Bot, yuh digital guide pon dis journey! Ready fi some serious kombat, bredrin?",
-      sender: 'rasta',
-      timestamp: Date.now(),
-      emotion: 'greeting'
-    }
-  ]);
+  const [currentEmotion, setCurrentEmotion] = useState<'happy' | 'excited' | 'thinking' | 'greeting' | 'cool' | 'speaking'>('cool');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
+  const [quickTips, setQuickTips] = useState<GameplayTip[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { speak, stopSpeaking, isLoading, isSpeaking, error } = useElevenLabsVoice({
     voiceId: 'N2lVS1w4EtoT3dr4eOWO', // Callum - good Caribbean accent
     model: 'eleven_multilingual_v2'
   });
+
+  // Initialize with contextual welcome message
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const locationInfo = NAVIGATION_GUIDE[currentPath as keyof typeof NAVIGATION_GUIDE];
+    
+    const welcomeMessage: ChatMessage = {
+      id: Date.now().toString(),
+      text: locationInfo 
+        ? `Irie! Welcome to ${locationInfo.location}. ${locationInfo.guidance}`
+        : "Wah gwaan, champion! Mi name Rasta Bot, yuh personal guide fi Badman Kombat Jamrock! Ask mi anything bout gameplay, controls, or navigation. Let's get yuh ready fi victory!",
+      sender: 'rasta',
+      timestamp: Date.now(),
+      emotion: 'greeting',
+      type: 'guidance'
+    };
+
+    setMessages([welcomeMessage]);
+    
+    // Set relevant quick tips based on current page
+    if (currentPath === '/character-select') {
+      setQuickTips(GAMEPLAY_TIPS.filter(tip => tip.category === 'Basic Controls'));
+    } else if (currentPath === '/game') {
+      setQuickTips(GAMEPLAY_TIPS.filter(tip => tip.category === 'Combat System'));
+    }
+  }, [location.pathname]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
