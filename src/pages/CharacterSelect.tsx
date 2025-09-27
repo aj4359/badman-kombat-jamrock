@@ -16,6 +16,34 @@ import sifuSprite from '@/assets/sifu-sprite.png';
 import rootsmanSprite from '@/assets/rootsman-sprite.png';
 import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
+import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
+
+// Enhanced handleStartFight function
+const handleStartFight = (selectedP1: string | null, selectedP2: string | null, selectedP1Fighter: any, selectedP2Fighter: any, navigate: any) => {
+  if (selectedP1 && selectedP2) {
+    // Enhanced fighter data passing with full integration
+    const enhancedFighterData = {
+      player1: {
+        ...selectedP1Fighter,
+        enhancedData: ENHANCED_FIGHTER_DATA[selectedP1] || ENHANCED_FIGHTER_DATA.leroy,
+        selectionTime: Date.now()
+      },
+      player2: {
+        ...selectedP2Fighter,
+        enhancedData: ENHANCED_FIGHTER_DATA[selectedP2] || ENHANCED_FIGHTER_DATA.jordan,
+        selectionTime: Date.now()
+      }
+    };
+    
+    navigate('/vs-screen', {
+      state: {
+        fighters: enhancedFighterData,
+        gameMode: 'versus',
+        integratedData: true
+      }
+    });
+  }
+};
 
 const fighters = [
   {

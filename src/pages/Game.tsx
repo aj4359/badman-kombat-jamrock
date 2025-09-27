@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAudioManager } from '@/hooks/useAudioManager';
+import { useIntegratedGameSystem } from '@/hooks/useIntegratedGameSystem';
 import ProfessionalGameCanvas from '@/components/game/ProfessionalGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,32 +11,46 @@ const Game = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoaded, playLayer, currentLayer, audioErrors } = useAudioManager();
+  const integratedSystem = useIntegratedGameSystem();
   const [gameReady, setGameReady] = useState(false);
   
-  // Get fighter data from character select
+  // Get enhanced fighter data from character select or vs screen
   const fighterData = location.state?.fighterData || {
     player1: { id: 'leroy', name: 'Leroy', colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' } },
     player2: { id: 'jordan', name: 'Jordan', colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' } }
   };
+  
+  const integratedMode = location.state?.integratedMode || false;
 
   useEffect(() => {
-    console.log('Game page mounted');
+    console.log('Game page mounted with integration mode:', integratedMode);
     console.log('Audio loaded:', isLoaded, 'Current layer:', currentLayer);
+    console.log('Fighter data:', fighterData);
     
-    // Start Shaw Brothers intro first if audio is loaded
-    if (isLoaded && currentLayer !== 'intro') {
-      console.log('Starting Shaw Brothers intro...');
-      playLayer('intro');
+    // Initialize integrated system if in integrated mode
+    if (integratedMode && fighterData.player1 && fighterData.player2) {
+      console.log('Initializing integrated game system...');
+      integratedSystem.initializeWithCharacterData(
+        fighterData.player1.id,
+        fighterData.player2.id,
+        fighterData
+      );
+    }
+    
+    // Start gameplay music if audio is loaded
+    if (isLoaded && currentLayer !== 'gameplay') {
+      console.log('Starting gameplay music...');
+      playLayer('gameplay');
     }
 
-    // Mark game as ready after brief delay to allow audio initialization
+    // Mark game as ready after brief delay to allow full initialization
     const readyTimer = setTimeout(() => {
       setGameReady(true);
       console.log('Game marked as ready');
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(readyTimer);
-  }, [isLoaded, currentLayer, playLayer]);
+  }, [isLoaded, currentLayer, playLayer, integratedMode, fighterData, integratedSystem]);
 
   const handleRetry = () => {
     console.log('Retrying game initialization...');
@@ -99,9 +114,23 @@ const Game = () => {
         </div>
       )}
       
-      <ProfessionalGameCanvas />
+      {/* Enhanced Game Integration Wrapper */}
+      {integratedMode ? (
+        <div className="relative">
+          <ProfessionalGameCanvas />
+          <div className="fixed bottom-4 left-4 z-50 bg-neon-cyan/10 border border-neon-cyan/30 
+                         rounded-lg px-3 py-2 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-xs text-neon-cyan">
+              <div className="w-2 h-2 bg-neon-cyan rounded-full animate-pulse" />
+              INTEGRATED MODE ACTIVE
+            </div>
+          </div>
+        </div>
+      ) : (
+        <ProfessionalGameCanvas />
+      )}
 
-      {/* Rasta Chatbot Navigator */}
+      {/* Enhanced Rasta Chatbot Navigator */}
       <RastaChatbot 
         onNavigateToGame={() => navigate('/game')}
         onNavigateToCharacterSelect={() => navigate('/character-select')}
