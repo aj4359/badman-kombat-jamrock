@@ -80,11 +80,8 @@ export const useIntegratedGameSystem = () => {
       attacker, defender, attackType
     );
     
-    // Process audio events
-    audioSystem.processAudioEvent({
-      type: 'hit',
-      intensity: attackType === 'light' ? 'light' : attackType === 'heavy' ? 'heavy' : 'medium'
-    });
+    // BELL ELIMINATION: Audio processing disabled
+    console.log('Integrated audio disabled to prevent bell sounds');
     
     // Update match statistics
     if (attackType === 'special' || attackType === 'super') {
@@ -95,8 +92,6 @@ export const useIntegratedGameSystem = () => {
           specialMovesUsed: prev.matchStats.specialMovesUsed + 1
         }
       }));
-      
-      audioSystem.processAudioEvent({ type: attackType });
     }
     
     return { attacker: newAttacker, defender: newDefender };
@@ -107,11 +102,8 @@ export const useIntegratedGameSystem = () => {
     fighter: IntegratedFighter,
     comboCount: number
   ) => {
-    // Process audio feedback
-    audioSystem.processAudioEvent({
-      type: 'combo',
-      comboCount
-    });
+    // BELL ELIMINATION: Audio feedback disabled
+    console.log('Combo audio disabled to prevent bell sounds');
     
     // Update match stats
     setIntegrationState(prev => ({
@@ -144,8 +136,8 @@ export const useIntegratedGameSystem = () => {
       }));
     }
     
-    // Play victory audio
-    audioSystem.playVictoryFanfare(winner);
+    // BELL ELIMINATION: Victory audio disabled
+    console.log('Victory audio disabled to prevent bell sounds');
     
     console.log('Victory processed:', { winner, isPerfect, stats: integrationState.matchStats });
   }, [audioSystem, integrationState, gameEngine.gameState]);

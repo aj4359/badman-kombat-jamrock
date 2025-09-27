@@ -209,22 +209,23 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [render, updateEffects]);
 
-  // Combat event handlers
+  // Combat event handlers - BELL ELIMINATION: Audio disabled
   useEffect(() => {
     const handleCombatEvent = (event: any) => {
       switch (event.type) {
         case 'hit':
           addScreenShake(5, 200);
           addHitSpark(event.x || 400, event.y || 300, 'impact');
-          processAudioEvent({ type: 'hit', intensity: event.intensity });
+          // BELL ELIMINATION: processAudioEvent disabled
+          console.log('Combat audio disabled to prevent bell sounds');
           break;
         case 'special':
           addScreenShake(8, 300);
-          processAudioEvent({ type: 'special' });
+          // BELL ELIMINATION: processAudioEvent disabled
           break;
         case 'super':
           addScreenShake(12, 500);
-          processAudioEvent({ type: 'super' });
+          // BELL ELIMINATION: processAudioEvent disabled
           break;
       }
     };
@@ -235,7 +236,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     return () => {
       window.removeEventListener('streetfighter-event', handleCombatEvent);
     };
-  }, [addScreenShake, addHitSpark, processAudioEvent]);
+  }, [addScreenShake, addHitSpark]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black">

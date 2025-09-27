@@ -51,74 +51,10 @@ export const useEnhancedAudioSystem = () => {
   }, [audioManager]);
 
   const processAudioEvent = useCallback((event: AudioEvent) => {
-    const now = Date.now();
-    
-    // Prevent audio spam by limiting similar events
-    if (lastAudioEventRef.current &&
-        lastAudioEventRef.current.type === event.type &&
-        now - lastAudioEventRef.current.timestamp < 100) {
-      return;
-    }
-
-    lastAudioEventRef.current = { type: event.type, timestamp: now };
-
-    switch (event.type) {
-      case 'hit':
-        fightAudio.onHit(event.intensity || 'medium');
-        audioManager.playEffect('hit');
-        crowdAudio.playCrowdReaction('cheer', 1000);
-        break;
-
-      case 'block':
-        audioManager.playEffect('block');
-        crowdAudio.playCrowdReaction('gasp', 800);
-        break;
-
-      case 'special':
-        fightAudio.onSpecialMove();
-        audioManager.playEffect('specialMove');
-        crowdAudio.playCrowdReaction('cheer', 2000);
-        crowdAudio.setIntensity('high');
-        break;
-
-      case 'super':
-        fightAudio.onSpecialMove();
-        audioManager.playEffect('special');
-        crowdAudio.playCrowdReaction('cheer', 3000);
-        crowdAudio.setIntensity('high');
-        break;
-
-      case 'combo':
-        if (event.comboCount && event.comboCount > 1) {
-          fightAudio.onComboStart();
-          crowdAudio.playCrowdReaction('cheer', 2000 + (event.comboCount * 200));
-          crowdAudio.setIntensity('high');
-        }
-        break;
-
-      case 'ko':
-        fightAudio.onRoundEnd(event.winner);
-        audioManager.playEffect('ko');
-        crowdAudio.playCrowdReaction('cheer', 4000);
-        break;
-
-      case 'round-start':
-        fightAudio.onRoundStart();
-        // REMOVED: audioManager.playEffect('round-start'); - This was the source of infinite bell sounds
-        crowdAudio.playCrowdReaction('cheer', 2000);
-        break;
-
-      case 'round-end':
-        fightAudio.onRoundEnd(event.winner);
-        if (event.winner) {
-          crowdAudio.playCrowdReaction('cheer', 4000);
-        } else {
-          crowdAudio.playCrowdReaction('boo', 2000);
-        }
-        crowdAudio.setIntensity('low');
-        break;
-    }
-  }, [fightAudio, audioManager, crowdAudio]);
+    // BELL ELIMINATION: All audio event processing disabled
+    console.log('processAudioEvent disabled to prevent bell sounds:', event.type);
+    return;
+  }, []);
 
   const createDynamicSoundEffect = useCallback((
     frequency: number,
@@ -126,30 +62,10 @@ export const useEnhancedAudioSystem = () => {
     duration: number = 0.2,
     volume: number = 0.3
   ) => {
-    if (!audioContextRef.current || audioManager.settings.isMuted) return;
-
-    try {
-      const oscillator = audioContextRef.current.createOscillator();
-      const gainNode = audioContextRef.current.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContextRef.current.destination);
-      
-      oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
-      oscillator.type = type;
-      
-      const finalVolume = volume * audioManager.settings.effectsVolume * audioManager.settings.masterVolume;
-      
-      gainNode.gain.setValueAtTime(0, audioContextRef.current.currentTime);
-      gainNode.gain.linearRampToValueAtTime(finalVolume, audioContextRef.current.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContextRef.current.currentTime + duration);
-      
-      oscillator.start(audioContextRef.current.currentTime);
-      oscillator.stop(audioContextRef.current.currentTime + duration);
-    } catch (error) {
-      console.warn('Dynamic sound effect failed:', error);
-    }
-  }, [audioManager.settings]);
+    // BELL ELIMINATION: Completely disabled oscillator creation
+    console.log('createDynamicSoundEffect disabled to prevent bell sounds');
+    return;
+  }, []);
 
   const playRoundTransition = useCallback(() => {
     // Enhanced round transition with dynamic audio
