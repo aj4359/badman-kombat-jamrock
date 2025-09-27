@@ -58,25 +58,31 @@ export const CinematicTeaser: React.FC = () => {
 
     const scene = scenes[currentScene];
     
-    // Trigger scene-specific audio
+    // Trigger scene-specific audio with proper timing
     if (scene && audioManager.isLoaded) {
+      // Start audio first, then let video sync to it
       switch (scene.type) {
         case 'title':
           console.log('Starting Shaw Brothers intro audio');
           audioManager.playLayer('intro', true);
           break;
         case 'fighters':
+          console.log('Starting BMK Champion Loop for fighters');
+          audioManager.stopAll(); // Ensure clean transition
+          setTimeout(() => audioManager.playLayer('gameplay', true), 100);
+          break;
         case 'action':
-          console.log('Starting BMK Champion Loop');
-          audioManager.playLayer('gameplay', true);
+          console.log('Continuing BMK Champion Loop for action');
+          // Don't restart audio, let it continue
           break;
         case 'coming-soon':
-          console.log('Starting ambient soundtrack');
-          audioManager.playLayer('ambient', true);
+          console.log('Transitioning to ambient soundtrack');
+          audioManager.stopAll();
+          setTimeout(() => audioManager.playLayer('ambient', true), 100);
           break;
         case 'credits':
-          // Fade out audio for credits
-          audioManager.updateSettings({ musicVolume: 0.3 });
+          // Keep ambient playing but lower volume
+          audioManager.updateSettings({ musicVolume: 0.4 });
           break;
       }
     }
@@ -200,48 +206,76 @@ export const CinematicTeaser: React.FC = () => {
   };
 
   const renderFightersScene = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    const fighterIndex = Math.floor((Date.now() / 500) % fighters.length);
+    // Cycle through fighters every 800ms for better sync
+    const fighterIndex = Math.floor((Date.now() / 800) % fighters.length);
     const fighter = fighters[fighterIndex];
 
-    // Load and draw fighter image
-    const img = new Image();
-    img.onload = () => {
-      // Draw fighter with cinematic effect
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      
-      // Calculate position to center the fighter
-      const imgWidth = 300;
-      const imgHeight = 400;
-      const x = (width - imgWidth) / 2;
-      const y = (height - imgHeight) / 2 - 50;
-      
-      ctx.drawImage(img, x, y, imgWidth, imgHeight);
-      
-      // Add neon outline
-      ctx.strokeStyle = '#00FFFF';
-      ctx.lineWidth = 3;
-      ctx.shadowColor = '#00FFFF';
-      ctx.shadowBlur = 15;
-      ctx.strokeRect(x, y, imgWidth, imgHeight);
-      
-      ctx.restore();
+    // Pre-render fighter immediately (no async loading)
+    renderFighterCharacter(ctx, fighter, width, height);
+  };
 
-      // Fighter name
-      ctx.font = 'bold 24px "Orbitron", monospace';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.textAlign = 'center';
-      ctx.shadowColor = '#FFFFFF';
-      ctx.shadowBlur = 10;
-      ctx.fillText(fighter.name, width / 2, height - 150);
-
-      // Fighter title
-      ctx.font = 'bold 16px "Rajdhani", sans-serif';
-      ctx.fillStyle = '#FF0080';
-      ctx.shadowColor = '#FF0080';
-      ctx.fillText(fighter.title, width / 2, height - 120);
+  const renderFighterCharacter = (ctx: CanvasRenderingContext2D, fighter: any, width: number, height: number) => {
+    // Calculate position to center the fighter
+    const imgWidth = 280;
+    const imgHeight = 360;
+    const x = (width - imgWidth) / 2;
+    const y = (height - imgHeight) / 2 - 30;
+    
+    // Background character silhouette effect
+    ctx.fillStyle = 'rgba(0, 255, 255, 0.1)';
+    ctx.fillRect(x - 10, y - 10, imgWidth + 20, imgHeight + 20);
+    
+    // Character outline with fighter-specific color
+    const colors = {
+      'Leroy "Cyber Storm"': '#00FFFF',
+      'Jordan "Sound Master"': '#FF0080',
+      'Sifu YK Leung': '#FFFF00'
     };
-    img.src = fighter.image;
+    
+    ctx.strokeStyle = colors[fighter.name] || '#00FFFF';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = colors[fighter.name] || '#00FFFF';
+    ctx.shadowBlur = 20;
+    ctx.strokeRect(x, y, imgWidth, imgHeight);
+    
+    // Character representation with Street Fighter style
+    ctx.fillStyle = colors[fighter.name] || '#00FFFF';
+    ctx.globalAlpha = 0.8;
+    
+    // Draw stylized character silhouette
+    if (fighter.name.includes('Jordan')) {
+      // DJ character with headphones and turntables
+      ctx.fillRect(x + imgWidth * 0.3, y + imgHeight * 0.1, imgWidth * 0.4, imgHeight * 0.3); // Head
+      ctx.fillRect(x + imgWidth * 0.2, y + imgHeight * 0.4, imgWidth * 0.6, imgHeight * 0.5); // Body
+      ctx.fillRect(x + imgWidth * 0.1, y + imgHeight * 0.15, imgWidth * 0.8, imgHeight * 0.1); // Headphones
+    } else if (fighter.name.includes('Sifu')) {
+      // Kung fu master pose
+      ctx.fillRect(x + imgWidth * 0.35, y + imgHeight * 0.1, imgWidth * 0.3, imgHeight * 0.25); // Head
+      ctx.fillRect(x + imgWidth * 0.2, y + imgHeight * 0.35, imgWidth * 0.6, imgHeight * 0.4); // Body
+      ctx.fillRect(x + imgWidth * 0.05, y + imgHeight * 0.4, imgWidth * 0.15, imgHeight * 0.3); // Arm
+    } else {
+      // Default character silhouette
+      ctx.fillRect(x + imgWidth * 0.3, y + imgHeight * 0.1, imgWidth * 0.4, imgHeight * 0.25); // Head
+      ctx.fillRect(x + imgWidth * 0.25, y + imgHeight * 0.35, imgWidth * 0.5, imgHeight * 0.45); // Body
+    }
+    
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 0;
+
+    // Fighter name with better positioning
+    ctx.font = 'bold 22px "Orbitron", monospace';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#FFFFFF';
+    ctx.shadowBlur = 15;
+    ctx.fillText(fighter.name, width / 2, height - 140);
+
+    // Fighter title
+    ctx.font = 'bold 14px "Rajdhani", sans-serif';
+    ctx.fillStyle = colors[fighter.name] || '#FF0080';
+    ctx.shadowColor = colors[fighter.name] || '#FF0080';
+    ctx.shadowBlur = 10;
+    ctx.fillText(fighter.title, width / 2, height - 115);
   };
 
   const renderActionScene = (ctx: CanvasRenderingContext2D, width: number, height: number) => {

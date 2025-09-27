@@ -3,36 +3,49 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+// Import fighter images
+import leroySprite from '@/assets/leroy-sprite.png';
+import razorSprite from '@/assets/razor-sprite.png';
+import voltageSprite from '@/assets/voltage-sprite.png';
+import blazeSprite from '@/assets/blaze-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite.png';
+import sifuSprite from '@/assets/sifu-sprite.png';
+import rootsmanSprite from '@/assets/rootsman-sprite.png';
+
 const FighterShowcase = () => {
   const navigate = useNavigate();
   const fighters = [
     {
-      name: "LEROY",
-      title: "Cyber Showdown Specialist", 
-      description: "Master of digital combat from Downtown Kingston",
+      name: "JORDAN \"SOUND MASTER\"",
+      title: "Dancehall Combat Specialist", 
+      description: "Master of sonic attacks from Kingston's sound system culture",
       stats: { power: 85, speed: 90, defense: 75 },
-      color: "neon-cyan"
+      color: "neon-purple",
+      image: jordanSprite
+    },
+    {
+      name: "SIFU YK LEUNG",
+      title: "Steel Wire Sage",
+      description: "Traditional kung fu master with modern techniques",
+      stats: { power: 90, speed: 80, defense: 85 },
+      color: "neon-yellow",
+      image: sifuSprite
+    },
+    {
+      name: "LEROY \"ROOTSMAN\"",
+      title: "Cyber-Rasta Warrior",
+      description: "Tech-nature hybrid fighter from Trench Town",
+      stats: { power: 88, speed: 95, defense: 70 },
+      color: "neon-cyan",
+      image: leroySprite
     },
     {
       name: "RAZOR",
-      title: "Neon Street Warrior",
-      description: "Electric fighter from Spanish Town roads",
-      stats: { power: 90, speed: 80, defense: 85 },
-      color: "neon-pink"
-    },
-    {
-      name: "VOLTAGE",
-      title: "Kingston Thunder",
-      description: "Lightning-fast combos from Trench Town",
-      stats: { power: 88, speed: 95, defense: 70 },
-      color: "neon-green"
-    },
-    {
-      name: "BLAZE",
-      title: "Fire Kombat King",
-      description: "Burning techniques from Half Way Tree",
+      title: "Cyber Samurai",
+      description: "Digital blade master from Spanish Town",
       stats: { power: 95, speed: 75, defense: 80 },
-      color: "neon-orange"
+      color: "neon-pink",
+      image: razorSprite
     }
   ];
 
@@ -54,11 +67,15 @@ const FighterShowcase = () => {
           {fighters.map((fighter, index) => (
             <Card key={fighter.name} className="relative overflow-hidden combat-border bg-card/20 backdrop-blur-sm hover:bg-card/30 transition-all duration-300 group">
               <div className="p-6">
-                {/* Fighter Avatar Placeholder */}
-                <div className={`w-full h-48 mb-4 rounded-lg bg-gradient-to-br from-${fighter.color}/20 to-${fighter.color}/40 flex items-center justify-center relative overflow-hidden`}>
-                  <div className={`text-6xl font-retro font-black text-${fighter.color} opacity-80 group-hover:scale-110 transition-transform duration-300`}>
-                    {fighter.name[0]}
-                  </div>
+                {/* Fighter Image */}
+                <div className={`w-full h-48 mb-4 rounded-lg bg-gradient-to-br from-${fighter.color}/20 to-${fighter.color}/40 flex items-center justify-center relative overflow-hidden border-2 border-${fighter.color}/30`}>
+                  <img 
+                    src={fighter.image} 
+                    alt={fighter.name}
+                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300 filter contrast-125 saturate-125"
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                  <div className={`absolute inset-0 bg-${fighter.color}/10 group-hover:bg-${fighter.color}/20 transition-colors duration-300`} />
                   <div className="absolute inset-0 retro-grid opacity-20" />
                 </div>
 
