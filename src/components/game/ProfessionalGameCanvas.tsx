@@ -12,7 +12,7 @@ const ProfessionalGameCanvas: React.FC = () => {
   const audioManager = useAudioManager();
   const [showDebug, setShowDebug] = useState(false);
   
-  const { gameState, initializeFighters, handleMobileInput: gameEngineInput } = useEnhancedGameEngine();
+  const { gameState, initializeFighters } = useEnhancedGameEngine();
   
   // Enhanced input system with combo detection
   const { handleMobileInput } = useEnhancedInputSystem({
