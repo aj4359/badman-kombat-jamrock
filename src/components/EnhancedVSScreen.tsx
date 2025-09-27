@@ -32,35 +32,31 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
   };
 
   useEffect(() => {
-    // Play Shaw Brothers intro audio for combat preparation
+    // Play Shaw Brothers intro ONCE (NO LOOP)
     playLayer('intro', false);
-    playEffect('whoosh');
     
     // Show fighters with delay
     const showTimer = setTimeout(() => {
       setShowFighters(true);
     }, 500);
 
-    // Start countdown
+    // Start countdown (NO BELL SOUNDS)
     const countdownTimer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(countdownTimer);
-          // Keep Shaw Brothers audio playing until we transition to game
-          // The Game component will handle switching to Champion audio
           setTimeout(() => {
             navigate('/game', {
               state: {
                 fighterData,
                 integratedMode: true,
                 gameMode: location.state?.gameMode || 'versus',
-                startFight: true // Signal that fight should start immediately
+                startFight: true
               }
             });
           }, 1000);
           return 0;
         }
-        playEffect('hit');
         return prev - 1;
       });
     }, 1000);
@@ -69,7 +65,7 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
       clearTimeout(showTimer);
       clearInterval(countdownTimer);
     };
-  }, [navigate, playLayer, playEffect, fighterData, location.state]);
+  }, [navigate, playLayer, fighterData, location.state]);
 
   return (
     <div className="min-h-screen bg-gradient-cyber flex items-center justify-center relative overflow-hidden">

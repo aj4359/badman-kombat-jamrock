@@ -36,10 +36,13 @@ export const useAudioManager = () => {
 
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadedFilesRef = useRef<Set<string>>(new Set());
+  const isInitialized = useRef(false);
 
   // Initialize audio elements with error handling
   useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     const { intro, gameplay, ambient } = audioRefs.current;
     const errors: string[] = [];
     
@@ -53,17 +56,10 @@ export const useAudioManager = () => {
 
     const handleAudioLoad = (audioElement: HTMLAudioElement, name: string) => {
       audioElement.addEventListener('canplaythrough', () => {
-        console.log(`Audio loaded successfully: ${name}`);
-        loadedFilesRef.current.add(name);
-        
-        // Check if all critical files are loaded
-        if (loadedFilesRef.current.has('intro') || loadedFilesRef.current.has('gameplay')) {
-          setIsLoaded(true);
-        }
-      });
+        // Audio loaded successfully - no console spam
+      }, { once: true });
     };
-
-    // Set up error and load handlers
+    
     handleAudioError(intro, 'intro');
     handleAudioError(gameplay, 'gameplay');
     handleAudioError(ambient, 'ambient');
@@ -86,13 +82,11 @@ export const useAudioManager = () => {
     ambient.loop = true;
     ambient.volume = settings.musicVolume * settings.masterVolume * 0.6;
 
-    // Mark as loaded even if some audio files fail
+    // Mark as loaded after delay
     const loadTimer = setTimeout(() => {
       setIsLoaded(true);
       if (errors.length > 0) {
-        console.warn(`Audio system loaded with ${errors.length} missing files:`, errors);
-      } else {
-        console.log('Audio system fully loaded');
+        console.warn(`Audio system loaded with ${errors.length} missing files`);
       }
     }, 1000);
 
@@ -101,9 +95,6 @@ export const useAudioManager = () => {
       intro.pause();
       gameplay.pause();
       ambient.pause();
-      intro.src = '';
-      gameplay.src = '';
-      ambient.src = '';
     };
   }, []);
 
@@ -122,264 +113,148 @@ export const useAudioManager = () => {
   }, [settings]);
 
   const stopAllAudio = useCallback(() => {
-    console.log('Force stopping all audio instances');
     const { intro, gameplay, ambient } = audioRefs.current;
     
-    // Clear any ongoing crossfades
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
     }
     
-    // Force stop all audio with proper cleanup
-    [intro, gameplay, ambient].forEach(audio => {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.volume = 0;
-    });
+    intro.pause();
+    gameplay.pause();
+    ambient.pause();
     
-    currentAudioRef.current = null;
+    intro.currentTime = 0;
+    gameplay.currentTime = 0;
+    ambient.currentTime = 0;
+    
     setIsPlaying(false);
     setIntroPlaying(false);
+    currentAudioRef.current = null;
   }, []);
 
-  const crossFade = useCallback((fromAudio: HTMLAudioElement, toAudio: HTMLAudioElement, duration = 2000) => {
+  const crossFade = useCallback((fromAudio: HTMLAudioElement, toAudio: HTMLAudioElement, duration: number = 2000) => {
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
     }
-
-    const steps = 50;
-    const stepTime = duration / steps;
-    const fromStartVolume = fromAudio.volume;
-    const toTargetVolume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
     
-    let step = 0;
+    const fadeSteps = 50;
+    const stepTime = duration / fadeSteps;
+    const volumeStep = 1 / fadeSteps;
     
-    // Ensure clean start - stop other audio first
-    stopAllAudio();
+    let currentStep = 0;
     
-    // Start the new audio
-    toAudio.currentTime = 0;
     toAudio.volume = 0;
-    
-    // Only play if audio element is valid
-    toAudio.play().catch(error => {
-      console.warn('Audio playback failed during crossfade:', error);
-    });
-    
-    setIsPlaying(true);
+    toAudio.play();
     
     fadeIntervalRef.current = setInterval(() => {
-      step++;
-      const progress = step / steps;
+      currentStep++;
       
-      // Fade out current audio
-      if (fromAudio && !fromAudio.paused) {
-        fromAudio.volume = fromStartVolume * (1 - progress);
-      }
+      fromAudio.volume = Math.max(0, 1 - (currentStep * volumeStep));
+      toAudio.volume = Math.min(1, currentStep * volumeStep) * settings.musicVolume * settings.masterVolume;
       
-      // Fade in new audio
-      toAudio.volume = toTargetVolume * progress;
-      
-      if (step >= steps) {
-        if (fromAudio && !fromAudio.paused) {
-          fromAudio.pause();
-          fromAudio.currentTime = 0;
-        }
-        toAudio.volume = toTargetVolume;
-        currentAudioRef.current = toAudio;
+      if (currentStep >= fadeSteps) {
+        fromAudio.pause();
+        fromAudio.currentTime = 0;
         clearInterval(fadeIntervalRef.current!);
         fadeIntervalRef.current = null;
       }
     }, stepTime);
-  }, [settings, stopAllAudio]);
+  }, [settings]);
 
-  const playLayer = useCallback((layer: 'intro' | 'gameplay' | 'ambient', immediate = false) => {
-    console.log(`Attempting to play audio layer: ${layer}, isLoaded: ${isLoaded}, currentLayer: ${currentLayer}`);
-    
-    // Force stop all current audio to prevent doubling
-    stopAllAudio();
-    
+  const playLayer = useCallback((layer: 'intro' | 'gameplay' | 'ambient', autoTransition: boolean = true) => {
     const { intro, gameplay, ambient } = audioRefs.current;
-    let targetAudio: HTMLAudioElement;
     
-    switch (layer) {
-      case 'intro':
-        targetAudio = intro;
-        break;
-      case 'gameplay':
-        targetAudio = gameplay;
-        break;
-      case 'ambient':
-      default:
-        targetAudio = ambient;
-        break;
+    if (currentLayer === layer && isPlaying) return;
+    
+    const targetAudio = audioRefs.current[layer];
+    
+    if (currentAudioRef.current && currentAudioRef.current !== targetAudio) {
+      if (autoTransition) {
+        crossFade(currentAudioRef.current, targetAudio);
+      } else {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+        targetAudio.play();
+      }
+    } else {
+      targetAudio.play();
     }
     
-    // Check if the target audio file exists and is loadable
-    if (!targetAudio.src || targetAudio.error) {
-      console.warn(`Audio file not available for layer: ${layer}`);
-      setAudioErrors(prev => [...prev, layer]);
-      return;
-    }
-    
-    console.log(`Playing audio layer: ${layer}`);
+    currentAudioRef.current = targetAudio;
     setCurrentLayer(layer);
+    setIsPlaying(true);
     
     if (layer === 'intro') {
       setIntroPlaying(true);
-      console.log('Setting up Shaw Brothers intro with auto-transition');
       
-      // Clear any previous event listeners
-      intro.onended = null;
-      
-      // Shaw Brothers intro - enhanced auto-transition to gameplay
-      const handleIntroEnd = () => {
-        console.log('Shaw Brothers intro ended, transitioning to gameplay');
-        setIntroPlaying(false);
-        setCurrentLayer('gameplay');
-        setTimeout(() => playLayer('gameplay', true), 100); // Small delay for smooth transition
-      };
-      
-      intro.removeEventListener('ended', handleIntroEnd); // Remove any existing
-      intro.addEventListener('ended', handleIntroEnd, { once: true });
-    } else {
-      setIntroPlaying(false);
+      // Auto-transition to gameplay when intro ends
+      if (autoTransition) {
+        targetAudio.addEventListener('ended', () => {
+          setIntroPlaying(false);
+          playLayer('gameplay', false);
+        }, { once: true });
+      }
+    }
+  }, [currentLayer, isPlaying, crossFade]);
+
+  const playEffect = useCallback((effectType: string) => {
+    if (!isLoaded || settings.isMuted) return;
+    
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    let frequency = 440;
+    let duration = 0.2;
+    
+    switch (effectType) {
+      case 'hit':
+        frequency = 200;
+        duration = 0.15;
+        break;
+      case 'block':
+        frequency = 150;
+        duration = 0.1;
+        break;
+      case 'whoosh':
+        frequency = 300;
+        duration = 0.3;
+        break;
+      case 'special':
+        frequency = 500;
+        duration = 0.5;
+        break;
+      case 'round-start':
+        // NO ROUND START SOUND - SILENCE THE BELL
+        return;
     }
     
-    // Enhanced immediate playback with proper cleanup
-    if (immediate || !currentAudioRef.current) {
-      // Reset and configure target audio
-      targetAudio.currentTime = 0;
-      targetAudio.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
-      
-      // Special handling for ambient layer
-      if (layer === 'ambient') {
-        targetAudio.volume *= 0.6;
-      }
-      
-      // Play target audio with comprehensive error handling
-      targetAudio.play()
-        .then(() => {
-          console.log(`Successfully started playing ${layer} audio`);
-          currentAudioRef.current = targetAudio;
-          setIsPlaying(true);
-        })
-        .catch(error => {
-          console.warn(`Failed to play ${layer} audio:`, error);
-          setAudioErrors(prev => [...prev, `${layer}-playback`]);
-        });
-    } else if (currentAudioRef.current && currentAudioRef.current !== targetAudio) {
-      // Use crossfade for smooth transitions
-      crossFade(currentAudioRef.current, targetAudio);
-    }
-  }, [isLoaded, currentLayer, crossFade, stopAllAudio, settings]);
-
-  const stopAll = useCallback(() => {
-    stopAllAudio();
-  }, [stopAllAudio]);
-
-  const playEffect = useCallback((effectType: 'hit' | 'block' | 'whoosh' | 'special' | 'round-start' | 'ko' | 'specialMove') => {
-    if (settings.isMuted) return;
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.3 * settings.effectsVolume * settings.masterVolume, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
     
-    try {
-      // Create better sound effects with Web Audio API
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
-      // Create different types of sounds based on effect type
-      if (effectType === 'hit' || effectType === 'block') {
-        // Punch/impact sounds - use noise and filters
-        const bufferSize = 4096;
-        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const data = buffer.getChannelData(0);
-        
-        // Generate noise
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        
-        const noise = audioContext.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(effectType === 'hit' ? 800 : 400, audioContext.currentTime);
-        
-        const gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(settings.effectsVolume * settings.masterVolume * 0.3, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-        
-        noise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        noise.start(audioContext.currentTime);
-        noise.stop(audioContext.currentTime + 0.15);
-      } else {
-        // Other effects - use oscillators with envelopes
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Enhanced frequencies and waveforms for different effects
-        const soundConfig: Record<string, {frequency: number, type: OscillatorType, duration: number}> = {
-          whoosh: { frequency: 300, type: 'sawtooth', duration: 0.3 },
-          special: { frequency: 440, type: 'sine', duration: 0.5 },
-          specialMove: { frequency: 660, type: 'triangle', duration: 0.8 },
-          'round-start': { frequency: 523, type: 'square', duration: 1.0 },
-          ko: { frequency: 110, type: 'sawtooth', duration: 1.5 }
-        };
-        
-        const config = soundConfig[effectType] || { frequency: 220, type: 'sine', duration: 0.2 };
-        
-        oscillator.frequency.setValueAtTime(config.frequency, audioContext.currentTime);
-        oscillator.type = config.type;
-        
-        // Add frequency modulation for more interesting sounds
-        if (effectType === 'special' || effectType === 'specialMove') {
-          oscillator.frequency.exponentialRampToValueAtTime(config.frequency * 1.5, audioContext.currentTime + config.duration / 2);
-          oscillator.frequency.exponentialRampToValueAtTime(config.frequency * 0.8, audioContext.currentTime + config.duration);
-        }
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(settings.effectsVolume * settings.masterVolume * 0.2, audioContext.currentTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + config.duration);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + config.duration);
-      }
-      
-      console.log(`Played enhanced ${effectType} sound effect`);
-    } catch (error) {
-      console.warn('Sound effect playback failed:', error);
-    }
-  }, [settings]);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+  }, [isLoaded, settings]);
 
   const updateSettings = useCallback((newSettings: Partial<AudioSettings>) => {
-    console.log('Updating audio settings:', newSettings);
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
   const toggleMute = useCallback(() => {
-    setSettings(prev => {
-      const newMuted = !prev.isMuted;
-      console.log(`Audio ${newMuted ? 'muted' : 'unmuted'}`);
-      return { ...prev, isMuted: newMuted };
-    });
+    setSettings(prev => ({ ...prev, isMuted: !prev.isMuted }));
   }, []);
 
-  // iOS Audio Context fix
   const initializeAudioContext = useCallback(() => {
     try {
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContext) {
-        const context = new AudioContext();
-        if (context.state === 'suspended') {
-          context.resume();
-        }
+      const audioContext = new AudioContext();
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
       }
     } catch (error) {
       console.warn('Audio context initialization failed:', error);
@@ -389,16 +264,17 @@ export const useAudioManager = () => {
   return {
     isLoaded,
     currentLayer,
-    settings,
-    audioErrors,
     introPlaying,
     isPlaying,
+    audioErrors,
+    settings,
+    audioRefs,
     playLayer,
-    stopAll,
+    stopAll: stopAllAudio,
+    stopAllAudio,
     playEffect,
     updateSettings,
     toggleMute,
-    initializeAudioContext,
-    audioRefs: audioRefs.current
+    initializeAudioContext
   };
 };

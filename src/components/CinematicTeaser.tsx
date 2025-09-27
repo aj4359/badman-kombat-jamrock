@@ -378,16 +378,16 @@ export const CinematicTeaser: React.FC = () => {
       const audioStream = audioDestination.stream;
       
       // Connect audio elements to the stream
-      if (audioManager.audioRefs.intro) {
-        const introSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.intro);
+      if (audioManager.audioRefs.current.intro) {
+        const introSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.intro);
         introSource.connect(audioDestination);
       }
-      if (audioManager.audioRefs.gameplay) {
-        const gameplaySource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.gameplay);
+      if (audioManager.audioRefs.current.gameplay) {
+        const gameplaySource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.gameplay);
         gameplaySource.connect(audioDestination);
       }
-      if (audioManager.audioRefs.ambient) {
-        const ambientSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.ambient);
+      if (audioManager.audioRefs.current.ambient) {
+        const ambientSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.ambient);
         ambientSource.connect(audioDestination);
       }
       
