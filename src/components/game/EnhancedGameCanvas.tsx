@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
+import { useEnhancedSpriteSystem } from '@/hooks/useEnhancedSpriteSystem';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { useFightCommentary } from '@/hooks/useFightCommentary';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
@@ -11,27 +12,86 @@ import FightingStage from '@/components/game/FightingStage';
 
 const EnhancedGameCanvas = () => {
   const { canvasRef, gameState, handleMobileInput, initializeFighters } = useEnhancedGameEngine();
+  const { drawEnhancedFighter, isLoaded: spritesLoaded } = useEnhancedSpriteSystem();
   const { playEffect, isLoaded, audioErrors, toggleMute, settings, initializeAudioContext } = useAudioManager();
   const { commentary, triggerCommentary, hideCommentary } = useFightCommentary();
   const [gameInitialized, setGameInitialized] = useState(false);
 
+  // Enhanced game rendering
+  const renderGame = useCallback(() => {
+    if (!canvasRef.current || !spritesLoaded) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'hsl(210, 30%, 15%)');
+    gradient.addColorStop(0.6, 'hsl(200, 25%, 10%)');
+    gradient.addColorStop(1, 'hsl(30, 20%, 20%)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw ground
+    ctx.fillStyle = 'hsl(30, 15%, 25%)';
+    ctx.fillRect(0, canvas.height - 120, canvas.width, 120);
+
+    // Draw center line
+    ctx.strokeStyle = 'hsl(60, 100%, 50%, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([10, 5]);
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, canvas.height - 120);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw fighters
+    if (gameState.fighters.player1) {
+      drawEnhancedFighter(ctx, gameState.fighters.player1, gameState.fighters.player1.animationTimer || 0);
+    }
+    
+    if (gameState.fighters.player2) {
+      drawEnhancedFighter(ctx, gameState.fighters.player2, gameState.fighters.player2.animationTimer || 0);
+    }
+  }, [canvasRef, spritesLoaded, drawEnhancedFighter, gameState]);
+
   useEffect(() => {
     console.log('Game Canvas mounted');
     console.log('Audio loaded:', isLoaded);
+    console.log('Sprites loaded:', spritesLoaded);
     console.log('Game state:', gameState);
-    console.log('Audio errors:', audioErrors);
     
-    // Initialize fighters first
-    initializeFighters();
-    
-    // Mark game as initialized after a brief delay
-    const initTimer = setTimeout(() => {
-      setGameInitialized(true);
-      console.log('Game canvas fully initialized');
-    }, 500);
+    // Initialize fighters when both audio and sprites are loaded
+    if (isLoaded && spritesLoaded) {
+      initializeFighters();
+      
+      // Mark game as initialized after a brief delay
+      const initTimer = setTimeout(() => {
+        setGameInitialized(true);
+        console.log('Game canvas fully initialized');
+      }, 500);
 
-    return () => clearTimeout(initTimer);
-  }, [isLoaded, initializeFighters]);
+      return () => clearTimeout(initTimer);
+    }
+  }, [isLoaded, spritesLoaded, initializeFighters]);
+
+  // Game loop for rendering
+  useEffect(() => {
+    if (!gameInitialized) return;
+    
+    const gameLoop = () => {
+      renderGame();
+      requestAnimationFrame(gameLoop);
+    };
+    
+    const animationId = requestAnimationFrame(gameLoop);
+    return () => cancelAnimationFrame(animationId);
+  }, [gameInitialized, renderGame]);
 
   // iOS audio initialization
   useEffect(() => {
@@ -160,14 +220,20 @@ const EnhancedGameCanvas = () => {
           </div>
         </div>
 
-        {/* Enhanced Fighting Stage with Street Fighter Rendering */}
-        <FightingStage
-          canvasRef={canvasRef}
-          gameState={gameState}
-          fighterSprites={{}}
-          onKeyDown={(key) => console.log('Key down:', key)}
-          onKeyUp={(key) => console.log('Key up:', key)}
-        />
+        {/* Game Canvas */}
+        <div className="relative border-2 border-neon-cyan/30 rounded-lg shadow-2xl shadow-neon-cyan/20">
+          <canvas
+            ref={canvasRef}
+            width={1024}
+            height={576}
+            className="w-full h-full rounded-lg"
+            style={{
+              imageRendering: 'pixelated',
+              filter: 'contrast(1.1) saturate(1.2)',
+            }}
+            tabIndex={0}
+          />
+        </div>
 
         {/* Enhanced Controls Guide */}
         <div className="absolute bottom-4 left-0 right-0 z-10 flex justify-between px-8">

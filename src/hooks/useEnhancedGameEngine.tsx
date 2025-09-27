@@ -217,7 +217,7 @@ export const useEnhancedGameEngine = () => {
   const createFighter = useCallback((id: string, name: string, x: number): Fighter => {
     const data = ENHANCED_FIGHTER_DATA[id] || ENHANCED_FIGHTER_DATA.leroy;
     
-    return {
+    const fighter = {
       id,
       name: data.name,
       health: 100,
@@ -230,8 +230,8 @@ export const useEnhancedGameEngine = () => {
       y: GROUND_Y - 100,
       width: 70,
       height: 100,
-      facing: x < CANVAS_WIDTH / 2 ? 'right' : 'left',
-      state: { current: 'idle', timer: 0, canCancel: true, frameAdvantage: 0 },
+      facing: (x < CANVAS_WIDTH / 2 ? 'right' : 'left') as 'left' | 'right',
+      state: { current: 'idle' as const, timer: 0, canCancel: true, frameAdvantage: 0 },
       animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
       animationTimer: 0,
       velocityX: 0,
@@ -251,6 +251,9 @@ export const useEnhancedGameEngine = () => {
       inputBuffer: [],
       lastInputTime: 0
     };
+    
+    console.log('Created fighter:', id, fighter);
+    return fighter;
   }, []);
 
   const initializeFighters = useCallback(() => {
