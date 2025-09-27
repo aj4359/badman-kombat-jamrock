@@ -186,6 +186,7 @@ export const useEnhancedSpriteSystem = () => {
   // Load sprite images
   useEffect(() => {
     const loadSprites = async () => {
+      console.log('useEnhancedSpriteSystem: Starting sprite loading...');
       const sprites: Record<string, HTMLImageElement> = {};
       const spriteMap = {
         leroy: leroySprite,
@@ -195,34 +196,44 @@ export const useEnhancedSpriteSystem = () => {
         rootsman: rootsmanSprite
       };
       
+      console.log('useEnhancedSpriteSystem: Sprite map:', spriteMap);
+      
       try {
         for (const [key, src] of Object.entries(spriteMap)) {
+          console.log(`useEnhancedSpriteSystem: Loading sprite for ${key} from ${src}`);
           const img = new Image();
           img.src = src;
           
           await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = () => {
-              console.warn(`Failed to load sprite for ${key}:`, src);
+            img.onload = () => {
+              console.log(`useEnhancedSpriteSystem: Successfully loaded sprite for ${key}`);
+              resolve(null);
+            };
+            img.onerror = (error) => {
+              console.error(`useEnhancedSpriteSystem: Failed to load sprite for ${key}:`, error);
               resolve(null);
             };
             setTimeout(() => {
-              console.warn(`Sprite loading timeout for ${key}`);
+              console.warn(`useEnhancedSpriteSystem: Sprite loading timeout for ${key}`);
               resolve(null);
             }, 5000);
           });
           
           if (img.complete && img.naturalWidth > 0) {
             sprites[key] = img;
-            console.log(`Successfully loaded sprite for ${key}`);
+            console.log(`useEnhancedSpriteSystem: Sprite ${key} loaded successfully (${img.naturalWidth}x${img.naturalHeight})`);
+          } else {
+            console.warn(`useEnhancedSpriteSystem: Sprite ${key} failed to load or has invalid dimensions`);
           }
         }
 
         spriteImages.current = sprites;
         setIsLoaded(true);
-        console.log('Enhanced sprite system loaded. Available sprites:', Object.keys(sprites));
+        console.log('useEnhancedSpriteSystem: Enhanced sprite system loaded. Available sprites:', Object.keys(sprites));
+        console.log('useEnhancedSpriteSystem: Setting isLoaded=true, enabling sprite rendering');
       } catch (error) {
-        console.error('Error loading sprites:', error);
+        console.error('useEnhancedSpriteSystem: Error loading sprites:', error);
+        console.log('useEnhancedSpriteSystem: Setting isLoaded=true anyway to enable fallback rendering');
         setIsLoaded(true);
       }
     };
@@ -264,55 +275,89 @@ export const useEnhancedSpriteSystem = () => {
     fighter: Fighter,
     effects: any = {}
   ) => {
+    if (!fighter) {
+      console.error('useEnhancedSpriteSystem: drawEnhancedFighter called with null fighter');
+      return;
+    }
+
+    console.log(`useEnhancedSpriteSystem: Drawing enhanced fighter ${fighter.name}`, { 
+      fighterPos: { x: fighter.x, y: fighter.y },
+      state: fighter.state?.current || fighter.state,
+      facing: fighter.facing,
+      hasSprite: !!spriteImages.current[fighter.id]
+    });
+
     const spriteImage = spriteImages.current[fighter.id];
     
     if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
+      console.log(`useEnhancedSpriteSystem: Using sprite rendering for ${fighter.name}`);
       // Use sprite system
-      const currentFrame = getCurrentFrame(fighter.id, fighter.state.current, fighter.animation?.frameTimer || 0);
+      const fighterState = typeof fighter.state === 'object' ? fighter.state.current : fighter.state;
+      const currentFrame = getCurrentFrame(fighter.id, fighterState || 'idle', fighter.animation?.frameTimer || 0);
       
       if (currentFrame.frame) {
-        ctx.save();
-        
-        // Apply effects
-        if (effects.alpha !== undefined) {
-          ctx.globalAlpha = effects.alpha;
+        try {
+          ctx.save();
+          
+          // Apply effects
+          if (effects.alpha !== undefined) {
+            ctx.globalAlpha = effects.alpha;
+          }
+          
+          if (effects.hueRotation) {
+            ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
+          }
+          
+          if (effects.shake) {
+            ctx.translate(effects.shake.x, effects.shake.y);
+          }
+          
+          // Handle sprite flipping based on facing direction
+          const scaleX = fighter.facing === 'left' ? -1 : 1;
+          ctx.translate(fighter.x + fighter.width / 2, fighter.y);
+          ctx.scale(scaleX, 1);
+          ctx.translate(-fighter.width / 2, 0);
+          
+          // Render sprite
+          ctx.drawImage(
+            spriteImage,
+            currentFrame.frame.x,
+            currentFrame.frame.y,
+            currentFrame.frame.width,
+            currentFrame.frame.height,
+            0,
+            0,
+            fighter.width,
+            fighter.height
+          );
+          
+          ctx.restore();
+          console.log(`useEnhancedSpriteSystem: Successfully rendered sprite for ${fighter.name}`);
+          return;
+        } catch (error) {
+          console.error(`useEnhancedSpriteSystem: Error rendering sprite for ${fighter.name}:`, error);
         }
-        
-        if (effects.hueRotation) {
-          ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
-        }
-        
-        if (effects.shake) {
-          ctx.translate(effects.shake.x, effects.shake.y);
-        }
-        
-        // Handle sprite flipping based on facing direction
-        const scaleX = fighter.facing === 'left' ? -1 : 1;
-        ctx.translate(fighter.x + fighter.width / 2, fighter.y);
-        ctx.scale(scaleX, 1);
-        ctx.translate(-fighter.width / 2, 0);
-        
-        // Render sprite
-        ctx.drawImage(
-          spriteImage,
-          currentFrame.frame.x,
-          currentFrame.frame.y,
-          currentFrame.frame.width,
-          currentFrame.frame.height,
-          0,
-          0,
-          fighter.width,
-          fighter.height
-        );
-        
-        ctx.restore();
-        return;
+      } else {
+        console.warn(`useEnhancedSpriteSystem: No current frame for ${fighter.name}, falling back`);
       }
+    } else {
+      console.log(`useEnhancedSpriteSystem: No sprite available for ${fighter.name}, using fallback`);
     }
     
     // Use authentic Street Fighter-style rendering instead of basic fallback
-    const { renderAuthenticFighter } = await import('@/components/game/AuthenticFighterRenderer');
-    renderAuthenticFighter({ ctx, fighter, effects });
+    try {
+      const { renderAuthenticFighter } = await import('@/components/game/AuthenticFighterRenderer');
+      console.log(`useEnhancedSpriteSystem: Using AuthenticFighterRenderer for ${fighter.name}`);
+      renderAuthenticFighter({ ctx, fighter, effects });
+    } catch (error) {
+      console.error(`useEnhancedSpriteSystem: Failed to load AuthenticFighterRenderer, using basic fallback:`, error);
+      // Ultra basic fallback - just draw a rectangle
+      ctx.fillStyle = fighter.id === 'leroy' ? '#FF6B6B' : '#4ECDC4';
+      ctx.fillRect(fighter.x, fighter.y - 100, 80, 100);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '16px Arial';
+      ctx.fillText(fighter.name, fighter.x, fighter.y - 110);
+    }
   }, [getCurrentFrame]);
 
   const getAnimationDuration = useCallback((fighterId: string, state: string): number => {
