@@ -22,8 +22,15 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   const { 
     gameState, 
     handleMobileInput,
-    streetFighterCombat
+    streetFighterCombat,
+    initializeFighters
   } = useEnhancedGameEngine();
+
+  // Initialize fighters on mount
+  useEffect(() => {
+    console.log('ViralStreetFighterCanvas: Initializing fighters on mount...');
+    initializeFighters();
+  }, [initializeFighters]);
   
   const { processAudioEvent } = useEnhancedAudioSystem();
   const { 
@@ -117,41 +124,42 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.arc(canvas.width - 100, 50, 20, 0, Math.PI * 2);
     ctx.fill();
     
-    // Render fighters with authentic sprites when available, fallback to stylized rendering
-    if (gameState.fighters.player1) {
-      if (spritesLoaded) {
-        // Use enhanced sprite rendering when sprites are loaded
-        drawEnhancedFighter(
-          ctx,
-          gameState.fighters.player1
-        );
-      } else {
-        renderStreetFighter(
-          ctx, 
-          gameState.fighters.player1, 
-          gameState.fighters.player1.x, 
-          gameState.fighters.player1.y,
-          gameState.fighters.player1.facing
-        );
-      }
+    // Debug: Show fighter initialization status
+    if (!gameState.fighters.player1 || !gameState.fighters.player2) {
+      ctx.fillStyle = '#ff0000';
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('FIGHTERS INITIALIZING...', canvas.width / 2, canvas.height / 2);
+      ctx.textAlign = 'start';
+      console.log('ViralStreetFighterCanvas: Fighters not ready yet', gameState.fighters);
+      return;
     }
-    
-    if (gameState.fighters.player2) {
-      if (spritesLoaded) {
-        // Use enhanced sprite rendering when sprites are loaded
-        drawEnhancedFighter(
-          ctx,
-          gameState.fighters.player2
-        );
-      } else {
-        renderStreetFighter(
-          ctx, 
-          gameState.fighters.player2, 
-          gameState.fighters.player2.x, 
-          gameState.fighters.player2.y,
-          gameState.fighters.player2.facing
-        );
-      }
+
+    console.log('ViralStreetFighterCanvas: Rendering fighters', { 
+      player1: { x: gameState.fighters.player1.x, y: gameState.fighters.player1.y, health: gameState.fighters.player1.health },
+      player2: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y, health: gameState.fighters.player2.health }
+    });
+
+    // Render fighters with authentic sprites when available, fallback to stylized rendering
+    if (spritesLoaded) {
+      // Use enhanced sprite rendering when sprites are loaded
+      drawEnhancedFighter(ctx, gameState.fighters.player1, Date.now());
+      drawEnhancedFighter(ctx, gameState.fighters.player2, Date.now());
+    } else {
+      renderStreetFighter(
+        ctx, 
+        gameState.fighters.player1, 
+        gameState.fighters.player1.x, 
+        gameState.fighters.player1.y,
+        gameState.fighters.player1.facing
+      );
+      renderStreetFighter(
+        ctx, 
+        gameState.fighters.player2, 
+        gameState.fighters.player2.x, 
+        gameState.fighters.player2.y,
+        gameState.fighters.player2.facing
+      );
     }
     
     // Render projectiles (Hadoken-style)

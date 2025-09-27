@@ -273,19 +273,24 @@ export const useEnhancedGameEngine = () => {
   }, []);
 
   const initializeFighters = useCallback(() => {
-    console.log('Creating fighters...');
+    console.log('useEnhancedGameEngine: Creating fighters...');
     const player1 = createFighter('leroy', 'Leroy', CANVAS_WIDTH / 2 - 150);
     const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH / 2 + 70);
     
-    console.log('Player 1:', player1);
-    console.log('Player 2:', player2);
+    console.log('useEnhancedGameEngine: Player 1 created:', player1);
+    console.log('useEnhancedGameEngine: Player 2 created:', player2);
     
-    setGameState(prev => ({
-      ...prev,
-      fighters: { player1, player2 }
-    }));
+    setGameState(prev => {
+      const newState: GameState = {
+        ...prev,
+        fighters: { player1, player2 },
+        screen: 'fighting' as const
+      };
+      console.log('useEnhancedGameEngine: Setting new game state:', newState);
+      return newState;
+    });
     
-    console.log('Fighters initialized successfully');
+    console.log('useEnhancedGameEngine: Fighters initialized successfully');
   }, [createFighter]);
 
   const checkCollision = useCallback((rect1: any, rect2: any): boolean => {
