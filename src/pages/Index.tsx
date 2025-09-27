@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAudioManager } from '@/hooks/useAudioManager';
 import Hero from '@/components/Hero';
 import FighterShowcase from '@/components/FighterShowcase';
 import GameplayTrailer from '@/components/GameplayTrailer';
@@ -11,6 +12,14 @@ import { EpicTrailerCreator } from '@/components/trailer/EpicTrailerCreator';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { playLayer, isLoaded } = useAudioManager();
+
+  // Initialize ambient audio on home page
+  useEffect(() => {
+    if (isLoaded) {
+      playLayer('ambient');
+    }
+  }, [isLoaded, playLayer]);
 
   return (
     <div className="min-h-screen bg-background">

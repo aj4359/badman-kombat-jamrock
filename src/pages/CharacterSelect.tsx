@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useProgressionSystem } from '@/hooks/useProgressionSystem';
+import { useAudioManager } from '@/hooks/useAudioManager';
 import { Lock } from 'lucide-react';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { FighterGallery } from '@/components/FighterGallery';
@@ -258,9 +259,17 @@ const fighters = [
 const CharacterSelect = () => {
   const navigate = useNavigate();
   const { fighters: progressionFighters, getUnlockConditions } = useProgressionSystem();
+  const { playLayer, isLoaded } = useAudioManager();
   const [selectedP1, setSelectedP1] = useState<string | null>(null);
   const [selectedP2, setSelectedP2] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState<string | null>(null);
+
+  // Initialize audio when component mounts
+  useEffect(() => {
+    if (isLoaded) {
+      playLayer('ambient');
+    }
+  }, [isLoaded, playLayer]);
 
   const handleFighterSelect = (fighterId: string, player: 1 | 2) => {
     if (player === 1) {
