@@ -29,32 +29,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     initializeFighters
   } = useEnhancedGameEngine();
 
-  // PHASE 1: STABILIZE FIGHTER INITIALIZATION - Single initialization with safeguards
+  // Single initialization to prevent loops
   useEffect(() => {
-    // Prevent multiple initializations
-    if (initializationRef.current) {
-      console.log('ViralStreetFighterCanvas: Initialization already done, skipping');
-      return;
+    if (!initializationRef.current && !gameState.fighters?.player1) {
+      initializationRef.current = true;
+      initializeFighters();
     }
-    
-    console.log('ViralStreetFighterCanvas: Component mounted, initializing fighters ONCE...');
-    initializationRef.current = true;
-    initializeFighters();
-    
-    // Cleanup function to reset flag if component unmounts
-    return () => {
-      initializationRef.current = false;
-    };
-  }, []); // CRITICAL: Empty dependency array to prevent loops
-  
-  // Debug fighter state changes
-  useEffect(() => {
-    console.log('ViralStreetFighterCanvas: Fighter state changed:', {
-      hasPlayer1: !!gameState.fighters?.player1,
-      hasPlayer2: !!gameState.fighters?.player2,
-      fighters: gameState.fighters
-    });
-  }, [gameState.fighters]);
+  }, [initializeFighters, gameState.fighters?.player1]);
   
   const { processAudioEvent } = useEnhancedAudioSystem();
   const { 

@@ -696,10 +696,7 @@ export const useEnhancedGameEngine = () => {
     animationFrameRef.current = requestAnimationFrame(gameLoop);
   }, [gameState.screen, updateFighter, updateParticles, checkCollision, audioManager, visualEffects, streetFighterCombat]);
 
-  // Initialize game
-  useEffect(() => {
-    initializeFighters();
-  }, [initializeFighters]);
+  // Fighter initialization is handled by the canvas component only
 
   // Start game loop
   useEffect(() => {
