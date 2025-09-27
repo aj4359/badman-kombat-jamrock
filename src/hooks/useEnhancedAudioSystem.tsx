@@ -104,7 +104,7 @@ export const useEnhancedAudioSystem = () => {
 
       case 'round-start':
         fightAudio.onRoundStart();
-        audioManager.playEffect('round-start');
+        // REMOVED: audioManager.playEffect('round-start'); - This was the source of infinite bell sounds
         crowdAudio.playCrowdReaction('cheer', 2000);
         break;
 

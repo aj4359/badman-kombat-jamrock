@@ -653,7 +653,7 @@ export const useEnhancedGameEngine = () => {
             newState.winner = 'draw';
             fightAudio.onRoundEnd();
           }
-          audioManager.playEffect('round-start');
+          // REMOVED: audioManager.playEffect('round-start'); - This was causing infinite bell sounds
         }
 
         return newState;

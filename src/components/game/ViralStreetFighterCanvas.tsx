@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useEnhancedAudioSystem } from '@/hooks/useEnhancedAudioSystem';
 import { useVisualEffects } from '@/hooks/useVisualEffects';
+import { useEnhancedSpriteSystem } from '@/hooks/useEnhancedSpriteSystem';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -32,6 +33,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     getShakeOffset,
     updateEffects 
   } = useVisualEffects();
+  
+  const { isLoaded: spritesLoaded, drawEnhancedFighter } = useEnhancedSpriteSystem();
 
   // Render authentic Street Fighter characters with proper proportions
   const renderStreetFighter = useCallback((
@@ -114,25 +117,41 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.arc(canvas.width - 100, 50, 20, 0, Math.PI * 2);
     ctx.fill();
     
-    // Render fighters with authentic SF proportions
+    // Render fighters with authentic sprites when available, fallback to stylized rendering
     if (gameState.fighters.player1) {
-      renderStreetFighter(
-        ctx, 
-        gameState.fighters.player1, 
-        gameState.fighters.player1.x, 
-        gameState.fighters.player1.y,
-        gameState.fighters.player1.facing
-      );
+      if (spritesLoaded) {
+        // Use enhanced sprite rendering when sprites are loaded
+        drawEnhancedFighter(
+          ctx,
+          gameState.fighters.player1
+        );
+      } else {
+        renderStreetFighter(
+          ctx, 
+          gameState.fighters.player1, 
+          gameState.fighters.player1.x, 
+          gameState.fighters.player1.y,
+          gameState.fighters.player1.facing
+        );
+      }
     }
     
     if (gameState.fighters.player2) {
-      renderStreetFighter(
-        ctx, 
-        gameState.fighters.player2, 
-        gameState.fighters.player2.x, 
-        gameState.fighters.player2.y,
-        gameState.fighters.player2.facing
-      );
+      if (spritesLoaded) {
+        // Use enhanced sprite rendering when sprites are loaded
+        drawEnhancedFighter(
+          ctx,
+          gameState.fighters.player2
+        );
+      } else {
+        renderStreetFighter(
+          ctx, 
+          gameState.fighters.player2, 
+          gameState.fighters.player2.x, 
+          gameState.fighters.player2.y,
+          gameState.fighters.player2.facing
+        );
+      }
     }
     
     // Render projectiles (Hadoken-style)

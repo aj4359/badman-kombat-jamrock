@@ -39,14 +39,15 @@ const Game = () => {
       );
     }
     
-    // Only start Champion audio if coming from VS screen (startFight = true)
-    // This allows Shaw Brothers audio to continue playing during game preparation
+    // Only start Champion audio after Shaw Brothers intro completes
+    // Check if we're transitioning from VS screen with startFight flag
     if (isLoaded && shouldStartFight) {
-      console.log('Starting Champion audio for fight...');
-      // Delay slightly to allow for smooth transition
+      console.log('Waiting for Shaw Brothers intro to complete before starting Champion audio...');
+      // Wait longer to allow Shaw Brothers intro to complete properly
       setTimeout(() => {
+        console.log('Now starting Champion audio for fight...');
         playLayer('gameplay');
-      }, 500);
+      }, 3000); // Extended delay to ensure Shaw Brothers plays completely
     }
 
     // Mark game as ready after brief delay to allow full initialization
@@ -54,9 +55,9 @@ const Game = () => {
       setGameReady(true);
       console.log('Game marked as ready');
       
-      // If we haven't started fight audio yet and we're ready, start it now
-      if (isLoaded && !shouldStartFight && currentLayer !== 'gameplay') {
-        console.log('Starting gameplay music (fallback)...');
+      // Only start gameplay music if no other audio is playing and we're not waiting for transition
+      if (isLoaded && !shouldStartFight && currentLayer !== 'gameplay' && currentLayer !== 'intro') {
+        console.log('Starting gameplay music (fallback - no active audio detected)...');
         playLayer('gameplay');
       }
     }, shouldStartFight ? 2000 : 1000); // Longer delay when transitioning from VS screen

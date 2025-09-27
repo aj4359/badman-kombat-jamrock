@@ -57,8 +57,7 @@ export const useIntegratedGameSystem = () => {
     // Initialize game engine with character data
     gameEngine.initializeFighters();
     
-    // Set up audio context for characters
-    audioSystem.playRoundTransition();
+    // REMOVED: audioSystem.playRoundTransition(); - This was causing premature bell sounds
     
     // Update integration state
     setIntegrationState(prev => ({
