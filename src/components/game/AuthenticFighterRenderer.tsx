@@ -92,11 +92,12 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {} }: Authentic
     ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
   }
   
-  // Scale for facing direction
+  // Scale for facing direction - FIXED POSITIONING
   const scaleX = fighter.facing === 'left' ? -1 : 1;
-  ctx.translate(fighter.x + fighter.width / 2, fighter.y);
-  ctx.scale(scaleX, 1);
-  ctx.translate(-fighter.width / 2, 0);
+  if (scaleX === -1) {
+    ctx.translate(fighter.x + fighter.width, 0);
+    ctx.scale(scaleX, 1);
+  }
   
   // Choose rendering function based on fighter ID
   switch (fighter.id) {

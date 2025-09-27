@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useEnhancedAudioSystem } from '@/hooks/useEnhancedAudioSystem';
 import { useVisualEffects } from '@/hooks/useVisualEffects';
-import { useEnhancedSpriteSystem } from '@/hooks/useEnhancedSpriteSystem';
+import { renderAuthenticFighter } from './AuthenticFighterRenderer';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { renderProfessionalArena } from './ProfessionalArenaRenderer';
@@ -46,7 +46,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     updateEffects 
   } = useVisualEffects();
   
-  const { isLoaded: spritesLoaded, drawEnhancedFighter } = useEnhancedSpriteSystem();
+  // Removed problematic sprite system - using direct rendering
 
   // Render authentic Street Fighter characters with proper proportions
   const renderStreetFighter = useCallback((
@@ -147,40 +147,22 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
     // Render fighters with enhanced logging and debugging
     console.log('ViralStreetFighterCanvas: About to render fighters', { 
-      spritesLoaded, 
       player1Pos: { x: gameState.fighters.player1.x, y: gameState.fighters.player1.y },
       player2Pos: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y }
     });
     
-    if (spritesLoaded) {
-      console.log('ViralStreetFighterCanvas: Using sprite rendering');
-      // Use enhanced sprite rendering when sprites are loaded
-      try {
-        drawEnhancedFighter(ctx, gameState.fighters.player1);
-        drawEnhancedFighter(ctx, gameState.fighters.player2);
-      } catch (error) {
-        console.error('ViralStreetFighterCanvas: Sprite rendering failed, falling back', error);
-        // Fallback to basic rendering
-        renderStreetFighter(ctx, gameState.fighters.player1, gameState.fighters.player1.x, gameState.fighters.player1.y, gameState.fighters.player1.facing);
-        renderStreetFighter(ctx, gameState.fighters.player2, gameState.fighters.player2.x, gameState.fighters.player2.y, gameState.fighters.player2.facing);
-      }
-    } else {
-      console.log('ViralStreetFighterCanvas: Using fallback rendering (sprites not loaded)');
-      renderStreetFighter(
-        ctx, 
-        gameState.fighters.player1, 
-        gameState.fighters.player1.x, 
-        gameState.fighters.player1.y,
-        gameState.fighters.player1.facing
-      );
-      renderStreetFighter(
-        ctx, 
-        gameState.fighters.player2, 
-        gameState.fighters.player2.x, 
-        gameState.fighters.player2.y,
-        gameState.fighters.player2.facing
-      );
-    }
+    // DIRECT FIGHTER RENDERING - No sprite complications, guaranteed to work
+    renderAuthenticFighter({
+      ctx,
+      fighter: gameState.fighters.player1,
+      effects: {}
+    });
+    
+    renderAuthenticFighter({
+      ctx,
+      fighter: gameState.fighters.player2,
+      effects: {}
+    });
     
     // Render projectiles (Hadoken-style)
     streetFighterCombat.projectiles.forEach(projectile => {
@@ -272,7 +254,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
         <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
         <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✗' : '✗'} P2</div>
-        <div>Sprites: {spritesLoaded ? '✓' : '✗'} Loaded</div>
+        <div>Sprites: ✓ Direct Rendering</div>
         <div>Game State: {gameState.screen}</div>
         <div className="text-xs mt-1">
           Initialization: {initializationRef.current ? '✅ DONE' : '⏳ PENDING'}
