@@ -229,10 +229,10 @@ export const useEnhancedGameEngine = () => {
     return { move: null, newFighter: fighter };
   }, []);
 
+  // PHASE 2: FIX CALLBACK DEPENDENCIES - Stable createFighter with no external dependencies
   const createFighter = useCallback((id: string, name: string, x: number): Fighter => {
-    console.log(`useEnhancedGameEngine: createFighter called with id=${id}, name=${name}, x=${x}`);
+    console.log(`✅ createFighter: Creating ${id} at x=${x}`);
     const data = ENHANCED_FIGHTER_DATA[id] || ENHANCED_FIGHTER_DATA.leroy;
-    console.log('useEnhancedGameEngine: Fighter data retrieved:', data);
     
     const fighter = {
       id,
@@ -270,21 +270,27 @@ export const useEnhancedGameEngine = () => {
       inputBufferSystem: CombatSystem.initializeInputBuffer()
     };
     
-    console.log('Created fighter:', id, fighter);
+    console.log(`✅ Created fighter: ${fighter.name} successfully`);
     return fighter;
-  }, []);
+  }, []); // PHASE 2: Empty deps array for stable reference
 
+  // PHASE 4: ADD SAFEGUARDS - Single initialization flag and error boundaries
+  const initializationCompleteRef = useRef(false);
+  
   const initializeFighters = useCallback(() => {
-    console.log('useEnhancedGameEngine: initializeFighters called - START');
+    // PHASE 4: Prevent multiple initializations
+    if (initializationCompleteRef.current) {
+      console.log('⚠️ initializeFighters: Already initialized, skipping');
+      return;
+    }
+    
+    console.log('🚀 initializeFighters: Starting SINGLE initialization...');
     
     try {
       const player1 = createFighter('leroy', 'Leroy', CANVAS_WIDTH / 2 - 150);
       const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH / 2 + 70);
       
-      console.log('useEnhancedGameEngine: Created fighters successfully:');
-      console.log('Player 1:', player1);
-      console.log('Player 2:', player2);
-      
+      // PHASE 3: OPTIMIZE STATE UPDATES - Functional update to avoid stale closures
       setGameState(prev => {
         const newState = {
           ...prev,
@@ -293,15 +299,25 @@ export const useEnhancedGameEngine = () => {
           round: 1,
           timer: 99
         };
-        console.log('useEnhancedGameEngine: About to set new game state:', newState);
+        console.log('✅ Setting fighters in game state:', {
+          p1: player1.name,
+          p2: player2.name,
+          p1Pos: { x: player1.x, y: player1.y },
+          p2Pos: { x: player2.x, y: player2.y }
+        });
         return newState;
       });
       
-      console.log('useEnhancedGameEngine: Fighter initialization complete!');
+      // PHASE 4: Mark as complete
+      initializationCompleteRef.current = true;
+      console.log('🎉 Fighter initialization COMPLETE and LOCKED!');
+      
     } catch (error) {
-      console.error('useEnhancedGameEngine: Error in initializeFighters:', error);
+      console.error('💥 initializeFighters: FAILED:', error);
+      // Reset flag on error to allow retry
+      initializationCompleteRef.current = false;
     }
-  }, [createFighter]);
+  }, [createFighter]); // Stable dependency
 
   const checkCollision = useCallback((rect1: any, rect2: any): boolean => {
     return rect1.x < rect2.x + rect2.width &&

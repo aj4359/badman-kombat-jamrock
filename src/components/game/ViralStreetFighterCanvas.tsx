@@ -18,6 +18,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isMobile = useIsMobile();
+  const initializationRef = useRef(false);
   
   const { 
     gameState, 
@@ -26,24 +27,23 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     initializeFighters
   } = useEnhancedGameEngine();
 
-  // Initialize fighters on mount with more aggressive debugging and fallback
+  // PHASE 1: STABILIZE FIGHTER INITIALIZATION - Single initialization with safeguards
   useEffect(() => {
-    console.log('ViralStreetFighterCanvas: Component mounted, initializing fighters...');
-    console.log('ViralStreetFighterCanvas: Current gameState:', gameState);
+    // Prevent multiple initializations
+    if (initializationRef.current) {
+      console.log('ViralStreetFighterCanvas: Initialization already done, skipping');
+      return;
+    }
     
-    // Always try to initialize fighters on mount
+    console.log('ViralStreetFighterCanvas: Component mounted, initializing fighters ONCE...');
+    initializationRef.current = true;
     initializeFighters();
     
-    // Set up a backup initialization after a short delay
-    const backupTimer = setTimeout(() => {
-      if (!gameState.fighters?.player1 || !gameState.fighters?.player2) {
-        console.log('ViralStreetFighterCanvas: Backup initialization triggered');
-        initializeFighters();
-      }
-    }, 1000);
-    
-    return () => clearTimeout(backupTimer);
-  }, [initializeFighters]);
+    // Cleanup function to reset flag if component unmounts
+    return () => {
+      initializationRef.current = false;
+    };
+  }, []); // CRITICAL: Empty dependency array to prevent loops
   
   // Debug fighter state changes
   useEffect(() => {
@@ -330,15 +330,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✗' : '✗'} P2</div>
         <div>Sprites: {spritesLoaded ? '✓' : '✗'} Loaded</div>
         <div>Game State: {gameState.screen}</div>
-        <button 
-          onClick={() => {
-            console.log('DEBUG: Force initializing fighters...');
-            initializeFighters();
-          }}
-          className="mt-2 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-        >
-          Force Init Fighters
-        </button>
+        <div className="text-xs mt-1">
+          Initialization: {initializationRef.current ? '✅ DONE' : '⏳ PENDING'}
+        </div>
       </div>
       
       {isMobile && (
