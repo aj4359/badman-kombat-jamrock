@@ -17,52 +17,84 @@ interface TrailerScene {
 
 const TRAILER_SCRIPT: TrailerScene[] = [
   {
-    id: 'intro',
-    title: 'Opening',
-    duration: 3000,
-    voiceover: "In the digital streets of Kingston...",
-    visualElement: 'kingston-street-pan',
-    effects: ['film-grain', 'neon-glow']
-  },
-  {
-    id: 'fighters',
-    title: 'Character Showcase',
-    duration: 5000,
-    voiceover: "Warriors from every corner of Jamaica unite for the ultimate kombat!",
-    visualElement: 'fighter-montage',
-    effects: ['character-spotlight', 'energy-bursts']
-  },
-  {
-    id: 'action',
-    title: 'Combat Sequences',
-    duration: 4000,
-    voiceover: "Experience the power of authentic Jamaican martial arts!",
-    visualElement: 'combat-showcase',
-    effects: ['hit-sparks', 'screen-shake', 'slow-motion']
-  },
-  {
-    id: 'special',
-    title: 'Special Moves',
-    duration: 4000,
-    voiceover: "Master devastating special moves inspired by Caribbean culture!",
-    visualElement: 'special-moves',
-    effects: ['super-effects', 'energy-waves']
-  },
-  {
-    id: 'climax',
-    title: 'Epic Finish',
-    duration: 3000,
-    voiceover: "This is BadMan Kombat... Jamrock Edition!",
-    visualElement: 'title-reveal',
-    effects: ['title-glow', 'epic-music-crescendo']
-  },
-  {
-    id: 'cta',
-    title: 'Call to Action',
+    id: 'studio',
+    title: 'Studio Logo',
     duration: 2000,
-    voiceover: "Coming Soon to digital battlegrounds everywhere!",
-    visualElement: 'coming-soon',
-    effects: ['fade-to-black', 'release-info']
+    voiceover: "",
+    visualElement: 'studio-logo',
+    effects: ['cinematic-fade-in', 'orchestral-hit']
+  },
+  {
+    id: 'darkness',
+    title: 'Dark Opening',
+    duration: 2500,
+    voiceover: "In a world where honor meets violence...",
+    visualElement: 'noir-opening',
+    effects: ['film-noir', 'deep-shadows', 'subtle-grain']
+  },
+  {
+    id: 'hero-intro',
+    title: 'Hero Introduction',
+    duration: 3000,
+    voiceover: "One warrior emerges from the streets of Kingston.",
+    visualElement: 'hero-silhouette',
+    effects: ['dramatic-lighting', 'slow-motion-walk', 'lens-flare']
+  },
+  {
+    id: 'villains',
+    title: 'Villain Montage',
+    duration: 2500,
+    voiceover: "But darkness has many faces...",
+    visualElement: 'villain-reveal',
+    effects: ['evil-red-tint', 'quick-cuts', 'menacing-shadows']
+  },
+  {
+    id: 'action-sequence',
+    title: 'Pure Action',
+    duration: 4000,
+    voiceover: "When fists collide with destiny...",
+    visualElement: 'john-wick-combat',
+    effects: ['bullet-time', 'impact-frames', 'motion-blur', 'screen-shake']
+  },
+  {
+    id: 'power-up',
+    title: 'Special Powers',
+    duration: 3000,
+    voiceover: "Ancient Caribbean power flows through their veins!",
+    visualElement: 'marvel-energy',
+    effects: ['energy-surges', 'particle-effects', 'cosmic-background']
+  },
+  {
+    id: 'team-assembly',
+    title: 'Heroes Unite',
+    duration: 2500,
+    voiceover: "Together, they are unstoppable.",
+    visualElement: 'avengers-assembly',
+    effects: ['hero-poses', 'wind-effects', 'epic-lighting']
+  },
+  {
+    id: 'final-showdown',
+    title: 'Epic Climax',
+    duration: 4000,
+    voiceover: "The ultimate battle for Jamaica's soul begins NOW!",
+    visualElement: 'final-battle',
+    effects: ['explosive-chaos', 'rapid-cuts', 'intensity-max']
+  },
+  {
+    id: 'title-drop',
+    title: 'Title Reveal',
+    duration: 3000,
+    voiceover: "BadMan Kombat: Jamrock Edition",
+    visualElement: 'epic-title-drop',
+    effects: ['metallic-shine', 'dramatic-zoom', 'orchestral-crescendo']
+  },
+  {
+    id: 'release-info',
+    title: 'Coming Soon',
+    duration: 2500,
+    voiceover: "Experience the legend. Coming Soon.",
+    visualElement: 'release-slate',
+    effects: ['premium-fade', 'subtle-glow']
   }
 ];
 
@@ -87,7 +119,7 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
 
   // ElevenLabs voice for epic movie trailer voice
   const { speak, isLoading: voiceLoading } = useElevenLabsVoice({
-    voiceId: 'CwhRBWXzGAHq8TQ4Fs17', // Roger - Deep movie trailer voice
+    voiceId: 'onwK4e9ZLuTAKqWW03F9', // Daniel - Cinematic epic voice
     model: 'eleven_multilingual_v2'
   });
 
@@ -102,239 +134,575 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     };
   }, []);
 
-  // Render trailer scene on canvas
-  const renderScene = (scene: TrailerScene, canvas: HTMLCanvasElement) => {
+  // Render trailer scene on canvas with cinematic effects
+  const renderScene = (scene: TrailerScene, canvas: HTMLCanvasElement, time: number = 0) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions for cinema quality
+    // Set canvas dimensions for 4K cinema quality
     canvas.width = 1920;
     canvas.height = 1080;
 
-    // Clear canvas with cinematic black
+    // Clear canvas with pure black
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Apply film grain effect
-    if (scene.effects.includes('film-grain')) {
-      ctx.save();
-      ctx.globalAlpha = 0.1;
-      for (let i = 0; i < 1000; i++) {
-        ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#000000';
-        ctx.fillRect(
-          Math.random() * canvas.width,
-          Math.random() * canvas.height,
-          1, 1
-        );
-      }
-      ctx.restore();
-    }
+    // Apply cinematic effects first
+    applyCinematicEffects(ctx, canvas, scene.effects, time);
 
     // Render scene-specific content
     switch (scene.visualElement) {
-      case 'kingston-street-pan':
-        renderKingstonStreet(ctx, canvas);
+      case 'studio-logo':
+        renderStudioLogo(ctx, canvas, time);
         break;
-      case 'fighter-montage':
-        renderFighterMontage(ctx, canvas);
+      case 'noir-opening':
+        renderNoirOpening(ctx, canvas, time);
         break;
-      case 'combat-showcase':
-        renderCombatShowcase(ctx, canvas);
+      case 'hero-silhouette':
+        renderHeroSilhouette(ctx, canvas, time);
         break;
-      case 'special-moves':
-        renderSpecialMoves(ctx, canvas);
+      case 'villain-reveal':
+        renderVillainReveal(ctx, canvas, time);
         break;
-      case 'title-reveal':
-        renderTitleReveal(ctx, canvas);
+      case 'john-wick-combat':
+        renderJohnWickCombat(ctx, canvas, time);
         break;
-      case 'coming-soon':
-        renderComingSoon(ctx, canvas);
+      case 'marvel-energy':
+        renderMarvelEnergy(ctx, canvas, time);
+        break;
+      case 'avengers-assembly':
+        renderAvengersAssembly(ctx, canvas, time);
+        break;
+      case 'final-battle':
+        renderFinalBattle(ctx, canvas, time);
+        break;
+      case 'epic-title-drop':
+        renderEpicTitleDrop(ctx, canvas, time);
+        break;
+      case 'release-slate':
+        renderReleaseSlate(ctx, canvas, time);
         break;
     }
 
-    // Apply neon glow effects
-    if (scene.effects.includes('neon-glow')) {
+    // Apply post-processing effects
+    applyPostProcessing(ctx, canvas, scene.effects, time);
+  };
+
+  // Advanced cinematic effects system
+  const applyCinematicEffects = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, effects: string[], time: number) => {
+    // Film grain with noise
+    if (effects.includes('subtle-grain') || effects.includes('film-noir')) {
       ctx.save();
-      ctx.shadowColor = '#00ffff';
-      ctx.shadowBlur = 20;
-      ctx.strokeStyle = '#00ffff';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-      ctx.restore();
-    }
-  };
-
-  const renderKingstonStreet = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Gradient sky background
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#FF6B35'); // Orange sunset
-    gradient.addColorStop(0.6, '#F7931E'); // Yellow
-    gradient.addColorStop(1, '#2E1A47'); // Dark purple
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Street silhouettes
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
-
-    // Palm trees silhouettes
-    drawPalmTree(ctx, 200, canvas.height * 0.4);
-    drawPalmTree(ctx, canvas.width - 200, canvas.height * 0.5);
-
-    // Text overlay
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 72px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('KINGSTON STREETS', canvas.width / 2, canvas.height / 2);
-  };
-
-  const renderFighterMontage = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Dark background with spotlight effects
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Character spotlight circles
-    const spotlights = [
-      { x: canvas.width * 0.25, y: canvas.height * 0.5, name: 'LEROY' },
-      { x: canvas.width * 0.75, y: canvas.height * 0.5, name: 'JORDAN' }
-    ];
-
-    spotlights.forEach(spot => {
-      // Spotlight gradient
-      const gradient = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, 200);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Character name
-      ctx.fillStyle = '#FFD700';
-      ctx.font = 'bold 48px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(spot.name, spot.x, spot.y + 150);
-    });
-  };
-
-  const renderCombatShowcase = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Action background
-    ctx.fillStyle = '#1a0000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Energy burst effects
-    for (let i = 0; i < 5; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
-      gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)');
-      gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // Combat text
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 64px Arial';
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = '#ff0000';
-    ctx.lineWidth = 3;
-    ctx.strokeText('AUTHENTIC KOMBAT', canvas.width / 2, canvas.height / 2);
-    ctx.fillText('AUTHENTIC KOMBAT', canvas.width / 2, canvas.height / 2);
-  };
-
-  const renderSpecialMoves = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Electric blue background
-    ctx.fillStyle = '#000033';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Lightning effects
-    for (let i = 0; i < 3; i++) {
-      ctx.strokeStyle = '#00ffff';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(Math.random() * canvas.width, 0);
-      
-      for (let j = 0; j < 5; j++) {
-        ctx.lineTo(
+      ctx.globalAlpha = effects.includes('film-noir') ? 0.15 : 0.08;
+      for (let i = 0; i < 2000; i++) {
+        const noise = Math.random();
+        ctx.fillStyle = noise > 0.5 ? '#ffffff' : '#000000';
+        ctx.fillRect(
           Math.random() * canvas.width,
-          (j + 1) * (canvas.height / 5)
+          Math.random() * canvas.height,
+          Math.random() * 2 + 1, Math.random() * 2 + 1
         );
       }
-      ctx.stroke();
+      ctx.restore();
     }
 
-    // Special moves text
-    ctx.fillStyle = '#00ffff';
-    ctx.font = 'bold 56px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('DEVASTATING SPECIALS', canvas.width / 2, canvas.height / 2);
+    // Color grading - Teal and Orange cinematic look
+    if (effects.includes('cinematic-fade-in') || effects.includes('dramatic-lighting')) {
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, 'rgba(0, 150, 180, 0.1)'); // Teal
+      gradient.addColorStop(1, 'rgba(255, 140, 0, 0.1)'); // Orange
+      ctx.fillStyle = gradient;
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // Deep shadows for noir effect
+    if (effects.includes('deep-shadows')) {
+      const shadowGradient = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 0,
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.8
+      );
+      shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      shadowGradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.3)');
+      shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+      ctx.fillStyle = shadowGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   };
 
-  const renderTitleReveal = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Jamaica flag colors background
-    const sections = [
-      { color: '#009639', height: canvas.height / 3 },
-      { color: '#FFD320', height: canvas.height / 3 },
-      { color: '#009639', height: canvas.height / 3 }
-    ];
+  const applyPostProcessing = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, effects: string[], time: number) => {
+    // Lens flare effects
+    if (effects.includes('lens-flare')) {
+      const flareX = canvas.width * 0.3;
+      const flareY = canvas.height * 0.3;
+      const flareGradient = ctx.createRadialGradient(flareX, flareY, 0, flareX, flareY, 200);
+      flareGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+      flareGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+      flareGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = flareGradient;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+    }
 
-    let y = 0;
-    sections.forEach(section => {
-      ctx.fillStyle = section.color;
-      ctx.fillRect(0, y, canvas.width, section.height);
-      y += section.height;
-    });
-
-    // Epic title
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 96px Arial';
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 6;
-    ctx.strokeText('BADMAN KOMBAT', canvas.width / 2, canvas.height / 2 - 50);
-    ctx.fillText('BADMAN KOMBAT', canvas.width / 2, canvas.height / 2 - 50);
-
-    ctx.font = 'bold 72px Arial';
-    ctx.strokeText('JAMROCK EDITION', canvas.width / 2, canvas.height / 2 + 50);
-    ctx.fillText('JAMROCK EDITION', canvas.width / 2, canvas.height / 2 + 50);
+    // Screen shake effect
+    if (effects.includes('screen-shake')) {
+      const shakeX = (Math.random() - 0.5) * 10;
+      const shakeY = (Math.random() - 0.5) * 10;
+      ctx.translate(shakeX, shakeY);
+    }
   };
 
-  const renderComingSoon = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Fade to black
+  // Hollywood-style rendering functions
+  const renderStudioLogo = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Elegant black background
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Coming soon text
+    // Studio logo effect with golden letters
     ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 120px serif';
+    ctx.textAlign = 'center';
+    
+    // Add metallic shine effect
+    const shineGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    shineGradient.addColorStop(0, '#FFD700');
+    shineGradient.addColorStop(0.5, '#FFF8DC');
+    shineGradient.addColorStop(1, '#B8860B');
+    
+    ctx.fillStyle = shineGradient;
+    ctx.fillText('BADMAN STUDIOS', canvas.width / 2, canvas.height / 2);
+    
+    // Subtle glow
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 30;
+    ctx.fillText('BADMAN STUDIOS', canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0;
+  };
+
+  const renderNoirOpening = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Dark, moody background
+    const noirGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    noirGradient.addColorStop(0, '#1a1a1a');
+    noirGradient.addColorStop(0.7, '#000000');
+    noirGradient.addColorStop(1, '#000000');
+    
+    ctx.fillStyle = noirGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // City silhouette
+    ctx.fillStyle = '#0f0f0f';
+    for (let i = 0; i < 20; i++) {
+      const buildingWidth = 60 + Math.random() * 80;
+      const buildingHeight = 200 + Math.random() * 300;
+      ctx.fillRect(i * 100, canvas.height - buildingHeight, buildingWidth, buildingHeight);
+    }
+
+    // Dramatic lighting from windows
+    for (let i = 0; i < 50; i++) {
+      if (Math.random() > 0.7) {
+        ctx.fillStyle = '#ffff99';
+        ctx.fillRect(
+          Math.random() * canvas.width,
+          canvas.height - Math.random() * 400,
+          8, 12
+        );
+      }
+    }
+  };
+
+  const renderHeroSilhouette = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Dramatic sunset background
+    const heroGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    heroGradient.addColorStop(0, '#FF6B35');
+    heroGradient.addColorStop(0.5, '#F7931E');
+    heroGradient.addColorStop(1, '#2C1810');
+    
+    ctx.fillStyle = heroGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Hero silhouette in center
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    // Simple hero figure silhouette
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height * 0.3;
+    
+    // Head
+    ctx.arc(centerX, centerY, 40, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Body (shoulders, torso, fighting stance)
+    ctx.fillRect(centerX - 30, centerY + 40, 60, 120);
+    ctx.fillRect(centerX - 50, centerY + 60, 30, 80); // Left arm
+    ctx.fillRect(centerX + 20, centerY + 60, 30, 80); // Right arm
+    ctx.fillRect(centerX - 20, centerY + 160, 15, 100); // Left leg
+    ctx.fillRect(centerX + 5, centerY + 160, 15, 100); // Right leg
+
+    // Dramatic backlighting
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const backlight = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 300);
+    backlight.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+    backlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = backlight;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  };
+
+  const renderVillainReveal = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Evil red tint background
+    ctx.fillStyle = '#200000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Multiple villain silhouettes emerging from shadows
+    const villains = [
+      { x: canvas.width * 0.2, scale: 0.8 },
+      { x: canvas.width * 0.5, scale: 1.2 },
+      { x: canvas.width * 0.8, scale: 0.9 }
+    ];
+
+    villains.forEach((villain, index) => {
+      ctx.save();
+      ctx.translate(villain.x, canvas.height * 0.3);
+      ctx.scale(villain.scale, villain.scale);
+      
+      // Menacing figure
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(-25, 0, 50, 100);
+      ctx.arc(0, -20, 25, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Red glowing eyes
+      ctx.fillStyle = '#ff0000';
+      ctx.arc(-10, -25, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.arc(10, -25, 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+    });
+
+    // Lightning effect
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, Math.random() * canvas.height);
+    for (let i = 0; i < 8; i++) {
+      ctx.lineTo(
+        (i / 8) * canvas.width + (Math.random() - 0.5) * 100,
+        Math.random() * canvas.height
+      );
+    }
+    ctx.stroke();
+  };
+
+  const renderJohnWickCombat = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Dark action environment
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Motion blur streaks (bullet time effect)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath();
+      const startX = Math.random() * canvas.width;
+      const startY = Math.random() * canvas.height;
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(startX + (Math.random() - 0.5) * 200, startY + (Math.random() - 0.5) * 100);
+      ctx.stroke();
+    }
+
+    // Impact flashes
+    for (let i = 0; i < 5; i++) {
+      const impactX = Math.random() * canvas.width;
+      const impactY = Math.random() * canvas.height;
+      
+      const impact = ctx.createRadialGradient(impactX, impactY, 0, impactX, impactY, 80);
+      impact.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+      impact.addColorStop(0.3, 'rgba(255, 200, 0, 0.6)');
+      impact.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      
+      ctx.fillStyle = impact;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Action text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 72px Arial';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 4;
+    ctx.strokeText('PRECISION', canvas.width / 2, canvas.height / 2 - 50);
+    ctx.fillText('PRECISION', canvas.width / 2, canvas.height / 2 - 50);
+    
+    ctx.strokeText('COMBAT', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('COMBAT', canvas.width / 2, canvas.height / 2 + 50);
+  };
+
+  const renderMarvelEnergy = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Cosmic background
+    const spaceGradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, canvas.width
+    );
+    spaceGradient.addColorStop(0, '#001122');
+    spaceGradient.addColorStop(0.5, '#000033');
+    spaceGradient.addColorStop(1, '#000000');
+    
+    ctx.fillStyle = spaceGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Energy particles
+    for (let i = 0; i < 100; i++) {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      const size = Math.random() * 4 + 1;
+      
+      ctx.fillStyle = `hsl(${180 + Math.random() * 180}, 100%, ${50 + Math.random() * 50}%)`;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Particle trail
+      ctx.strokeStyle = ctx.fillStyle;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - Math.random() * 30, y - Math.random() * 30);
+      ctx.stroke();
+    }
+
+    // Central energy surge
+    const energyGradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, 400
+    );
+    energyGradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+    energyGradient.addColorStop(0.5, 'rgba(0, 150, 255, 0.4)');
+    energyGradient.addColorStop(1, 'rgba(0, 0, 255, 0)');
+    
+    ctx.fillStyle = energyGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Power text
+    ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 84px Arial';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 20;
+    ctx.fillText('ANCIENT POWER', canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0;
+  };
+
+  const renderAvengersAssembly = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Epic assembly background
+    const assemblyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    assemblyGradient.addColorStop(0, '#2C1810');
+    assemblyGradient.addColorStop(0.7, '#1a1a1a');
+    assemblyGradient.addColorStop(1, '#000000');
+    
+    ctx.fillStyle = assemblyGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Multiple hero silhouettes in formation
+    const heroes = [
+      { x: canvas.width * 0.15, name: 'LEROY' },
+      { x: canvas.width * 0.35, name: 'JORDAN' },
+      { x: canvas.width * 0.55, name: 'RAZOR' },
+      { x: canvas.width * 0.75, name: 'SIFU' }
+    ];
+
+    heroes.forEach((hero, index) => {
+      // Hero silhouette
+      ctx.fillStyle = '#000000';
+      const heroY = canvas.height * 0.4;
+      
+      // Different poses for each hero
+      ctx.save();
+      ctx.translate(hero.x, heroY);
+      
+      // Head
+      ctx.beginPath();
+      ctx.arc(0, -20, 25, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Body in action pose
+      ctx.fillRect(-20, 10, 40, 80);
+      
+      // Arms in different positions
+      if (index % 2 === 0) {
+        ctx.fillRect(-40, 30, 25, 60); // Left arm extended
+        ctx.fillRect(15, 20, 25, 70); // Right arm up
+      } else {
+        ctx.fillRect(-35, 20, 25, 70); // Left arm up
+        ctx.fillRect(10, 30, 25, 60); // Right arm extended
+      }
+      
+      // Legs
+      ctx.fillRect(-15, 90, 12, 60);
+      ctx.fillRect(3, 90, 12, 60);
+      
+      ctx.restore();
+
+      // Wind effect around each hero
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      for (let j = 0; j < 10; j++) {
+        ctx.beginPath();
+        ctx.arc(hero.x + (Math.random() - 0.5) * 100, heroY + (Math.random() - 0.5) * 100, 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    });
+
+    // Epic text overlay
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 64px Arial';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.strokeText('WARRIORS UNITE', canvas.width / 2, canvas.height * 0.8);
+    ctx.fillText('WARRIORS UNITE', canvas.width / 2, canvas.height * 0.8);
+  };
+
+  const renderFinalBattle = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Explosive chaos background
+    ctx.fillStyle = '#330000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Multiple explosion effects
+    for (let i = 0; i < 8; i++) {
+      const expX = Math.random() * canvas.width;
+      const expY = Math.random() * canvas.height;
+      const expSize = 100 + Math.random() * 200;
+      
+      const explosion = ctx.createRadialGradient(expX, expY, 0, expX, expY, expSize);
+      explosion.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      explosion.addColorStop(0.3, 'rgba(255, 200, 0, 0.7)');
+      explosion.addColorStop(0.6, 'rgba(255, 100, 0, 0.5)');
+      explosion.addColorStop(1, 'rgba(200, 0, 0, 0)');
+      
+      ctx.fillStyle = explosion;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Rapid combat flashes
+    for (let i = 0; i < 20; i++) {
+      ctx.strokeStyle = `rgba(255, 255, 255, ${Math.random()})`;
+      ctx.lineWidth = Math.random() * 5 + 1;
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.stroke();
+    }
+
+    // Intensity text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 96px Arial';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 6;
+    ctx.strokeText('ULTIMATE', canvas.width / 2, canvas.height / 2 - 50);
+    ctx.fillText('ULTIMATE', canvas.width / 2, canvas.height / 2 - 50);
+    
+    ctx.strokeText('SHOWDOWN', canvas.width / 2, canvas.height / 2 + 50);
+    ctx.fillText('SHOWDOWN', canvas.width / 2, canvas.height / 2 + 50);
+  };
+
+  const renderEpicTitleDrop = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Dramatic black background
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Metallic title with dramatic lighting
+    ctx.save();
+    
+    // Create metallic gradient
+    const metallicGradient = ctx.createLinearGradient(0, canvas.height / 2 - 100, 0, canvas.height / 2 + 100);
+    metallicGradient.addColorStop(0, '#FFD700');
+    metallicGradient.addColorStop(0.3, '#FFF8DC');
+    metallicGradient.addColorStop(0.7, '#DAA520');
+    metallicGradient.addColorStop(1, '#B8860B');
+    
+    ctx.fillStyle = metallicGradient;
+    ctx.font = 'bold 120px serif';
+    ctx.textAlign = 'center';
+    
+    // Shadow for depth
+    ctx.shadowColor = '#000000';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+    
+    ctx.fillText('BADMAN KOMBAT', canvas.width / 2, canvas.height / 2 - 50);
+    
+    ctx.font = 'bold 80px serif';
+    ctx.fillText('JAMROCK EDITION', canvas.width / 2, canvas.height / 2 + 50);
+    
+    ctx.restore();
+
+    // Lens flare burst
+    const flareGradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, 600
+    );
+    flareGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+    flareGradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.2)');
+    flareGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    ctx.fillStyle = flareGradient;
+    ctx.globalCompositeOperation = 'screen';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
+  };
+
+  const renderReleaseSlate = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, time: number) => {
+    // Elegant black background
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Premium gold accent line
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(canvas.width * 0.2, canvas.height / 2 - 100);
+    ctx.lineTo(canvas.width * 0.8, canvas.height / 2 - 100);
+    ctx.stroke();
+
+    // Release info text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 72px serif';
     ctx.textAlign = 'center';
     ctx.fillText('COMING SOON', canvas.width / 2, canvas.height / 2);
 
-    // Website/info
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '36px Arial';
-    ctx.fillText('lovable.dev', canvas.width / 2, canvas.height / 2 + 100);
+    ctx.font = '48px serif';
+    ctx.fillStyle = '#cccccc';
+    ctx.fillText('Experience the Legend', canvas.width / 2, canvas.height / 2 + 80);
+
+    ctx.font = '36px serif';
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText('lovable.dev/badman-kombat', canvas.width / 2, canvas.height / 2 + 140);
+
+    // Bottom accent line
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(canvas.width * 0.2, canvas.height / 2 + 200);
+    ctx.lineTo(canvas.width * 0.8, canvas.height / 2 + 200);
+    ctx.stroke();
+
+    // Subtle glow effect
+    ctx.save();
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 30;
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.4);
+    ctx.restore();
   };
 
-  const drawPalmTree = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    // Tree trunk
-    ctx.fillStyle = '#4a3728';
-    ctx.fillRect(x - 10, y, 20, 200);
-
-    // Palm fronds
-    ctx.strokeStyle = '#2d5a2d';
-    ctx.lineWidth = 8;
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(angle) * 80, y + Math.sin(angle) * 80);
-      ctx.stroke();
-    }
-  };
 
   const createTrailer = async () => {
     if (!canvasRef.current) return;
@@ -385,11 +753,21 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
       const scene = TRAILER_SCRIPT[sceneIndex];
       setCurrentScene(sceneIndex);
       
-      // Speak the voiceover for this scene
-      speak(scene.voiceover);
+      // Speak the voiceover for this scene (only if there's text)
+      if (scene.voiceover && scene.voiceover.trim()) {
+        speak(scene.voiceover);
+      }
       
-      // Render the scene
-      renderScene(scene, canvas);
+      // Animate the scene with time progression
+      let sceneStartTime = Date.now();
+      const animateFrame = () => {
+        const currentTime = Date.now() - sceneStartTime;
+        if (currentTime < scene.duration) {
+          renderScene(scene, canvas, currentTime);
+          requestAnimationFrame(animateFrame);
+        }
+      };
+      animateFrame();
       
       // Update progress
       elapsedTime += scene.duration;
@@ -431,7 +809,7 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
         }
 
         const scene = TRAILER_SCRIPT[sceneIndex];
-        renderScene(scene, canvasRef.current!);
+        renderScene(scene, canvasRef.current!, 0);
         setCurrentScene(sceneIndex);
 
         setTimeout(() => {
@@ -449,10 +827,10 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 left-6 z-50 w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg"
+          className="fixed bottom-6 left-6 z-50 w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 via-yellow-600 to-orange-600 hover:scale-110 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-500 shadow-xl border-2 border-gold animate-pulse"
           size="icon"
         >
-          <Film className="w-8 h-8 text-white" />
+          <Film className="w-10 h-10 text-white drop-shadow-lg" />
         </Button>
       )}
 
@@ -463,13 +841,15 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
           'bg-black/95 backdrop-blur border-2 border-red-500/50 shadow-2xl',
           className
         )}>
-          <CardHeader className="bg-gradient-to-r from-red-600 to-yellow-600 text-white p-4">
+          <CardHeader className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white p-6 border-b border-amber-500/30">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Film className="w-6 h-6" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
+                  <Film className="w-6 h-6 text-white" />
+                </div>
                 <div>
-                  <CardTitle className="text-lg font-retro">🎬 Epic Trailer</CardTitle>
-                  <p className="text-sm opacity-90">Professional Movie Trailer Creator</p>
+                  <CardTitle className="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">🎬 EPIC CINEMATIC TRAILER</CardTitle>
+                  <p className="text-sm text-gray-300">Hollywood-Quality Movie Trailer Generator</p>
                 </div>
               </div>
               <Button
