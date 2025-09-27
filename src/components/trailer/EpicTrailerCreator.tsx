@@ -175,11 +175,13 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
   });
   
   const { playCrowdReaction } = useCrowdAudio();
-  const { playLayer } = useAudioManager();
+  const audioManager = useAudioManager();
 
-  // Initialize audio context
+  // Initialize audio context only once
   useEffect(() => {
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
     
     return () => {
       if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
@@ -798,7 +800,7 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     setProgress(0);
     recordedChunks.current = [];
 
-    playLayer('intro', false);
+    audioManager.playLayer('intro', false);
 
     const canvas = canvasRef.current;
     

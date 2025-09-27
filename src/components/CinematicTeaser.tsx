@@ -34,9 +34,10 @@ export const CinematicTeaser: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   
-  // Audio integration
+  // Audio integration (independent mode)
   const audioManager = useAudioManager();
   const audioContextRef = useRef<AudioContext | null>(null);
+  const [audioReady, setAudioReady] = useState(false);
 
   const scenes = [
     { type: 'title', duration: 2000 },
@@ -46,44 +47,42 @@ export const CinematicTeaser: React.FC = () => {
     { type: 'credits', duration: 1500 }
   ];
 
-  // Initialize audio context
+  // Initialize audio context only once
   useEffect(() => {
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    audioManager.initializeAudioContext();
-  }, [audioManager]);
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // Set audio ready regardless of files
+      setAudioReady(true);
+    }
+  }, []);
 
-  // Scene progression with audio synchronization
+  // Scene progression (visual-first, audio optional)
   useEffect(() => {
     if (!isPlaying) return;
 
     const scene = scenes[currentScene];
     
-    // Trigger scene-specific audio with proper timing
-    if (scene && audioManager.isLoaded) {
-      // Start audio first, then let video sync to it
-      switch (scene.type) {
-        case 'title':
-          console.log('Starting Shaw Brothers intro audio');
-          audioManager.playLayer('intro', true);
-          break;
-        case 'fighters':
-          console.log('Starting BMK Champion Loop for fighters');
-          audioManager.stopAll(); // Ensure clean transition
-          setTimeout(() => audioManager.playLayer('gameplay', true), 100);
-          break;
-        case 'action':
-          console.log('Continuing BMK Champion Loop for action');
-          // Don't restart audio, let it continue
-          break;
-        case 'coming-soon':
-          console.log('Transitioning to ambient soundtrack');
-          audioManager.stopAll();
-          setTimeout(() => audioManager.playLayer('ambient', true), 100);
-          break;
-        case 'credits':
-          // Keep ambient playing but lower volume
-          audioManager.updateSettings({ musicVolume: 0.4 });
-          break;
+    // Optional audio enhancement (don't block if audio isn't ready)
+    if (scene && audioManager.isLoaded && audioReady) {
+      try {
+        switch (scene.type) {
+          case 'title':
+            audioManager.playLayer('intro', true);
+            break;
+          case 'fighters':
+            audioManager.stopAll();
+            setTimeout(() => audioManager.playLayer('gameplay', true), 100);
+            break;
+          case 'coming-soon':
+            audioManager.stopAll();
+            setTimeout(() => audioManager.playLayer('ambient', true), 100);
+            break;
+          case 'credits':
+            audioManager.updateSettings({ musicVolume: 0.4 });
+            break;
+        }
+      } catch (error) {
+        console.log('Audio playback optional - continuing with visuals');
       }
     }
 
@@ -94,13 +93,15 @@ export const CinematicTeaser: React.FC = () => {
         // End of sequence
         setIsPlaying(false);
         setCurrentScene(0);
-        audioManager.stopAll();
-        audioManager.updateSettings({ musicVolume: 0.8 }); // Reset volume
+        if (audioManager.isLoaded) {
+          audioManager.stopAll();
+          audioManager.updateSettings({ musicVolume: 0.8 });
+        }
       }
     }, scene?.duration || 2000);
 
     return () => clearTimeout(timer);
-  }, [currentScene, isPlaying, audioManager]);
+  }, [currentScene, isPlaying, audioReady]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -453,16 +454,20 @@ export const CinematicTeaser: React.FC = () => {
     
     if (isPlaying) {
       setIsPlaying(false);
-      audioManager.stopAll();
+      if (audioManager.isLoaded) {
+        audioManager.stopAll();
+      }
     } else {
       setIsPlaying(true);
       setCurrentScene(0);
-      audioManager.initializeAudioContext(); // Ensure audio context is ready
+      // Audio context is already initialized, no need to call again
     }
   };
 
   const toggleMute = () => {
-    audioManager.toggleMute();
+    if (audioManager.isLoaded) {
+      audioManager.toggleMute();
+    }
   };
 
   return (
@@ -493,32 +498,38 @@ export const CinematicTeaser: React.FC = () => {
       <div className="flex gap-4">
         <Button 
           onClick={togglePlayback}
-          disabled={isRecording || !audioManager.isLoaded}
-          variant="neon"
-          className="flex items-center gap-2"
+          disabled={isRecording}
+          variant="outline"
+          size="lg"
+          className="flex items-center gap-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
         >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           {isPlaying ? 'Pause' : 'Preview'}
         </Button>
         
         <Button 
           onClick={toggleMute}
-          disabled={isRecording}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
+          variant="ghost" 
+          size="lg"
+          className="flex items-center gap-2 text-foreground/70 hover:text-foreground"
+          disabled={!audioManager.isLoaded}
         >
-          {audioManager.settings.isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          {audioManager.settings?.isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          {audioManager.isLoaded ? 
+            (audioManager.settings?.isMuted ? 'Unmute' : 'Mute') : 
+            'Audio Loading'
+          }
         </Button>
         
         <Button 
           onClick={startRecording}
-          disabled={isRecording || !audioManager.isLoaded}
-          variant="combat"
-          className="flex items-center gap-2"
+          disabled={isRecording || isPlaying}
+          variant="default"
+          size="lg"
+          className="flex items-center gap-2 bg-neon-pink text-white hover:bg-neon-pink/90"
         >
-          <Download className="h-4 w-4" />
-          {isRecording ? 'Recording...' : 'Download with Audio'}
+          <Download className="h-5 w-5" />
+          {isRecording ? 'Recording...' : 'Create & Download'}
         </Button>
       </div>
 
@@ -530,15 +541,15 @@ export const CinematicTeaser: React.FC = () => {
           © 2024 TA GuruLabs Production.
         </p>
         
-        {!audioManager.isLoaded && (
-          <div className="mt-2 text-xs text-yellow-400">
-            Loading audio tracks... Preview will be available once audio loads.
-          </div>
-        )}
+        <div className="mt-3 space-y-1 text-xs">
+          <p>Audio: {audioManager.isLoaded ? '✓ Ready' : '⏳ Optional (Visual-only mode active)'}</p>
+          <p>Canvas: {canvasRef.current ? '✓ Ready' : '⏳ Initializing...'}</p>
+          <p>Status: {isRecording ? '🔴 Recording' : isPlaying ? `▶️ Scene ${currentScene + 1}/${scenes.length}` : '⏹️ Ready'}</p>
+        </div>
         
         {audioManager.audioErrors.length > 0 && (
-          <div className="mt-2 text-xs text-red-400">
-            Some audio tracks failed to load: {audioManager.audioErrors.join(', ')}
+          <div className="mt-2 text-xs text-yellow-400">
+            ⚠️ Audio enhancement unavailable - Visual-only mode active
           </div>
         )}
       </div>
