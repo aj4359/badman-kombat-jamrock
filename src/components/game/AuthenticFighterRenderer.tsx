@@ -399,7 +399,7 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
   // Ninja suit legs
   ctx.fillStyle = profile.colors.ninja_suit;
   ctx.fillRect(w * 0.25, h * 0.7, w * 0.2, h * 0.3);
-  ctx.fillRect(w * 0.55, h * 0.7, h * 0.2, h * 0.3);
+  ctx.fillRect(w * 0.55, h * 0.7, w * 0.2, h * 0.3);
   
   // Ninja boots
   ctx.fillStyle = 'hsl(0, 0%, 5%)';

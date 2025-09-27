@@ -175,8 +175,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       console.log('ViralStreetFighterCanvas: Using sprite rendering');
       // Use enhanced sprite rendering when sprites are loaded
       try {
-        drawEnhancedFighter(ctx, gameState.fighters.player1, Date.now());
-        drawEnhancedFighter(ctx, gameState.fighters.player2, Date.now());
+        drawEnhancedFighter(ctx, gameState.fighters.player1);
+        drawEnhancedFighter(ctx, gameState.fighters.player2);
       } catch (error) {
         console.error('ViralStreetFighterCanvas: Sprite rendering failed, falling back', error);
         // Fallback to basic rendering
