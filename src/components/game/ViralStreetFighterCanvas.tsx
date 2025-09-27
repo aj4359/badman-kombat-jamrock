@@ -26,11 +26,33 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     initializeFighters
   } = useEnhancedGameEngine();
 
-  // Initialize fighters on mount
+  // Initialize fighters on mount with more aggressive debugging and fallback
   useEffect(() => {
-    console.log('ViralStreetFighterCanvas: Initializing fighters on mount...');
+    console.log('ViralStreetFighterCanvas: Component mounted, initializing fighters...');
+    console.log('ViralStreetFighterCanvas: Current gameState:', gameState);
+    
+    // Always try to initialize fighters on mount
     initializeFighters();
+    
+    // Set up a backup initialization after a short delay
+    const backupTimer = setTimeout(() => {
+      if (!gameState.fighters?.player1 || !gameState.fighters?.player2) {
+        console.log('ViralStreetFighterCanvas: Backup initialization triggered');
+        initializeFighters();
+      }
+    }, 1000);
+    
+    return () => clearTimeout(backupTimer);
   }, [initializeFighters]);
+  
+  // Debug fighter state changes
+  useEffect(() => {
+    console.log('ViralStreetFighterCanvas: Fighter state changed:', {
+      hasPlayer1: !!gameState.fighters?.player1,
+      hasPlayer2: !!gameState.fighters?.player2,
+      fighters: gameState.fighters
+    });
+  }, [gameState.fighters]);
   
   const { processAudioEvent } = useEnhancedAudioSystem();
   const { 
@@ -301,6 +323,23 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           aspectRatio: '16/9'
         }}
       />
+      
+      {/* Debug Panel - Remove this once fighters are working */}
+      <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
+        <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
+        <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✗' : '✗'} P2</div>
+        <div>Sprites: {spritesLoaded ? '✓' : '✗'} Loaded</div>
+        <div>Game State: {gameState.screen}</div>
+        <button 
+          onClick={() => {
+            console.log('DEBUG: Force initializing fighters...');
+            initializeFighters();
+          }}
+          className="mt-2 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+        >
+          Force Init Fighters
+        </button>
+      </div>
       
       {isMobile && (
         <MobileControls 
