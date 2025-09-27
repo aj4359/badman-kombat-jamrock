@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { EnhancedMobileControls } from './EnhancedMobileControls';
@@ -26,15 +26,25 @@ const ProfessionalGameCanvas: React.FC = () => {
     }
   });
 
-  // Initialize the game
+  // Initialize fighters when passed from character select
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const player1Id = urlParams.get('player1') || 'leroy';
+    const player2Id = urlParams.get('player2') || 'jordan';
+    
+    console.log('Initializing fighters with IDs:', { player1Id, player2Id });
     initializeFighters();
     
-    // Start background music
     if (audioManager.isLoaded) {
-      audioManager.playLayer('gameplay');
+      audioManager.playLayer('gameplay', false);
     }
   }, [initializeFighters, audioManager]);
+
+  // Enhanced mobile controls integration
+  const handleMobileTouch = useCallback((action: string, pressed: boolean) => {
+    console.log(`Mobile input: ${action} ${pressed ? 'pressed' : 'released'}`);
+    handleMobileInput(action, pressed, 1);
+  }, [handleMobileInput]);
 
   // Enhanced rendering system
   useEffect(() => {
@@ -396,29 +406,33 @@ const ProfessionalGameCanvas: React.FC = () => {
 
       {/* Enhanced Mobile Controls */}
       <EnhancedMobileControls 
-        onTouch={handleMobileInput}
+        onTouch={handleMobileTouch}
         onGesture={(gesture) => {
-          console.log('Gesture detected:', gesture);
-          // Map gestures to game actions
+          // Enhanced gesture handling for mobile
           switch (gesture) {
-            case 'swipe-right':
-              handleMobileInput('right', true);
-              setTimeout(() => handleMobileInput('right', false), 100);
-              break;
             case 'swipe-left':
-              handleMobileInput('left', true);
-              setTimeout(() => handleMobileInput('left', false), 100);
+              handleMobileTouch('left', true);
+              setTimeout(() => handleMobileTouch('left', false), 100);
+              break;
+            case 'swipe-right':
+              handleMobileTouch('right', true);
+              setTimeout(() => handleMobileTouch('right', false), 100);
+              break;
+            case 'swipe-up':
+              handleMobileTouch('up', true);
+              setTimeout(() => handleMobileTouch('up', false), 100);
               break;
             case 'tap':
-              handleMobileInput('punch', true);
-              setTimeout(() => handleMobileInput('punch', false), 50);
+              handleMobileTouch('punch', true);
+              setTimeout(() => handleMobileTouch('punch', false), 100);
               break;
             case 'double-tap':
-              handleMobileInput('kick', true);
-              setTimeout(() => handleMobileInput('kick', false), 50);
+              handleMobileTouch('kick', true);
+              setTimeout(() => handleMobileTouch('kick', false), 100);
               break;
             case 'hold':
-              handleMobileInput('block', true);
+              handleMobileTouch('block', true);
+              setTimeout(() => handleMobileTouch('block', false), 500);
               break;
           }
         }}

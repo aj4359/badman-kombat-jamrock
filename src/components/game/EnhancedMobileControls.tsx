@@ -76,21 +76,35 @@ export const EnhancedMobileControls: React.FC<EnhancedMobileControlsProps> = ({
       holdTimer.current = null;
     }
 
-    // Detect swipes (minimum distance and speed)
+    // Enhanced gesture to button mapping
     if (distance > 50 && deltaTime < 300) {
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        onGesture(deltaX > 0 ? 'swipe-right' : 'swipe-left');
+        if (deltaX > 0) {
+          onTouch('right', true);
+          setTimeout(() => onTouch('right', false), 100);
+        } else {
+          onTouch('left', true);
+          setTimeout(() => onTouch('left', false), 100);
+        }
       } else {
-        onGesture(deltaY > 0 ? 'swipe-down' : 'swipe-up');
+        if (deltaY > 0) {
+          onTouch('down', true);
+          setTimeout(() => onTouch('down', false), 100);
+        } else {
+          onTouch('up', true);
+          setTimeout(() => onTouch('up', false), 100);
+        }
       }
     } 
-    // Detect taps
+    // Enhanced tap to button mapping
     else if (distance < 30 && deltaTime < 200) {
       const now = Date.now();
       if (now - lastTap.current < 300) {
-        onGesture('double-tap');
+        onTouch('kick', true);
+        setTimeout(() => onTouch('kick', false), 100);
       } else {
-        onGesture('tap');
+        onTouch('punch', true);
+        setTimeout(() => onTouch('punch', false), 100);
       }
       lastTap.current = now;
     }

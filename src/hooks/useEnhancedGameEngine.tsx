@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAudioManager } from './useAudioManager';
+import { useCrowdAudio } from './useCrowdAudio';
+import { useFightAudio } from './useFightAudio';
 import { useProjectileSystem } from './useProjectileSystem';
 import { useSuperMoveSystem } from './useSuperMoveSystem';
 import { useEnhancedSpriteSystem } from './useEnhancedSpriteSystem';
@@ -99,6 +101,8 @@ export const useEnhancedGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const audioManager = useAudioManager();
+  const crowdAudio = useCrowdAudio();
+  const fightAudio = useFightAudio();
   const { projectiles, updateProjectiles, addProjectile } = useProjectileSystem();
   const { checkSuperMoves, createSuperProjectile, getVoiceLine } = useSuperMoveSystem();
   const { isLoaded: spritesLoaded, drawEnhancedFighter, getAnimationDuration, registerAnimationCallback, isAnimationComplete } = useEnhancedSpriteSystem();
@@ -372,6 +376,9 @@ export const useEnhancedGameEngine = () => {
         newFighter.state.current = 'attacking';
         newFighter.animationTimer = 0;
         newFighter.state.timer = 15; // Faster recovery for fluid combos
+        
+        // Integrated audio system
+        fightAudio.onHit('medium');
         audioManager.playEffect('hit');
         
         // Enhanced visual effects
@@ -438,20 +445,31 @@ export const useEnhancedGameEngine = () => {
           const fighter2Hitbox = newFighter2.hitbox || { x: newFighter2.x, y: newFighter2.y, width: newFighter2.width, height: newFighter2.height };
 
           if (checkCollision(fighter1Hitbox, fighter2Hitbox)) {
-            // Handle collision
+            // Handle collision with integrated audio
             if (newFighter1.state.current === 'attacking' && newFighter2.state.current !== 'blocking') {
               newFighter2.health = Math.max(0, newFighter2.health - 10);
+              newFighter2.frameData.hitstun = 8;
+              
+              // Integrated fight audio
+              fightAudio.onHit('heavy');
               audioManager.playEffect('hit');
               visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
+              visualEffects.addScreenShake(6, 120);
             } else if (newFighter1.state.current === 'attacking' && newFighter2.state.current === 'blocking') {
+              newFighter2.frameData.blockstun = 4;
               audioManager.playEffect('block');
               visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'block');
             }
 
             if (newFighter2.state.current === 'attacking' && newFighter1.state.current !== 'blocking') {
               newFighter1.health = Math.max(0, newFighter1.health - 10);
+              newFighter1.frameData.hitstun = 8;
+              
+              // Integrated fight audio
+              fightAudio.onHit('heavy');
               audioManager.playEffect('hit');
               visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
+              visualEffects.addScreenShake(6, 120);
             }
           }
 
@@ -468,19 +486,24 @@ export const useEnhancedGameEngine = () => {
         if (newState.fighters.player1?.health === 0) {
           newState.fighters.player1.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player2';
+          fightAudio.onRoundEnd('player2');
           audioManager.playEffect('ko');
         } else if (newState.fighters.player2?.health === 0) {
           newState.fighters.player2.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player1';
+          fightAudio.onRoundEnd('player1');
           audioManager.playEffect('ko');
         } else if (newState.timer <= 0) {
           // Time up
           if (newState.fighters.player1.health > newState.fighters.player2.health) {
             newState.winner = 'player1';
+            fightAudio.onRoundEnd('player1');
           } else if (newState.fighters.player2.health > newState.fighters.player1.health) {
             newState.winner = 'player2';
+            fightAudio.onRoundEnd('player2');
           } else {
             newState.winner = 'draw';
+            fightAudio.onRoundEnd();
           }
           audioManager.playEffect('round-start');
         }
