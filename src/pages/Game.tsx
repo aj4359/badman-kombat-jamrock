@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import ProfessionalGameCanvas from '@/components/game/ProfessionalGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
@@ -8,8 +8,15 @@ import { RastaChatbot } from '@/components/RastaChatbot';
 
 const Game = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoaded, playLayer, currentLayer, audioErrors } = useAudioManager();
   const [gameReady, setGameReady] = useState(false);
+  
+  // Get fighter data from character select
+  const fighterData = location.state?.fighterData || {
+    player1: { id: 'leroy', name: 'Leroy', colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' } },
+    player2: { id: 'jordan', name: 'Jordan', colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' } }
+  };
 
   useEffect(() => {
     console.log('Game page mounted');

@@ -441,17 +441,28 @@ const CharacterSelect = () => {
 
       <div className="flex gap-4">
         <Button 
-          variant="retro" 
           onClick={() => navigate('/')}
-          className="text-lg px-8"
+          className="text-lg px-8 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all"
+          variant="outline"
         >
           Back to Menu
         </Button>
         <Button 
-          variant="combat" 
           disabled={!canProceed}
-          onClick={() => navigate('/game')}
-          className="text-lg px-8"
+          onClick={() => {
+            console.log('Starting combat with:', { selectedP1, selectedP2 });
+            navigate('/game', { 
+              state: { 
+                selectedP1, 
+                selectedP2,
+                fighterData: {
+                  player1: selectedP1Fighter,
+                  player2: selectedP2Fighter
+                }
+              } 
+            });
+          }}
+          className="text-lg px-8 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold transform hover:scale-105 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           START KOMBAT!
         </Button>

@@ -174,7 +174,7 @@ const ProfessionalGameCanvas: React.FC = () => {
   };
 
   const renderEnhancedFighter = (ctx: CanvasRenderingContext2D, fighter: any) => {
-    // Enhanced fighter rendering with authentic proportions
+    // Enhanced fighter rendering with sprite-like visuals and clear faces
     ctx.save();
 
     // Fighter shadow
@@ -183,57 +183,112 @@ const ProfessionalGameCanvas: React.FC = () => {
                 fighter.width / 2, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Main fighter body with authentic Street Fighter proportions
-    const bodyGradient = ctx.createLinearGradient(fighter.x, fighter.y, 
-                                                 fighter.x, fighter.y + fighter.height);
-    bodyGradient.addColorStop(0, fighter.colors?.primary || 'hsl(30, 60%, 50%)');
-    bodyGradient.addColorStop(1, fighter.colors?.secondary || 'hsl(30, 60%, 30%)');
+    // Character-specific colors and features
+    let primaryColor = 'hsl(30, 60%, 50%)';
+    let secondaryColor = 'hsl(30, 60%, 30%)';
+    let skinTone = 'hsl(25, 40%, 60%)';
     
-    ctx.fillStyle = bodyGradient;
-    
-    // Head (larger for cartoon proportions)
+    if (fighter.id === 'leroy') {
+      primaryColor = 'hsl(180, 100%, 50%)'; // Cyber blue
+      secondaryColor = 'hsl(180, 100%, 30%)';
+      skinTone = 'hsl(25, 40%, 45%)';
+    } else if (fighter.id === 'jordan') {
+      primaryColor = 'hsl(270, 100%, 60%)'; // Purple
+      secondaryColor = 'hsl(270, 100%, 40%)';
+      skinTone = 'hsl(25, 40%, 50%)';
+    } else if (fighter.id === 'razor') {
+      primaryColor = 'hsl(320, 100%, 60%)'; // Pink
+      secondaryColor = 'hsl(320, 100%, 40%)';
+      skinTone = 'hsl(35, 30%, 70%)'; // Asian skin tone
+    }
+
+    // Head with clear facial features
+    ctx.fillStyle = skinTone;
     ctx.fillRect(fighter.x + 15, fighter.y, 40, 35);
     
-    // Torso
+    // Eyes (always visible)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(fighter.x + 22, fighter.y + 10, 8, 6); // Left eye
+    ctx.fillRect(fighter.x + 35, fighter.y + 10, 8, 6); // Right eye
+    
+    // Pupils
+    ctx.fillStyle = 'black';
+    ctx.fillRect(fighter.x + 24, fighter.y + 12, 4, 2); // Left pupil
+    ctx.fillRect(fighter.x + 37, fighter.y + 12, 4, 2); // Right pupil
+    
+    // Mouth
+    ctx.fillStyle = 'hsl(0, 50%, 40%)';
+    ctx.fillRect(fighter.x + 28, fighter.y + 22, 12, 3);
+    
+    // Torso with clothing
+    const bodyGradient = ctx.createLinearGradient(fighter.x, fighter.y + 35, 
+                                                 fighter.x, fighter.y + 80);
+    bodyGradient.addColorStop(0, primaryColor);
+    bodyGradient.addColorStop(1, secondaryColor);
+    ctx.fillStyle = bodyGradient;
     ctx.fillRect(fighter.x + 10, fighter.y + 35, 50, 45);
     
     // Arms
-    ctx.fillRect(fighter.x, fighter.y + 40, 15, 30);
-    ctx.fillRect(fighter.x + 55, fighter.y + 40, 15, 30);
+    ctx.fillStyle = skinTone;
+    ctx.fillRect(fighter.x, fighter.y + 40, 15, 30); // Left arm
+    ctx.fillRect(fighter.x + 55, fighter.y + 40, 15, 30); // Right arm
     
-    // Legs  
-    ctx.fillRect(fighter.x + 20, fighter.y + 80, 15, 35);
-    ctx.fillRect(fighter.x + 35, fighter.y + 80, 15, 35);
+    // Legs with pants
+    ctx.fillStyle = secondaryColor;
+    ctx.fillRect(fighter.x + 20, fighter.y + 80, 15, 35); // Left leg
+    ctx.fillRect(fighter.x + 35, fighter.y + 80, 15, 35); // Right leg
 
-    // Fighter details based on character
+    // Character-specific details
     if (fighter.id === 'leroy') {
       // Dreadlocks
       ctx.fillStyle = 'hsl(30, 20%, 15%)';
       for (let i = 0; i < 6; i++) {
-        ctx.fillRect(fighter.x + 5 + i * 8, fighter.y - 10, 6, 20);
+        ctx.fillRect(fighter.x + 8 + i * 8, fighter.y - 5, 6, 25);
       }
       
-      // Cyber elements
-      ctx.fillStyle = 'hsl(180, 100%, 50%)';
-      ctx.fillRect(fighter.x + 45, fighter.y + 10, 8, 8); // Cyber eye
-    } else if (fighter.id === 'jordan') {
-      // DJ headphones
-      ctx.fillStyle = 'hsl(0, 0%, 20%)';
-      ctx.fillRect(fighter.x + 10, fighter.y - 5, 50, 15);
+      // Cyber eye glow
+      ctx.fillStyle = 'hsl(180, 100%, 70%)';
+      ctx.fillRect(fighter.x + 35, fighter.y + 10, 8, 6);
       
-      // Sound waves
-      ctx.strokeStyle = 'hsl(60, 100%, 50%)';
+      // Circuit tattoos on arms
+      ctx.strokeStyle = 'hsl(180, 100%, 50%)';
       ctx.lineWidth = 2;
-      for (let i = 1; i <= 3; i++) {
+      ctx.strokeRect(fighter.x + 2, fighter.y + 45, 11, 20);
+    } else if (fighter.id === 'jordan') {
+      // DJ headphones (clearly visible)
+      ctx.fillStyle = 'hsl(0, 0%, 10%)';
+      ctx.fillRect(fighter.x + 8, fighter.y - 5, 54, 12);
+      
+      // Headphone details
+      ctx.fillStyle = 'hsl(60, 100%, 50%)';
+      ctx.fillRect(fighter.x + 12, fighter.y - 3, 8, 8); // Left speaker
+      ctx.fillRect(fighter.x + 50, fighter.y - 3, 8, 8); // Right speaker
+      
+      // Sound wave aura
+      ctx.strokeStyle = 'hsl(270, 100%, 60%)';
+      ctx.lineWidth = 2;
+      for (let i = 1; i <= 2; i++) {
         ctx.beginPath();
-        ctx.arc(fighter.x + fighter.width / 2, fighter.y + 20, i * 15, 0, Math.PI * 2);
+        ctx.arc(fighter.x + fighter.width / 2, fighter.y + 20, i * 20, 0, Math.PI * 2);
         ctx.stroke();
       }
+    } else if (fighter.id === 'razor') {
+      // Katana on back
+      ctx.strokeStyle = 'hsl(0, 0%, 80%)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(fighter.x + 60, fighter.y + 20);
+      ctx.lineTo(fighter.x + 65, fighter.y + 60);
+      ctx.stroke();
+      
+      // Hair
+      ctx.fillStyle = 'hsl(0, 0%, 5%)';
+      ctx.fillRect(fighter.x + 18, fighter.y - 2, 34, 15);
     }
 
     // Health-based visual effects
     if (fighter.health < 30) {
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
       ctx.fillRect(fighter.x - 5, fighter.y - 5, fighter.width + 10, fighter.height + 10);
     }
 

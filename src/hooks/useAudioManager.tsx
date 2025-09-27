@@ -30,7 +30,7 @@ export const useAudioManager = () => {
   const audioRefs = useRef<AudioLayer>({
     intro: new Audio('/assets/audio/shaw-brothers-intro.mp3'),
     gameplay: new Audio('/assets/audio/bmk-champion-loop.mp3'),
-    ambient: new Audio('/assets/bmk-soundtrack.mp3'),
+    ambient: new Audio('/assets/audio/reggae-drum-bass.mp3'),
     effects: []
   });
 
