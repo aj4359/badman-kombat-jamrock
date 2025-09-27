@@ -909,6 +909,10 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
         }, 1000); // Faster preview
       };
       previewAnimation();
+    } else {
+      // Stop preview and stop all audio
+      audioManager.stopAllAudio();
+      console.log('Trailer preview stopped - all audio stopped');
     }
   };
 

@@ -41,7 +41,7 @@ const Game = () => {
     
     // Only start Champion audio after Shaw Brothers intro completes
     // Check if we're transitioning from VS screen with startFight flag
-    if (isLoaded && shouldStartFight) {
+    if (isLoaded && shouldStartFight && currentLayer !== 'gameplay') {
       console.log('Waiting for Shaw Brothers intro to complete before starting Champion audio...');
       // Wait longer to allow Shaw Brothers intro to complete properly
       setTimeout(() => {
