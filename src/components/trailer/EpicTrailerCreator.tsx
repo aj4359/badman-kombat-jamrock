@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Download, Play, Pause, Film, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useElevenLabsVoice } from '@/hooks/useElevenLabsVoice';
+import { useWebSpeechAPI } from '@/hooks/useWebSpeechAPI';
+import { useCrowdAudio } from '@/hooks/useCrowdAudio';
+import { useAudioManager } from '@/hooks/useAudioManager';
 
 interface TrailerScene {
   id: string;
@@ -117,11 +119,15 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunks = useRef<Blob[]>([]);
 
-  // ElevenLabs voice for epic movie trailer voice
-  const { speak, isLoading: voiceLoading } = useElevenLabsVoice({
-    voiceId: 'onwK4e9ZLuTAKqWW03F9', // Daniel - Cinematic epic voice
-    model: 'eleven_multilingual_v2'
+  // Free Web Speech API for epic movie trailer voice
+  const { speak, isLoading: voiceLoading } = useWebSpeechAPI({
+    voiceName: 'male',
+    rate: 0.7,
+    pitch: 0.6
   });
+  
+  const { playCrowdReaction } = useCrowdAudio();
+  const { playLayer } = useAudioManager();
 
   // Initialize audio context
   useEffect(() => {
@@ -711,18 +717,22 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     setProgress(0);
     recordedChunks.current = [];
 
+    // Start background music
+    playLayer('intro', false);
+
     const canvas = canvasRef.current;
     const stream = canvas.captureStream(30); // 30 FPS
     
-    // Add audio track (placeholder - in real implementation would sync with voiceover)
-    if (audioContextRef.current) {
-      const audioDestination = audioContextRef.current.createMediaStreamDestination();
-      stream.addTrack(audioDestination.stream.getAudioTracks()[0]);
+    // Try different codec options for better compatibility
+    let mimeType = 'video/webm;codecs=vp9';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp8';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm';
+      }
     }
 
-    mediaRecorderRef.current = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9,opus'
-    });
+    mediaRecorderRef.current = new MediaRecorder(stream, { mimeType });
 
     mediaRecorderRef.current.ondataavailable = (event) => {
       if (event.data.size > 0) {
@@ -731,7 +741,7 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     };
 
     mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(recordedChunks.current, { type: 'video/webm' });
+      const blob = new Blob(recordedChunks.current, { type: mimeType });
       const url = URL.createObjectURL(blob);
       setDownloadUrl(url);
       setIsCreating(false);
@@ -752,6 +762,11 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
 
       const scene = TRAILER_SCRIPT[sceneIndex];
       setCurrentScene(sceneIndex);
+      
+      // Add crowd reactions for fight scenes
+      if (scene.title.toLowerCase().includes('combat') || scene.title.toLowerCase().includes('battle')) {
+        playCrowdReaction('cheer', scene.duration);
+      }
       
       // Speak the voiceover for this scene (only if there's text)
       if (scene.voiceover && scene.voiceover.trim()) {
@@ -787,10 +802,11 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
     if (downloadUrl) {
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = 'badman-kombat-epic-trailer.webm';
+      a.download = `badman-kombat-epic-trailer-${Date.now()}.webm`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl); // Clean up memory
     }
   };
 
@@ -915,10 +931,11 @@ export const EpicTrailerCreator: React.FC<EpicTrailerCreatorProps> = ({
             {downloadUrl && (
               <Button
                 onClick={downloadTrailer}
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full"
+                variant="secondary"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Download Epic Trailer
+                Download Epic Trailer (.webm)
               </Button>
             )}
 
