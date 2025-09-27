@@ -205,47 +205,10 @@ export const useAudioManager = () => {
   }, [currentLayer, isPlaying, crossFade]);
 
   const playEffect = useCallback((effectType: string) => {
-    if (!isLoaded || settings.isMuted) return;
-    
-    // COMPLETELY DISABLE ALL SOUND EFFECTS TO ELIMINATE BELL
-    if (effectType === 'round-start' || effectType === 'special' || effectType === 'hit' || effectType === 'block' || effectType === 'whoosh') {
-      console.log(`🔇 Effect "${effectType}" silenced to prevent bell sound`);
-      return;
-    }
-    
-    // Use shared AudioContext to prevent context leaks
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      allAudioContextsRef.current.add(audioContextRef.current);
-    }
-    
-    const audioContext = audioContextRef.current;
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    // Track oscillators for proper cleanup
-    activeOscillatorsRef.current.add(oscillator);
-    activeGainNodesRef.current.add(gainNode);
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    let frequency = 440;
-    let duration = 0.2;
-    
-    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.3 * settings.effectsVolume * settings.masterVolume, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
-    
-    // Clean up oscillator when it ends
-    oscillator.addEventListener('ended', () => {
-      activeOscillatorsRef.current.delete(oscillator);
-      activeGainNodesRef.current.delete(gainNode);
-    });
-    
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-  }, [isLoaded, settings]);
+    // BELL ELIMINATION: All audio effects completely disabled
+    console.log('playEffect disabled to prevent double bell ringing:', effectType);
+    return;
+  }, []);
 
   const updateSettings = useCallback((newSettings: Partial<AudioSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
