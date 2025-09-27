@@ -10,6 +10,7 @@ import { EnhancedMobileControls } from '@/components/game/EnhancedMobileControls
 import { EnhancedComboDisplay } from '@/components/game/EnhancedComboSystem';
 import { FightCommentary } from '@/components/FightCommentary';
 import FightingStage from '@/components/game/FightingStage';
+import { renderStreetFighterProjectile, type Projectile } from '@/components/game/StreetFighterProjectiles';
 
 const EnhancedGameCanvas = () => {
   const { canvasRef, gameState, handleMobileInput, initializeFighters } = useEnhancedGameEngine();
@@ -55,12 +56,14 @@ const EnhancedGameCanvas = () => {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Draw fighters with enhanced Street Fighter styling
+    // Draw fighters with authentic Street Fighter styling
     if (gameState.fighters.player1) {
       const effects = {
         special: gameState.fighters.player1.state.current === 'special',
         hurt: gameState.fighters.player1.state.current === 'hurt',
-        alpha: gameState.fighters.player1.state.current === 'hurt' ? 0.7 : 1.0
+        alpha: gameState.fighters.player1.state.current === 'hurt' ? 0.7 : 1.0,
+        glow: gameState.fighters.player1.state.current === 'special',
+        flash: gameState.fighters.player1.combatState?.comboCount > 5
       };
       drawEnhancedFighter(ctx, gameState.fighters.player1, effects);
     }
@@ -69,9 +72,25 @@ const EnhancedGameCanvas = () => {
       const effects = {
         special: gameState.fighters.player2.state.current === 'special',
         hurt: gameState.fighters.player2.state.current === 'hurt',
-        alpha: gameState.fighters.player2.state.current === 'hurt' ? 0.7 : 1.0
+        alpha: gameState.fighters.player2.state.current === 'hurt' ? 0.7 : 1.0,
+        glow: gameState.fighters.player2.state.current === 'special',
+        flash: gameState.fighters.player2.combatState?.comboCount > 5
       };
       drawEnhancedFighter(ctx, gameState.fighters.player2, effects);
+    }
+
+    // Draw Street Fighter projectiles
+    if (gameState.projectiles) {
+      gameState.projectiles.forEach((projectile: Projectile) => {
+        renderStreetFighterProjectile({
+          ctx,
+          projectile,
+          effects: {
+            glow: true,
+            alpha: projectile.life / projectile.maxLife
+          }
+        });
+      });
     }
   }, [canvasRef, spritesLoaded, drawEnhancedFighter, gameState]);
 

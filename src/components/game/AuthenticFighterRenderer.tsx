@@ -127,10 +127,10 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   const w = fighter.width;
   const h = fighter.height;
   
-  // Enhanced Street Fighter proportions - bigger, more muscular build
-  const headSize = h * 0.35; // Larger head like Street Fighter
-  const torsoSize = h * 0.5;  // Bigger torso
-  const legSize = h * 0.35;   // Thicker legs
+  // Authentic Street Fighter proportions - muscular fighter build
+  const headSize = h * 0.4;   // Large head with strong jawline
+  const torsoSize = h * 0.45; // Broad muscular chest
+  const legSize = h * 0.4;    // Thick powerful legs
   
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
@@ -222,10 +222,10 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   const w = fighter.width;
   const h = fighter.height;
   
-  // Enhanced Street Fighter proportions
-  const headSize = h * 0.35;
-  const torsoSize = h * 0.5;
-  const legSize = h * 0.35;
+  // Street Fighter master proportions - wise but powerful
+  const headSize = h * 0.38;  // Mature facial features
+  const torsoSize = h * 0.47; // Strong martial artist build
+  const legSize = h * 0.38;   // Stable stance legs
   
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';

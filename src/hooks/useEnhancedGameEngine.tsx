@@ -6,6 +6,7 @@ import { useProjectileSystem } from './useProjectileSystem';
 import { useSuperMoveSystem } from './useSuperMoveSystem';
 import { useEnhancedSpriteSystem } from './useEnhancedSpriteSystem';
 import { useVisualEffects } from './useVisualEffects';
+import { useStreetFighterCombat } from './useStreetFighterCombat';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 import { Fighter as FighterType } from '@/types/gameTypes';
 import { CombatSystem, CombatState, InputBuffer } from '@/components/game/CombatSystem';
@@ -110,6 +111,7 @@ export const useEnhancedGameEngine = () => {
   const { checkSuperMoves, createSuperProjectile, getVoiceLine } = useSuperMoveSystem();
   const { isLoaded: spritesLoaded, drawEnhancedFighter, getAnimationDuration, registerAnimationCallback, isAnimationComplete } = useEnhancedSpriteSystem();
   const visualEffects = useVisualEffects();
+  const streetFighterCombat = useStreetFighterCombat();
   
   const [gameState, setGameState] = useState<GameState>({
     screen: 'fighting',
@@ -659,8 +661,9 @@ export const useEnhancedGameEngine = () => {
     }
 
     updateParticles();
+    streetFighterCombat.updateProjectiles();
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState.screen, updateFighter, updateParticles, checkCollision, audioManager, visualEffects]);
+  }, [gameState.screen, updateFighter, updateParticles, checkCollision, audioManager, visualEffects, streetFighterCombat]);
 
   // Initialize game
   useEffect(() => {
@@ -760,6 +763,7 @@ export const useEnhancedGameEngine = () => {
     canvasRef,
     gameState,
     initializeFighters,
-    handleMobileInput
+    handleMobileInput,
+    streetFighterCombat
   };
 };
