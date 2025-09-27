@@ -5,6 +5,8 @@ import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { useEnhancedSpriteSystem } from '@/hooks/useEnhancedSpriteSystem';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { renderProfessionalArena } from './ProfessionalArenaRenderer';
+import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
 
 interface ViralStreetFighterCanvasProps {
   fighterData?: {
@@ -142,23 +144,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas
+    // Clear canvas and render professional arena
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Render stage background (Kingston arena)
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#16213e');
-    gradient.addColorStop(1, '#0f0f23');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Stadium lights
-    ctx.fillStyle = '#FFD700';
-    ctx.beginPath();
-    ctx.arc(100, 50, 20, 0, Math.PI * 2);
-    ctx.arc(canvas.width - 100, 50, 20, 0, Math.PI * 2);
-    ctx.fill();
+    renderProfessionalArena(ctx, canvas.width, canvas.height);
     
     // Debug: Show fighter initialization status
     if (!gameState.fighters.player1 || !gameState.fighters.player2) {
@@ -233,34 +221,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // Render hit sparks and effects
     drawHitSparks(ctx);
     
-    // Health bars (clean design)
-    const barWidth = 300;
-    const barHeight = 20;
-    
-    // Player 1 health bar
-    ctx.fillStyle = '#333';
-    ctx.fillRect(50, 30, barWidth, barHeight);
-    ctx.fillStyle = '#00FF00';
-    ctx.fillRect(50, 30, (gameState.fighters.player1?.health || 100) / 100 * barWidth, barHeight);
-    
-    // Player 2 health bar  
-    ctx.fillStyle = '#333';
-    ctx.fillRect(canvas.width - 350, 30, barWidth, barHeight);
-    ctx.fillStyle = '#00FF00';
-    ctx.fillRect(canvas.width - 350, 30, (gameState.fighters.player2?.health || 100) / 100 * barWidth, barHeight);
-    
-    // Fighter names
-    ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText('LEROY', 50, 25);
-    ctx.fillText('RAZOR', canvas.width - 120, 25);
-    
-    // Round timer
-    ctx.fillStyle = '#FF0000';
-    ctx.font = 'bold 24px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${Math.ceil(gameState.timer / 60)}`, canvas.width / 2, 40);
-    ctx.textAlign = 'start';
+    // Professional UI elements
+    renderProfessionalHealthBars(ctx, canvas.width, gameState.fighters);
+    renderFighterNames(ctx, canvas.width, gameState.fighters);
     
   }, [gameState, streetFighterCombat, renderStreetFighter, drawHitSparks]);
 

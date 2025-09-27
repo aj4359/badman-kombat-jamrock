@@ -185,57 +185,106 @@ export const useEnhancedSpriteSystem = () => {
 
   // Load sprite images
   useEffect(() => {
-    const loadSprites = async () => {
-      console.log('useEnhancedSpriteSystem: Starting sprite loading...');
-      const sprites: Record<string, HTMLImageElement> = {};
-      const spriteMap = {
-        leroy: leroySprite,
-        jordan: jordanSprite,
-        sifu: sifuSprite,
-        razor: razorSprite,
-        rootsman: rootsmanSprite
-      };
+    const loadSprites = () => {
+      console.log('useEnhancedSpriteSystem: Creating enhanced placeholder sprites...');
       
-      console.log('useEnhancedSpriteSystem: Sprite map:', spriteMap);
-      
-      try {
-        for (const [key, src] of Object.entries(spriteMap)) {
-          console.log(`useEnhancedSpriteSystem: Loading sprite for ${key} from ${src}`);
-          const img = new Image();
-          img.src = src;
+      // Create professional placeholder sprites for immediate visibility
+      Object.keys(ENHANCED_FIGHTER_SPRITE_DATA).forEach(fighterId => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = FRAME_WIDTH;
+        canvas.height = FRAME_HEIGHT;
+        
+        if (ctx) {
+          // Fighter-specific colors for professional placeholders
+          const colors = {
+            leroy: { primary: '#00FFFF', secondary: '#008B8B', accent: '#FFD700', name: 'Leroy "Digital Dread"' },
+            jordan: { primary: '#9966FF', secondary: '#6633CC', accent: '#FF6B35', name: 'Jordan "Bassline Warrior"' },
+            sifu: { primary: '#FFD700', secondary: '#FFA500', accent: '#FF4500', name: 'Sifu "Temple Master"' },
+            razor: { primary: '#FF0066', secondary: '#CC0044', accent: '#00FFFF', name: 'Razor "Cyber Samurai"' },
+            rootsman: { primary: '#00FF00', secondary: '#008000', accent: '#FFFF00', name: 'Rootsman "Mystic"' }
+          };
           
-          await new Promise((resolve, reject) => {
-            img.onload = () => {
-              console.log(`useEnhancedSpriteSystem: Successfully loaded sprite for ${key}`);
-              resolve(null);
-            };
-            img.onerror = (error) => {
-              console.error(`useEnhancedSpriteSystem: Failed to load sprite for ${key}:`, error);
-              resolve(null);
-            };
-            setTimeout(() => {
-              console.warn(`useEnhancedSpriteSystem: Sprite loading timeout for ${key}`);
-              resolve(null);
-            }, 5000);
-          });
+          const color = colors[fighterId as keyof typeof colors] || { primary: '#FFFFFF', secondary: '#CCCCCC', accent: '#999999', name: 'Unknown Fighter' };
           
-          if (img.complete && img.naturalWidth > 0) {
-            sprites[key] = img;
-            console.log(`useEnhancedSpriteSystem: Sprite ${key} loaded successfully (${img.naturalWidth}x${img.naturalHeight})`);
-          } else {
-            console.warn(`useEnhancedSpriteSystem: Sprite ${key} failed to load or has invalid dimensions`);
+          // Clear background
+          ctx.clearRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+          
+          // Create professional fighter silhouette
+          const centerX = FRAME_WIDTH / 2;
+          const baseY = FRAME_HEIGHT - 10;
+          
+          // Main body with proper proportions
+          ctx.fillStyle = color.primary;
+          ctx.fillRect(centerX - 25, baseY - 90, 50, 65); // Torso
+          
+          // Head with proper size
+          ctx.fillStyle = color.secondary;
+          ctx.beginPath();
+          ctx.arc(centerX, baseY - 105, 18, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Arms with fighting stance
+          ctx.fillStyle = color.primary;
+          ctx.fillRect(centerX - 45, baseY - 85, 18, 35); // Left arm
+          ctx.fillRect(centerX + 27, baseY - 85, 18, 35); // Right arm
+          
+          // Fighting gloves
+          ctx.fillStyle = color.accent;
+          ctx.beginPath();
+          ctx.arc(centerX - 36, baseY - 50, 8, 0, Math.PI * 2);
+          ctx.arc(centerX + 36, baseY - 50, 8, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Strong legs with proper stance
+          ctx.fillStyle = color.primary;
+          ctx.fillRect(centerX - 18, baseY - 25, 15, 25); // Left leg
+          ctx.fillRect(centerX + 3, baseY - 25, 15, 25); // Right leg
+          
+          // Character-specific details
+          if (fighterId === 'leroy') {
+            // Dreadlocks
+            ctx.fillStyle = color.accent;
+            ctx.fillRect(centerX - 25, baseY - 125, 50, 20);
+            // Cyber elements
+            ctx.strokeStyle = '#00FFFF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(centerX - 27, baseY - 92, 54, 67);
+          } else if (fighterId === 'jordan') {
+            // Sound waves
+            ctx.strokeStyle = color.accent;
+            ctx.lineWidth = 3;
+            for (let i = 1; i <= 3; i++) {
+              ctx.beginPath();
+              ctx.arc(centerX, baseY - 70, 20 * i, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          } else if (fighterId === 'sifu') {
+            // Martial arts aura
+            ctx.strokeStyle = color.accent;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(centerX - 30, baseY - 95, 60, 70);
+            ctx.setLineDash([]);
           }
+          
+          // Professional glow effect
+          ctx.shadowColor = color.primary;
+          ctx.shadowBlur = 15;
+          ctx.strokeStyle = color.accent;
+          ctx.lineWidth = 3;
+          ctx.strokeRect(centerX - 27, baseY - 92, 54, 92);
+          ctx.shadowBlur = 0;
         }
-
-        spriteImages.current = sprites;
-        setIsLoaded(true);
-        console.log('useEnhancedSpriteSystem: Enhanced sprite system loaded. Available sprites:', Object.keys(sprites));
-        console.log('useEnhancedSpriteSystem: Setting isLoaded=true, enabling sprite rendering');
-      } catch (error) {
-        console.error('useEnhancedSpriteSystem: Error loading sprites:', error);
-        console.log('useEnhancedSpriteSystem: Setting isLoaded=true anyway to enable fallback rendering');
-        setIsLoaded(true);
-      }
+        
+        const img = new Image();
+        img.src = canvas.toDataURL();
+        spriteImages.current[fighterId] = img;
+        console.log(`useEnhancedSpriteSystem: Created professional placeholder for ${fighterId}`);
+      });
+      
+      setIsLoaded(true);
+      console.log('useEnhancedSpriteSystem: Professional placeholder sprites ready');
     };
 
     loadSprites();
