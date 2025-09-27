@@ -8,6 +8,7 @@ import { useEnhancedSpriteSystem } from './useEnhancedSpriteSystem';
 import { useVisualEffects } from './useVisualEffects';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 import { Fighter as FighterType } from '@/types/gameTypes';
+import { CombatSystem, CombatState, InputBuffer } from '@/components/game/CombatSystem';
 
 export interface SpecialMove {
   name: string;
@@ -62,6 +63,8 @@ export interface Fighter extends FighterType {
   };
   inputBuffer: string[];
   lastInputTime: number;
+  combatState: CombatState;
+  inputBufferSystem: InputBuffer;
 }
 
 export interface GameState {
@@ -251,15 +254,16 @@ export const useEnhancedGameEngine = () => {
       comboCount: 0,
       comboDecay: 0,
       comboDamage: 0,
-      frameData: { hitstun: 0, blockstun: 0, invulnerable: 0 },
+      frameData: { hitstun: 0, blockstun: 0, invulnerable: 0, startup: 0, active: 0, recovery: 0 },
       colors: data.colors,
       specialMoves: data.specialMoves,
       superMoves: data.superMoves || [],
       voiceLines: data.voiceLines || [],
       meter: 0,
-      combatState: {},
+      combatState: CombatSystem.initializeCombatState(),
       inputBuffer: [],
-      lastInputTime: 0
+      lastInputTime: 0,
+      inputBufferSystem: CombatSystem.initializeInputBuffer()
     };
     
     console.log('Created fighter:', id, fighter);
@@ -297,7 +301,10 @@ export const useEnhancedGameEngine = () => {
     // Enhanced frame-perfect timing for 60fps gameplay
     const deltaTime = 16.67; // Target 60fps frame time
     
-    // Update frame data timers
+    // Update combat state using the integrated system
+    newFighter.combatState = CombatSystem.updateCombatState(newFighter.combatState);
+    
+    // Update frame data timers (legacy support)
     newFighter.frameData.hitstun = Math.max(0, newFighter.frameData.hitstun - 1);
     newFighter.frameData.blockstun = Math.max(0, newFighter.frameData.blockstun - 1);
     newFighter.frameData.invulnerable = Math.max(0, newFighter.frameData.invulnerable - 1);
@@ -305,14 +312,10 @@ export const useEnhancedGameEngine = () => {
     // Update animation timer
     newFighter.animationTimer++;
     
-    // Update combo decay
-    if (newFighter.comboCount > 0) {
-      newFighter.comboDecay++;
-      if (newFighter.comboDecay > MAX_COMBO_DECAY) {
-        newFighter.comboCount = 0;
-        newFighter.comboDamage = 0;
-        newFighter.comboDecay = 0;
-      }
+    // Update combo decay with combat system
+    if (newFighter.combatState.comboCount > 0) {
+      newFighter.comboCount = newFighter.combatState.comboCount;
+      newFighter.comboDamage = newFighter.combatState.comboDamage;
     }
     
     // State management
@@ -326,8 +329,17 @@ export const useEnhancedGameEngine = () => {
       }
     }
     
-    // Only allow new actions if not in hitstun/blockstun
-    if (newFighter.frameData.hitstun === 0 && newFighter.frameData.blockstun === 0) {
+    // Input handling with advanced buffer system
+    if (keys.left) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'left');
+    if (keys.right) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'right');
+    if (keys.up) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'up');
+    if (keys.down) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'down');
+    if (keys.punch) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'punch');
+    if (keys.kick) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'kick');
+    if (keys.block) newFighter.inputBufferSystem = CombatSystem.addInputToBuffer(newFighter.inputBufferSystem, 'block');
+    
+    // Only allow new actions if fighter can act (using combat system)
+    if (CombatSystem.canAct(newFighter as any)) {
       // Enhanced Movement with frame-perfect responsiveness
       const moveSpeed = fighterData.stats.walkSpeed * (deltaTime / 16.67); // Normalize to 60fps
       if (keys.left && newFighter.x > 50) {
@@ -371,11 +383,20 @@ export const useEnhancedGameEngine = () => {
         }
       }
 
-      // Enhanced Attacking with combo system
-      if (keys.punch && (newFighter.state.current === 'idle' || newFighter.state.current === 'walking')) {
+      // Enhanced Attacking with frame data system
+      if (keys.punch && (newFighter.state.current === 'idle' || newFighter.state.current === 'walking' || CombatSystem.canCancel(newFighter as any))) {
+        const frameData = CombatSystem.FRAME_DATA.mediumPunch;
         newFighter.state.current = 'attacking';
-        newFighter.animationTimer = 0;
-        newFighter.state.timer = 15; // Faster recovery for fluid combos
+        if (newFighter.animationTimer !== undefined) newFighter.animationTimer = 0;
+        newFighter.state.timer = frameData.startup + frameData.active + frameData.recovery;
+        
+        // Store attack frame data for hit detection
+        if (!newFighter.frameData) {
+          newFighter.frameData = { hitstun: 0, blockstun: 0, invulnerable: 0 };
+        }
+        (newFighter.frameData as any).startup = frameData.startup;
+        (newFighter.frameData as any).active = frameData.active;
+        (newFighter.frameData as any).recovery = frameData.recovery;
         
         // Integrated audio system
         fightAudio.onHit('medium');
@@ -388,6 +409,31 @@ export const useEnhancedGameEngine = () => {
         // Build super meter
         newFighter.superMeter = Math.min(newFighter.maxSuperMeter, newFighter.superMeter + 5);
       }
+      
+      // Heavy attack
+      if (keys.kick && (newFighter.state.current === 'idle' || newFighter.state.current === 'walking' || CombatSystem.canCancel(newFighter as any))) {
+        const frameData = CombatSystem.FRAME_DATA.heavyKick;
+        newFighter.state.current = 'attacking';
+        if (newFighter.animationTimer !== undefined) newFighter.animationTimer = 0;
+        newFighter.state.timer = frameData.startup + frameData.active + frameData.recovery;
+        
+        // Store attack frame data for hit detection
+        if (!newFighter.frameData) {
+          newFighter.frameData = { hitstun: 0, blockstun: 0, invulnerable: 0 };
+        }
+        (newFighter.frameData as any).startup = frameData.startup;
+        (newFighter.frameData as any).active = frameData.active;
+        (newFighter.frameData as any).recovery = frameData.recovery;
+        
+        // Enhanced visual and audio feedback for heavy attacks
+        fightAudio.onHit('heavy');
+        audioManager.playEffect('hit');
+        visualEffects.addScreenShake(8, 120);
+        visualEffects.addHitSpark(newFighter.x + newFighter.width / 2, newFighter.y + 30, 'critical');
+        
+        // More meter gain for heavy attacks
+        newFighter.superMeter = Math.min(newFighter.maxSuperMeter, newFighter.superMeter + 8);
+      }
 
       // Blocking
       if (keys.block) {
@@ -399,9 +445,50 @@ export const useEnhancedGameEngine = () => {
         newFighter.animationTimer = 0;
       }
 
-      // Check for special moves
-      const specialResult = checkSpecialMoves(newFighter);
-      newFighter = specialResult.newFighter;
+      // Check for special moves using combat system
+      const specialMove = CombatSystem.checkSpecialMoveInputs(newFighter.inputBufferSystem || CombatSystem.initializeInputBuffer(), newFighter);
+      if (specialMove && (newFighter.stamina || 0) >= specialMove.cost) {
+        newFighter.state.current = 'special';
+        if (newFighter.animationTimer !== undefined) newFighter.animationTimer = 0;
+        newFighter.state.timer = specialMove.frames.startup + specialMove.frames.active + specialMove.frames.recovery;
+        if (newFighter.stamina !== undefined) newFighter.stamina -= specialMove.cost;
+        if (newFighter.superMeter !== undefined && newFighter.maxSuperMeter !== undefined) {
+          newFighter.superMeter = Math.min(newFighter.maxSuperMeter, newFighter.superMeter + 15);
+        }
+        
+        // Clear input buffer after successful special move
+        newFighter.inputBufferSystem = CombatSystem.initializeInputBuffer();
+        
+        // Enhanced special move feedback
+        fightAudio.onSpecialMove();
+        audioManager.playEffect('specialMove');
+        visualEffects.addScreenShake(10, 150);
+        visualEffects.createComboEffect(newFighter.x + newFighter.width / 2, newFighter.y + 30, 1);
+      }
+      
+      // Check for super moves
+      const superMove = CombatSystem.checkSuperMoveInputs(newFighter.inputBufferSystem || CombatSystem.initializeInputBuffer(), newFighter);
+      if (superMove && (newFighter.superMeter || 0) >= superMove.cost) {
+        newFighter.state.current = 'special';
+        if (newFighter.animationTimer !== undefined) newFighter.animationTimer = 0;
+        newFighter.state.timer = superMove.frames.startup + superMove.frames.active + superMove.frames.recovery;
+        if (newFighter.superMeter !== undefined) newFighter.superMeter -= superMove.cost;
+        
+        // Add invulnerability frames for supers
+        if (superMove.invulnerable && newFighter.combatState) {
+          newFighter.combatState.invulnerableFrames = superMove.frames.startup;
+        }
+        
+        // Clear input buffer after successful super move
+        newFighter.inputBufferSystem = CombatSystem.initializeInputBuffer();
+        
+        // Epic super move feedback
+        fightAudio.onSpecialMove();
+        audioManager.playEffect('special');
+        visualEffects.addScreenShake(15, 300);
+        visualEffects.addFlashEffect('hsl(60, 100%, 80%)', 0.8, 200);
+        visualEffects.createComboEffect(newFighter.x + newFighter.width / 2, newFighter.y + 30, 10);
+      }
     }
 
     return newFighter;
@@ -440,36 +527,95 @@ export const useEnhancedGameEngine = () => {
           let newFighter1 = updateFighter(newState.fighters.player1, true);
           let newFighter2 = updateFighter(newState.fighters.player2, false);
 
-          // Basic collision detection
+          // Enhanced collision detection with proper frame data
           const fighter1Hitbox = newFighter1.hitbox || { x: newFighter1.x, y: newFighter1.y, width: newFighter1.width, height: newFighter1.height };
           const fighter2Hitbox = newFighter2.hitbox || { x: newFighter2.x, y: newFighter2.y, width: newFighter2.width, height: newFighter2.height };
 
           if (checkCollision(fighter1Hitbox, fighter2Hitbox)) {
-            // Handle collision with integrated audio
-            if (newFighter1.state.current === 'attacking' && newFighter2.state.current !== 'blocking') {
-              newFighter2.health = Math.max(0, newFighter2.health - 10);
-              newFighter2.frameData.hitstun = 8;
+            // Player 1 attacking Player 2
+            if (newFighter1.state.current === 'attacking' && 
+                newFighter1.animationTimer !== undefined &&
+                (newFighter1.frameData as any)?.startup !== undefined &&
+                (newFighter1.frameData as any)?.active !== undefined &&
+                newFighter1.animationTimer >= (newFighter1.frameData as any).startup &&
+                newFighter1.animationTimer < (newFighter1.frameData as any).startup + (newFighter1.frameData as any).active &&
+                !CombatSystem.isInvulnerable(newFighter2 as any)) {
               
-              // Integrated fight audio
-              fightAudio.onHit('heavy');
-              audioManager.playEffect('hit');
-              visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
-              visualEffects.addScreenShake(6, 120);
-            } else if (newFighter1.state.current === 'attacking' && newFighter2.state.current === 'blocking') {
-              newFighter2.frameData.blockstun = 4;
-              audioManager.playEffect('block');
-              visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'block');
+              if (newFighter2.state.current === 'blocking') {
+                // Blocked attack
+                const blockResult = CombatSystem.applyBlock(newFighter1 as any, newFighter2 as any, 10, 6);
+                newFighter1 = { ...newFighter1, ...blockResult.attacker };
+                newFighter2 = { ...newFighter2, ...blockResult.defender };
+                
+                audioManager.playEffect('block');
+                visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'block');
+                visualEffects.addScreenShake(3, 80);
+              } else {
+                // Successful hit
+                const attackType = player1Keys.current.kick ? 'heavy' : 'medium';
+                const damage = player1Keys.current.kick ? 18 : 12;
+                const hitstun = player1Keys.current.kick ? 18 : 12;
+                
+                const hitResult = CombatSystem.applyHit(newFighter1 as any, newFighter2 as any, damage, hitstun, attackType);
+                newFighter1 = { ...newFighter1, ...hitResult.attacker };
+                newFighter2 = { ...newFighter2, ...hitResult.defender };
+                
+                // Enhanced feedback based on combo count
+                const comboCount = newFighter2.combatState.comboCount;
+                if (comboCount > 1) {
+                  fightAudio.onComboStart();
+                  visualEffects.createComboEffect(newFighter2.x + newFighter2.width / 2, newFighter2.y + 30, comboCount);
+                } else {
+                  fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
+                }
+                
+                audioManager.playEffect('hit');
+                visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
+                visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
+              }
             }
 
-            if (newFighter2.state.current === 'attacking' && newFighter1.state.current !== 'blocking') {
-              newFighter1.health = Math.max(0, newFighter1.health - 10);
-              newFighter1.frameData.hitstun = 8;
+            // Player 2 attacking Player 1 (symmetric logic)
+            if (newFighter2.state.current === 'attacking' && 
+                newFighter2.animationTimer !== undefined &&
+                (newFighter2.frameData as any)?.startup !== undefined &&
+                (newFighter2.frameData as any)?.active !== undefined &&
+                newFighter2.animationTimer >= (newFighter2.frameData as any).startup &&
+                newFighter2.animationTimer < (newFighter2.frameData as any).startup + (newFighter2.frameData as any).active &&
+                !CombatSystem.isInvulnerable(newFighter1 as any)) {
               
-              // Integrated fight audio
-              fightAudio.onHit('heavy');
-              audioManager.playEffect('hit');
-              visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
-              visualEffects.addScreenShake(6, 120);
+              if (newFighter1.state.current === 'blocking') {
+                // Blocked attack
+                const blockResult = CombatSystem.applyBlock(newFighter2 as any, newFighter1 as any, 10, 6);
+                newFighter2 = { ...newFighter2, ...blockResult.attacker };
+                newFighter1 = { ...newFighter1, ...blockResult.defender };
+                
+                audioManager.playEffect('block');
+                visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'block');
+                visualEffects.addScreenShake(3, 80);
+              } else {
+                // Successful hit  
+                const attackType = player2Keys.current.kick ? 'heavy' : 'medium';
+                const damage = player2Keys.current.kick ? 18 : 12;
+                const hitstun = player2Keys.current.kick ? 18 : 12;
+                
+                const hitResult = CombatSystem.applyHit(newFighter2 as any, newFighter1 as any, damage, hitstun, attackType);
+                newFighter2 = { ...newFighter2, ...hitResult.attacker };
+                newFighter1 = { ...newFighter1, ...hitResult.defender };
+                
+                // Enhanced feedback based on combo count
+                const comboCount = newFighter1.combatState.comboCount;
+                if (comboCount > 1) {
+                  fightAudio.onComboStart();
+                  visualEffects.createComboEffect(newFighter1.x + newFighter1.width / 2, newFighter1.y + 30, comboCount);
+                } else {
+                  fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
+                }
+                
+                audioManager.playEffect('hit');
+                visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
+                visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
+              }
             }
           }
 

@@ -124,6 +124,20 @@ export interface Fighter {
   comboCount?: number;
   comboDamage?: number;
   comboDecay?: number;
+  // Enhanced game engine properties
+  stamina?: number;
+  maxStamina?: number;
+  animationTimer?: number;
+  frameData?: {
+    hitstun: number;
+    blockstun: number;
+    invulnerable: number;
+    startup?: number;
+    active?: number;
+    recovery?: number;
+  };
+  inputBufferSystem?: any;
+  lastInputTime?: number;
 }
 
 export interface FighterData {
