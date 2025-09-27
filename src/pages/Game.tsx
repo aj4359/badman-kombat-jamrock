@@ -27,6 +27,8 @@ const Game = () => {
     console.log('Audio loaded:', isLoaded, 'Current layer:', currentLayer);
     console.log('Fighter data:', fighterData);
     
+    const shouldStartFight = location.state?.startFight;
+    
     // Initialize integrated system if in integrated mode
     if (integratedMode && fighterData.player1 && fighterData.player2) {
       console.log('Initializing integrated game system...');
@@ -37,20 +39,30 @@ const Game = () => {
       );
     }
     
-    // Start gameplay music if audio is loaded
-    if (isLoaded && currentLayer !== 'gameplay') {
-      console.log('Starting gameplay music...');
-      playLayer('gameplay');
+    // Only start Champion audio if coming from VS screen (startFight = true)
+    // This allows Shaw Brothers audio to continue playing during game preparation
+    if (isLoaded && shouldStartFight) {
+      console.log('Starting Champion audio for fight...');
+      // Delay slightly to allow for smooth transition
+      setTimeout(() => {
+        playLayer('gameplay');
+      }, 500);
     }
 
     // Mark game as ready after brief delay to allow full initialization
     const readyTimer = setTimeout(() => {
       setGameReady(true);
       console.log('Game marked as ready');
-    }, 1000);
+      
+      // If we haven't started fight audio yet and we're ready, start it now
+      if (isLoaded && !shouldStartFight && currentLayer !== 'gameplay') {
+        console.log('Starting gameplay music (fallback)...');
+        playLayer('gameplay');
+      }
+    }, shouldStartFight ? 2000 : 1000); // Longer delay when transitioning from VS screen
 
     return () => clearTimeout(readyTimer);
-  }, [isLoaded, currentLayer, playLayer, integratedMode, fighterData, integratedSystem]);
+  }, [isLoaded, currentLayer, playLayer, integratedMode, fighterData, integratedSystem, location.state]);
 
   const handleRetry = () => {
     console.log('Retrying game initialization...');

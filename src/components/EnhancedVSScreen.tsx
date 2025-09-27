@@ -32,7 +32,7 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
   };
 
   useEffect(() => {
-    // Play VS screen music
+    // Play Shaw Brothers intro audio for combat preparation
     playLayer('intro', false);
     playEffect('whoosh');
     
@@ -46,13 +46,15 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(countdownTimer);
-          // Navigate to game with integrated data
+          // Keep Shaw Brothers audio playing until we transition to game
+          // The Game component will handle switching to Champion audio
           setTimeout(() => {
             navigate('/game', {
               state: {
                 fighterData,
                 integratedMode: true,
-                gameMode: location.state?.gameMode || 'versus'
+                gameMode: location.state?.gameMode || 'versus',
+                startFight: true // Signal that fight should start immediately
               }
             });
           }, 1000);
