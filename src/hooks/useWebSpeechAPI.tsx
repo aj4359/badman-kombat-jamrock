@@ -71,18 +71,16 @@ export const useWebSpeechAPI = (options: UseWebSpeechAPIOptions = {}) => {
       
       // Priority voice selection for authentic Jamaican/Caribbean sound
       const voiceOptions = [
-        // Target Jamaican/Caribbean voices first
-        'jamaican-male',
-        'caribbean-male', 
-        'west-indian',
-        // British voices that sound Caribbean when adjusted
+        voiceName, // User-specified voice first
+        // British/UK voices work best for Caribbean when pitch/rate adjusted
         'Google UK English Male',
-        'Microsoft David Desktop',
+        'Microsoft Guy',           // Often deeper UK voice
         'Microsoft James Desktop',
-        'Daniel',
-        // Deep male voices for fallback
-        'Aaron',
-        'Alex',
+        'Microsoft David Desktop', 
+        'Daniel',                  // Good depth
+        'Google British Male',
+        'Aaron',                   // Deep fallback
+        'Alex',                    // macOS deep voice
         'default'
       ].filter(Boolean);
 

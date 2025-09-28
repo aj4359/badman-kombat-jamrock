@@ -126,10 +126,10 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { speak, stopSpeaking, isLoading, isSpeaking, error } = useWebSpeechAPI({
-    voiceName: 'Microsoft David', // Real UK English Male voice with Caribbean potential
-    rate: 0.8, // Slightly faster for natural flow
-    pitch: 0.7, // Moderate pitch for authentic sound
-    volume: 0.85
+    voiceName: 'Google UK English Male', // Primary Caribbean-sounding voice
+    rate: 0.7, // Slower for Caribbean rhythm  
+    pitch: 0.6, // Lower pitch for more authentic deep Caribbean voice
+    volume: 0.9 // Clear and confident volume
   });
 
   // Initialize with contextual welcome message
