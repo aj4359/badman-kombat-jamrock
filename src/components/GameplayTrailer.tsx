@@ -42,31 +42,24 @@ const GameplayTrailer = () => {
     if (videoRef.current && !hasError) {
       if (isPlaying) {
         videoRef.current.pause();
+        stopAll(); // Stop ALL audio when pausing
         setIsPlaying(false);
       } else {
         try {
-          // Reset video first for clean sync
+          // KILL ALL AUDIO FIRST
+          stopAll();
+          
+          // Reset video
           videoRef.current.currentTime = 0;
           videoRef.current.playbackRate = 1.0;
           
-          // Start audio and video simultaneously for perfect sync
-          const audioPromise = new Promise<void>((resolve) => {
-            stopAll();
-            setTimeout(() => {
-              playLayer('gameplay');
-              resolve();
-            }, 50); // Small delay to ensure audio context is ready
-          });
-          
-          // Wait for video to be ready and start both together
-          await audioPromise;
-          
+          // Play video ONLY - NO BACKGROUND AUDIO
           const playPromise = videoRef.current.play();
           if (playPromise !== undefined) {
             await playPromise;
             setIsPlaying(true);
             setTrailerStarted(true);
-            console.log('Video and audio started in sync');
+            console.log('Video playing - audio DISABLED');
           }
         } catch (error) {
           console.warn('Video playback failed:', error);

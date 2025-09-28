@@ -28,7 +28,7 @@ export const SimpleGame: React.FC = () => {
   const gameStateRef = useRef<GameState>({
     player1: {
       x: 150,
-      y: 260,
+      y: 250,
       width: 80,
       height: 120,
       health: 100,
@@ -44,7 +44,7 @@ export const SimpleGame: React.FC = () => {
     },
     player2: {
       x: 570,
-      y: 260,
+      y: 250,
       width: 80,
       height: 120,
       health: 100,
@@ -247,11 +247,11 @@ export const SimpleGame: React.FC = () => {
       }
     }
 
-    // Keep players on screen
+    // Keep players on screen - fixed positioning
     gameState.player1.x = Math.max(0, Math.min(720, gameState.player1.x));
-    gameState.player1.y = Math.max(50, Math.min(330, gameState.player1.y));
+    gameState.player1.y = Math.max(200, Math.min(250, gameState.player1.y));
     gameState.player2.x = Math.max(0, Math.min(720, gameState.player2.x));
-    gameState.player2.y = Math.max(50, Math.min(330, gameState.player2.y));
+    gameState.player2.y = Math.max(200, Math.min(250, gameState.player2.y));
 
     // Auto-face opponent
     if (gameState.player1.x < gameState.player2.x) {
@@ -346,12 +346,14 @@ export const SimpleGame: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log('🎮 GAME INPUT SYSTEM INITIALIZED');
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     
     const loopId = requestAnimationFrame(gameLoop);
 
     return () => {
+      console.log('🎮 GAME INPUT SYSTEM DESTROYED');
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(loopId);

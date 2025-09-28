@@ -219,60 +219,41 @@ export const useAudioManager = () => {
   }, []);
 
   const emergencyAudioKillSwitch = useCallback(() => {
-    console.log('🚨 NUCLEAR AUDIO KILL SWITCH ACTIVATED - ELIMINATING ALL AUDIO');
+    console.log('🚨 TOTAL AUDIO ANNIHILATION');
     
-    // Clear all timers and intervals
+    // Kill all audio intervals
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
     }
     
-    // Stop all HTML audio elements
+    // Destroy all audio elements
     const { intro, gameplay, ambient } = audioRefs.current;
     [intro, gameplay, ambient].forEach(audio => {
       audio.pause();
       audio.currentTime = 0;
       audio.muted = true;
       audio.volume = 0;
+      audio.src = '';
+      audio.load();
     });
     
-    // STOP ALL WEB AUDIO API OSCILLATORS
-    activeOscillatorsRef.current.forEach(oscillator => {
+    // Kill all Web Audio
+    if (window.AudioContext || (window as any).webkitAudioContext) {
       try {
-        oscillator.stop();
-        oscillator.disconnect();
-      } catch (e) {
-        // Oscillator might already be stopped
-      }
-    });
-    activeOscillatorsRef.current.clear();
+        const contexts = (window as any).__audioContexts || [];
+        contexts.forEach((ctx: AudioContext) => ctx.close());
+        (window as any).__audioContexts = [];
+      } catch (e) {}
+    }
     
-    // DISCONNECT ALL GAIN NODES
-    activeGainNodesRef.current.forEach(gainNode => {
-      try {
-        gainNode.disconnect();
-      } catch (e) {
-        // Gain node might already be disconnected
-      }
-    });
-    activeGainNodesRef.current.clear();
-    
-    // CLOSE ALL AUDIO CONTEXTS
-    allAudioContextsRef.current.forEach(context => {
-      try {
-        context.close();
-      } catch (e) {
-        // Context might already be closed
-      }
-    });
-    allAudioContextsRef.current.clear();
-    audioContextRef.current = null;
-    
+    // Reset all state
     setIsPlaying(false);
     setIntroPlaying(false);
     currentAudioRef.current = null;
+    fadeIntervalRef.current = null;
     
-    console.log('✅ ALL AUDIO SYSTEMS COMPLETELY DESTROYED - BELL ELIMINATED');
+    console.log('✅ AUDIO OBLITERATED');
   }, []);
 
   const initializeAudioContext = useCallback(() => {
