@@ -61,34 +61,62 @@ export const useWebSpeechAPI = (options: UseWebSpeechAPIOptions = {}) => {
       const utterance = new SpeechSynthesisUtterance(text);
       utteranceRef.current = utterance;
 
-      // Configure voice settings
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-      utterance.volume = volume;
+      // Configure voice settings for Jamaican accent - slower rate, deeper pitch
+      utterance.rate = rate || 0.75;
+      utterance.pitch = pitch || 0.4;  // Deeper for more authentic Caribbean sound
+      utterance.volume = volume || 0.85;
 
       // Enhanced voice selection for authentic Caribbean/Jamaican sound
       const voices = speechSynthesis.getVoices();
       
-      // Priority order for Jamaican-sounding voices
-      let selectedVoice = voices.find(voice => 
-        voice.name.toLowerCase().includes('daniel') ||  // Often has Caribbean-like qualities
-        voice.name.toLowerCase().includes('arthur') ||  // British male, good for Caribbean
-        voice.name.toLowerCase().includes('george') ||  // Deep British male
-        voice.name.toLowerCase().includes(voiceName.toLowerCase())
-      );
+      // Priority voice selection for authentic Jamaican/Caribbean sound
+      const voiceOptions = [
+        // Target Jamaican/Caribbean voices first
+        'jamaican-male',
+        'caribbean-male', 
+        'west-indian',
+        // British voices that sound Caribbean when adjusted
+        'Google UK English Male',
+        'Microsoft David Desktop',
+        'Microsoft James Desktop',
+        'Daniel',
+        // Deep male voices for fallback
+        'Aaron',
+        'Alex',
+        'default'
+      ].filter(Boolean);
+
+      let selectedVoice = null;
       
-      // Fallback to other good options
-      if (!selectedVoice) {
-        selectedVoice = voices.find(voice => 
-          (voice.name.toLowerCase().includes('male') && voice.lang.includes('en-gb')) ||
-          (voice.name.toLowerCase().includes('british') && voice.lang.includes('en')) ||
-          voice.name.toLowerCase().includes('deep')
+      for (const voiceName of voiceOptions) {
+        // Look for exact matches first, then partial matches
+        let voice = voices.find(v => 
+          v.name.toLowerCase() === voiceName.toLowerCase() ||
+          v.voiceURI.toLowerCase() === voiceName.toLowerCase()
         );
+        
+        if (!voice) {
+          // Try partial matching for broader compatibility
+          voice = voices.find(v => 
+            v.name.toLowerCase().includes(voiceName.toLowerCase()) ||
+            v.voiceURI.toLowerCase().includes(voiceName.toLowerCase()) ||
+            (voiceName.includes('male') && v.name.toLowerCase().includes('male')) ||
+            (voiceName.includes('british') && (v.lang === 'en-GB' || v.name.toLowerCase().includes('uk'))) ||
+            (voiceName.includes('deep') && v.name.toLowerCase().includes('deep'))
+          );
+        }
+        
+        if (voice) {
+          selectedVoice = voice;
+          console.log(`🎤🇯🇲 Selected JAMAICAN voice: ${voice.name} (${voice.lang}) for target: ${voiceName}`);
+          break;
+        }
       }
       
       // Final fallback to any English voice
       if (!selectedVoice) {
         selectedVoice = voices.find(voice => voice.lang.includes('en'));
+        console.log(`🎤 Fallback to English voice: ${selectedVoice?.name}`);
       }
       
       if (selectedVoice) {

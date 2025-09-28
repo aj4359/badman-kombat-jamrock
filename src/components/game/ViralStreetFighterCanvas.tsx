@@ -132,24 +132,37 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // PHASE 4: EMERGENCY FALLBACK FIGHTERS - Always render something visible
     if (!gameState.fighters.player1 || !gameState.fighters.player2) {
       ctx.fillStyle = '#ff0000';
-      ctx.font = '24px Arial';
+      ctx.font = '32px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('RENDERING EMERGENCY FALLBACK FIGHTERS...', canvas.width / 2, canvas.height / 2);
+      ctx.fillText('🚨 EMERGENCY FALLBACK FIGHTERS 🚨', canvas.width / 2, canvas.height / 2 - 100);
       ctx.textAlign = 'start';
       
-      // PHASE 4: Render bright emergency fighters that can't be missed
-      ctx.fillStyle = '#00FF00'; // Bright green
-      ctx.fillRect(200, 300, 80, 120); // Emergency Player 1
-      ctx.fillStyle = '#FF0080'; // Bright magenta  
-      ctx.fillRect(600, 300, 80, 120); // Emergency Player 2
+      // MASSIVE emergency fighters that dominate the screen
+      const centerY = canvas.height / 2;
+      const fighterWidth = 120;
+      const fighterHeight = 180;
       
-      // Labels
+      // Emergency Player 1 - MASSIVE bright green with debug outline
+      ctx.fillStyle = '#00FF00';
+      ctx.fillRect(200, centerY - fighterHeight, fighterWidth, fighterHeight);
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(200, centerY - fighterHeight, fighterWidth, fighterHeight);
+      
+      // Emergency Player 2 - MASSIVE bright magenta with debug outline  
+      ctx.fillStyle = '#FF0080';
+      ctx.fillRect(700, centerY - fighterHeight, fighterWidth, fighterHeight);
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(700, centerY - fighterHeight, fighterWidth, fighterHeight);
+      
+      // Big bold labels
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '16px Arial';
-      ctx.fillText('EMERGENCY P1', 190, 290);
-      ctx.fillText('EMERGENCY P2', 590, 290);
+      ctx.font = '24px Arial';
+      ctx.fillText('EMERGENCY P1', 180, centerY - fighterHeight - 20);
+      ctx.fillText('EMERGENCY P2', 680, centerY - fighterHeight - 20);
       
-      console.log('🚨 EMERGENCY: Rendering fallback fighters');
+      console.log('🚨 EMERGENCY: Rendering MASSIVE fallback fighters');
       return;
     }
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAudioManager } from '@/hooks/useAudioManager';
 import { useIntegratedGameSystem } from '@/hooks/useIntegratedGameSystem';
 import EnhancedGameCanvas from '@/components/game/EnhancedGameCanvas';
 import { AlertCircle, RefreshCw } from 'lucide-react';
@@ -10,7 +9,6 @@ import { RastaChatbot } from '@/components/RastaChatbot';
 const Game = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoaded, playLayer, currentLayer, audioErrors } = useAudioManager();
   const integratedSystem = useIntegratedGameSystem();
   const [gameReady, setGameReady] = useState(false);
   
@@ -22,8 +20,29 @@ const Game = () => {
   
   const integratedMode = location.state?.integratedMode || false;
 
+  // EMERGENCY AUDIO KILL SWITCH - Destroy any existing audio
   useEffect(() => {
-    console.log('🔇 PHASE 3: SIMPLIFIED GAME INITIALIZATION - No audio delays');
+    console.log('🔇 EMERGENCY AUDIO KILL SWITCH ACTIVATED');
+    
+    // Emergency stop all audio contexts
+    if (window.AudioContext || (window as any).webkitAudioContext) {
+      const contexts = (window as any)._audioContexts || [];
+      contexts.forEach((ctx: AudioContext) => {
+        try {
+          ctx.close();
+          console.log('🔇 Closed AudioContext');
+        } catch (e) {
+          console.log('🔇 Error closing AudioContext:', e);
+        }
+      });
+    }
+    
+    // Stop all HTML audio elements
+    document.querySelectorAll('audio').forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+      console.log('🔇 Stopped HTML audio element');
+    });
     
     // Initialize integrated system if in integrated mode
     if (integratedMode && fighterData.player1 && fighterData.player2) {
@@ -35,9 +54,9 @@ const Game = () => {
       );
     }
     
-    // PHASE 3: INSTANT LOADING - No audio layer management, immediate game ready
+    // INSTANT LOADING - No audio delays
     setGameReady(true);
-    console.log('✅ Game marked as ready INSTANTLY');
+    console.log('✅ Game marked as ready INSTANTLY - BELL ELIMINATED');
 
   }, [integratedMode, fighterData, integratedSystem]);
 
@@ -59,20 +78,7 @@ const Game = () => {
             <div>Setting up fighters...</div>
           </div>
           
-          {audioErrors && audioErrors.length > 0 && (
-            <div className="mt-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg max-w-md mx-auto">
-              <div className="flex items-center gap-2 text-destructive mb-2">
-                <AlertCircle className="h-5 w-5" />
-                <span className="font-retro">Audio Issues Detected</span>
-              </div>
-              <div className="text-sm text-muted-foreground mb-3">
-                Some audio files couldn't load, but the game will continue with placeholder sounds.
-              </div>
-              <div className="text-xs text-destructive/80">
-                Missing: {audioErrors.join(', ')}
-              </div>
-            </div>
-          )}
+          {/* Audio errors removed since audio manager is disabled */}
         </div>
       </div>
     );
@@ -80,26 +86,14 @@ const Game = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Debug panel for development */}
+      {/* Emergency Debug Panel */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-4 left-4 z-50 bg-black/80 text-green-400 font-mono text-xs p-3 rounded">
-          <div className="mb-2 font-bold">GAME DEBUG</div>
-          <div>Audio Loaded: {isLoaded ? '✓' : '✗'}</div>
-          <div>Current Layer: {currentLayer}</div>
-          <div>Audio Errors: {audioErrors ? audioErrors.length : 0}</div>
-          <div>Game Ready: {gameReady ? '✓' : '✗'}</div>
-          
-          {audioErrors && audioErrors.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRetry}
-              className="mt-2 text-xs"
-            >
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Retry
-            </Button>
-          )}
+        <div className="fixed top-4 left-4 z-50 bg-black/90 text-green-400 font-mono text-xs p-3 rounded border">
+          <div className="mb-2 font-bold text-red-400">🔇 EMERGENCY GAME DEBUG</div>
+          <div>🔇 Audio Manager: DISABLED</div>
+          <div>🔇 Bell Sounds: ELIMINATED</div>
+          <div>Game Ready: {gameReady ? '✅ INSTANT' : '⏳'}</div>
+          <div>Mode: {integratedMode ? '🥊 STREET FIGHTER' : '🎮 NORMAL'}</div>
         </div>
       )}
       
