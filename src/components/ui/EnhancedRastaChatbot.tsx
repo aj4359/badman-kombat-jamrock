@@ -126,9 +126,9 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { speak, stopSpeaking, isLoading, isSpeaking, error } = useWebSpeechAPI({
-    voiceName: 'deep', // Changed to deep male voice - more masculine
-    rate: 0.9, // Slightly faster, more confident pace  
-    pitch: 0.5, // Much lower pitch for deep, masculine voice
+    voiceName: 'british', // Use British accent as closest to Caribbean English
+    rate: 0.75, // Slower pace for authentic Caribbean rhythm 
+    pitch: 0.6, // Lower pitch for deeper, more masculine Jamaican sound
     volume: 1
   });
 

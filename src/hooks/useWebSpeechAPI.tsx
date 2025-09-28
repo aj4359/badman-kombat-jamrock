@@ -66,14 +66,27 @@ export const useWebSpeechAPI = (options: UseWebSpeechAPIOptions = {}) => {
       utterance.pitch = pitch;
       utterance.volume = volume;
 
-      // Select voice (prefer deep male voices for cinematic effect)
+      // Enhanced voice selection for authentic Caribbean/Jamaican sound
       const voices = speechSynthesis.getVoices();
+      
+      // Priority order for Jamaican-sounding voices
       let selectedVoice = voices.find(voice => 
-        voice.name.toLowerCase().includes(voiceName.toLowerCase()) ||
-        (voice.name.toLowerCase().includes('male') && voice.lang.includes('en')) ||
-        voice.name.toLowerCase().includes('deep')
+        voice.name.toLowerCase().includes('daniel') ||  // Often has Caribbean-like qualities
+        voice.name.toLowerCase().includes('arthur') ||  // British male, good for Caribbean
+        voice.name.toLowerCase().includes('george') ||  // Deep British male
+        voice.name.toLowerCase().includes(voiceName.toLowerCase())
       );
       
+      // Fallback to other good options
+      if (!selectedVoice) {
+        selectedVoice = voices.find(voice => 
+          (voice.name.toLowerCase().includes('male') && voice.lang.includes('en-gb')) ||
+          (voice.name.toLowerCase().includes('british') && voice.lang.includes('en')) ||
+          voice.name.toLowerCase().includes('deep')
+        );
+      }
+      
+      // Final fallback to any English voice
       if (!selectedVoice) {
         selectedVoice = voices.find(voice => voice.lang.includes('en'));
       }

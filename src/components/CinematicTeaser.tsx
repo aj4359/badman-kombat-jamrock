@@ -49,12 +49,10 @@ export const CinematicTeaser: React.FC = () => {
     { type: 'credits', duration: 1500 }
   ];
 
-  // Initialize audio context only once
+  // BELL ELIMINATION: AudioContext creation completely disabled
   useEffect(() => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioReady(true);
-    }
+    console.log('🔇 TEASER BELL ELIMINATION: AudioContext initialization completely disabled');
+    setAudioReady(false); // Never set to true to prevent audio
     
     return () => {
       // Cleanup on unmount
@@ -64,9 +62,7 @@ export const CinematicTeaser: React.FC = () => {
       if (sceneTimerRef.current) {
         clearTimeout(sceneTimerRef.current);
       }
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close();
-      }
+      // No AudioContext to close - completely disabled
       audioManager.emergencyAudioKillSwitch();
     };
   }, [audioManager]);
@@ -77,29 +73,8 @@ export const CinematicTeaser: React.FC = () => {
 
     const scene = scenes[currentScene];
     
-    // Optional audio enhancement (don't block if audio isn't ready)
-    if (scene && audioManager.isLoaded && audioReady) {
-      try {
-        switch (scene.type) {
-          case 'title':
-            audioManager.playLayer('intro', true);
-            break;
-          case 'fighters':
-            audioManager.stopAll();
-            setTimeout(() => audioManager.playLayer('gameplay', true), 100);
-            break;
-          case 'coming-soon':
-            audioManager.stopAll();
-            setTimeout(() => audioManager.playLayer('ambient', true), 100);
-            break;
-          case 'credits':
-            audioManager.updateSettings({ musicVolume: 0.4 });
-            break;
-        }
-      } catch (error) {
-        console.log('Audio playback optional - continuing with visuals');
-      }
-    }
+    // BELL ELIMINATION: All audio playback completely disabled
+    console.log('🔇 TEASER: Audio playback disabled for scene:', scene?.type);
 
     sceneTimerRef.current = setTimeout(() => {
       if (currentScene < scenes.length - 1) {
@@ -387,38 +362,15 @@ export const CinematicTeaser: React.FC = () => {
 
   const startRecording = async () => {
     const canvas = canvasRef.current;
-    if (!canvas || !audioContextRef.current) return;
+    if (!canvas) return;
 
+    // BELL ELIMINATION: Video-only recording, no audio
+    console.log('🔇 TEASER RECORDING: Audio disabled, video-only recording');
+    
     try {
-      // Create canvas stream
-      const canvasStream = canvas.captureStream(30); // 30 FPS
-      
-      // Create audio stream from audio manager
-      const audioDestination = audioContextRef.current.createMediaStreamDestination();
-      const audioStream = audioDestination.stream;
-      
-      // Connect audio elements to the stream
-      if (audioManager.audioRefs.current.intro) {
-        const introSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.intro);
-        introSource.connect(audioDestination);
-      }
-      if (audioManager.audioRefs.current.gameplay) {
-        const gameplaySource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.gameplay);
-        gameplaySource.connect(audioDestination);
-      }
-      if (audioManager.audioRefs.current.ambient) {
-        const ambientSource = audioContextRef.current.createMediaElementSource(audioManager.audioRefs.current.ambient);
-        ambientSource.connect(audioDestination);
-      }
-      
-      // Combine video and audio streams
-      const combinedStream = new MediaStream([
-        ...canvasStream.getVideoTracks(),
-        ...audioStream.getAudioTracks()
-      ]);
-      
-      mediaRecorderRef.current = new MediaRecorder(combinedStream, {
-        mimeType: 'video/webm;codecs=vp9,opus'
+      const stream = canvas.captureStream(30);
+      mediaRecorderRef.current = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9'
       });
 
       chunksRef.current = [];
@@ -434,12 +386,9 @@ export const CinematicTeaser: React.FC = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'badman-kombat-teaser-with-audio.webm';
+        a.download = 'badman-kombat-teaser-video-only.webm';
         a.click();
         URL.revokeObjectURL(url);
-        
-        // Reset audio settings
-        audioManager.updateSettings({ musicVolume: 0.8 });
       };
 
       mediaRecorderRef.current.start();
@@ -453,18 +402,11 @@ export const CinematicTeaser: React.FC = () => {
           mediaRecorderRef.current.stop();
           setIsRecording(false);
           setIsPlaying(false);
-          audioManager.stopAll();
         }
-      }, 12500); // Total duration of all scenes including credits
+      }, 12500);
       
     } catch (error) {
-      console.error('Failed to start recording with audio:', error);
-      // Fallback to video-only recording
-      const stream = canvas.captureStream(30);
-      mediaRecorderRef.current = new MediaRecorder(stream, {
-        mimeType: 'video/webm;codecs=vp9'
-      });
-      // ... rest of fallback logic
+      console.error('Failed to start video recording:', error);
     }
   };
 
