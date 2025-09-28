@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useAudioManager } from './useAudioManager';
+// Audio disabled to eliminate bell sounds
 import { useCrowdAudio } from './useCrowdAudio';
 import { useFightAudio } from './useFightAudio';
 import { useProjectileSystem } from './useProjectileSystem';
@@ -104,7 +104,7 @@ const MAX_COMBO_DECAY = 60;
 export const useEnhancedGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
-  const audioManager = useAudioManager();
+  // Audio manager removed to eliminate bell sounds
   const crowdAudio = useCrowdAudio();
   const fightAudio = useFightAudio();
   const { projectiles, updateProjectiles, addProjectile } = useProjectileSystem();
@@ -431,9 +431,8 @@ export const useEnhancedGameEngine = () => {
         (newFighter.frameData as any).active = frameData.active;
         (newFighter.frameData as any).recovery = frameData.recovery;
         
-        // Integrated audio system
-        fightAudio.onHit('medium');
-        audioManager.playEffect('hit');
+        // Audio disabled to prevent bell sounds
+        // fightAudio.onHit('medium');
         
         // Enhanced visual effects
         visualEffects.addScreenShake(4, 80);
@@ -458,9 +457,8 @@ export const useEnhancedGameEngine = () => {
         (newFighter.frameData as any).active = frameData.active;
         (newFighter.frameData as any).recovery = frameData.recovery;
         
-        // Enhanced visual and audio feedback for heavy attacks
-        fightAudio.onHit('heavy');
-        audioManager.playEffect('hit');
+        // Audio disabled to prevent bell sounds
+        // fightAudio.onHit('heavy');
         visualEffects.addScreenShake(8, 120);
         visualEffects.addHitSpark(newFighter.x + newFighter.width / 2, newFighter.y + 30, 'critical');
         
@@ -492,9 +490,8 @@ export const useEnhancedGameEngine = () => {
         // Clear input buffer after successful special move
         newFighter.inputBufferSystem = CombatSystem.initializeInputBuffer();
         
-        // Enhanced special move feedback
-        fightAudio.onSpecialMove();
-        audioManager.playEffect('specialMove');
+        // Audio disabled to prevent bell sounds
+        // fightAudio.onSpecialMove();
         visualEffects.addScreenShake(10, 150);
         visualEffects.createComboEffect(newFighter.x + newFighter.width / 2, newFighter.y + 30, 1);
       }
@@ -515,9 +512,8 @@ export const useEnhancedGameEngine = () => {
         // Clear input buffer after successful super move
         newFighter.inputBufferSystem = CombatSystem.initializeInputBuffer();
         
-        // Epic super move feedback
-        fightAudio.onSpecialMove();
-        audioManager.playEffect('special');
+        // Audio disabled to prevent bell sounds
+        // fightAudio.onSpecialMove();
         visualEffects.addScreenShake(15, 300);
         visualEffects.addFlashEffect('hsl(60, 100%, 80%)', 0.8, 200);
         visualEffects.createComboEffect(newFighter.x + newFighter.width / 2, newFighter.y + 30, 10);
@@ -525,7 +521,7 @@ export const useEnhancedGameEngine = () => {
     }
 
     return newFighter;
-  }, [isAnimationComplete, checkSpecialMoves, audioManager, visualEffects]);
+  }, [isAnimationComplete, checkSpecialMoves, visualEffects]);
 
   const updateParticles = useCallback(() => {
     setGameState(prev => ({
@@ -580,7 +576,7 @@ export const useEnhancedGameEngine = () => {
                 newFighter1 = { ...newFighter1, ...blockResult.attacker };
                 newFighter2 = { ...newFighter2, ...blockResult.defender };
                 
-                audioManager.playEffect('block');
+                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'block');
                 visualEffects.addScreenShake(3, 80);
               } else {
@@ -602,7 +598,7 @@ export const useEnhancedGameEngine = () => {
                   fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
                 }
                 
-                audioManager.playEffect('hit');
+                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
                 visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
               }
@@ -623,7 +619,7 @@ export const useEnhancedGameEngine = () => {
                 newFighter2 = { ...newFighter2, ...blockResult.attacker };
                 newFighter1 = { ...newFighter1, ...blockResult.defender };
                 
-                audioManager.playEffect('block');
+                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'block');
                 visualEffects.addScreenShake(3, 80);
               } else {
@@ -645,7 +641,7 @@ export const useEnhancedGameEngine = () => {
                   fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
                 }
                 
-                audioManager.playEffect('hit');
+                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
                 visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
               }
@@ -666,12 +662,12 @@ export const useEnhancedGameEngine = () => {
           newState.fighters.player1.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player2';
           fightAudio.onRoundEnd('player2');
-          audioManager.playEffect('ko');
+          // Audio disabled to prevent bell sounds
         } else if (newState.fighters.player2?.health === 0) {
           newState.fighters.player2.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player1';
           fightAudio.onRoundEnd('player1');
-          audioManager.playEffect('ko');
+          // Audio disabled to prevent bell sounds
         } else if (newState.timer <= 0) {
           // Time up
           if (newState.fighters.player1.health > newState.fighters.player2.health) {
@@ -694,7 +690,7 @@ export const useEnhancedGameEngine = () => {
     updateParticles();
     streetFighterCombat.updateProjectiles();
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState.screen, updateFighter, updateParticles, checkCollision, audioManager, visualEffects, streetFighterCombat]);
+  }, [gameState.screen, updateFighter, updateParticles, checkCollision, visualEffects, streetFighterCombat]);
 
   // Fighter initialization is handled by the canvas component only
 

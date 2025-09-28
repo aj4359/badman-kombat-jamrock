@@ -177,29 +177,37 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       player2Pos: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y }
     });
     
-    // PHASE 2: BRIGHT DEBUG FIGHTERS - Impossible to miss
+    // PHASE 2: RENDER AUTHENTIC FIGHTERS using AuthenticFighterRenderer
     const p1 = gameState.fighters.player1;
     const p2 = gameState.fighters.player2;
     
-    // Player 1 - Bright cyan fighter
-    ctx.fillStyle = '#00FFFF';
-    ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(p1.x, p1.y, p1.width, p1.height);
-    ctx.fillStyle = '#000000';
-    ctx.font = '16px Arial';
-    ctx.fillText(p1.name, p1.x, p1.y - 10);
+    // Render Player 1 with authentic sprite rendering
+    renderAuthenticFighter({
+      ctx,
+      fighter: p1,
+      effects: {
+        alpha: 1.0,
+        hueRotation: 0,
+        shake: getShakeOffset(),
+        glow: false,
+        flash: false,
+        special: p1.state.current === 'special'
+      }
+    });
     
-    // Player 2 - Bright magenta fighter  
-    ctx.fillStyle = '#FF00FF';
-    ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
-    ctx.strokeStyle = '#FFFFFF';  
-    ctx.lineWidth = 3;
-    ctx.strokeRect(p2.x, p2.y, p2.width, p2.height);
-    ctx.fillStyle = '#000000';
-    ctx.font = '16px Arial';
-    ctx.fillText(p2.name, p2.x, p2.y - 10);
+    // Render Player 2 with authentic sprite rendering
+    renderAuthenticFighter({
+      ctx,
+      fighter: p2,
+      effects: {
+        alpha: 1.0,
+        hueRotation: 0,
+        shake: getShakeOffset(),
+        glow: false,
+        flash: false,
+        special: p2.state.current === 'special'
+      }
+    });
     
     console.log('✅ PHASE 2: Rendering BRIGHT fighters:', { 
       p1: { x: p1.x, y: p1.y, health: p1.health },
