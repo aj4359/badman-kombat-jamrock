@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Send, Minimize2, Volume2, VolumeX, Settings, Navigation, Gamepad2, Users, Trophy } from 'lucide-react';
+import { MessageCircle, Send, Minimize2, Navigation, Gamepad2, Users, Trophy } from 'lucide-react';
 import { JamaicanPixelAvatar } from '@/components/ui/JamaicanPixelAvatar';
-import { useWebSpeechAPI } from '@/hooks/useWebSpeechAPI';
 
 interface ChatMessage {
   id: string;
@@ -117,20 +116,12 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const navigate = useNavigate();
   
   const [isOpen, setIsOpen] = useState(false);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [isThinking, setIsThinking] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<'happy' | 'excited' | 'thinking' | 'greeting' | 'cool' | 'speaking'>('cool');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [quickTips, setQuickTips] = useState<GameplayTip[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const { speak, stopSpeaking, isLoading, isSpeaking, error } = useWebSpeechAPI({
-    voiceName: 'Google UK English Male', // Primary Caribbean-sounding voice
-    rate: 0.7, // Slower for Caribbean rhythm  
-    pitch: 0.6, // Lower pitch for authentic Caribbean depth
-    volume: 0.9 // Clear and confident volume for Caribbean authority
-  });
 
   // Initialize with contextual welcome message
   useEffect(() => {
@@ -166,14 +157,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  // Speak the first message when opened
-  useEffect(() => {
-    if (isOpen && voiceEnabled && messages.length === 1) {
-      const firstMessage = messages[0];
-      speak(firstMessage.text);
-      setCurrentEmotion(firstMessage.emotion || 'greeting');
-    }
-  }, [isOpen, voiceEnabled]);
+  // Text-only mode - no voice functionality
 
   const addMessage = (text: string, sender: 'user' | 'rasta', emotion?: ChatMessage['emotion']) => {
     const newMessage: ChatMessage = {
@@ -184,15 +168,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       emotion
     };
     setMessages(prev => [...prev, newMessage]);
-
-    // Auto-speak rasta messages if voice is enabled
-    if (sender === 'rasta' && voiceEnabled) {
-      setTimeout(() => {
-        speak(text);
-        setCurrentEmotion(emotion || 'cool');
-      }, 300);
-    }
-
+    setCurrentEmotion(emotion || 'cool');
     return newMessage;
   };
 
@@ -407,12 +383,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
     }
   };
 
-  const toggleVoice = () => {
-    if (isSpeaking) {
-      stopSpeaking();
-    }
-    setVoiceEnabled(!voiceEnabled);
-  };
+  // Voice system removed - text-only mode
 
   return (
     <>
@@ -439,27 +410,18 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
                 <JamaicanPixelAvatar 
                   size="sm" 
                   emotion={currentEmotion}
-                  isSpeaking={isSpeaking}
+                  isSpeaking={false}
                   isThinking={isThinking}
                   showParticles={false}
                 />
                 <div>
                   <CardTitle className="text-sm font-retro">🇯🇲 Rasta Bot</CardTitle>
                   <p className="text-xs opacity-90">
-                    {isSpeaking ? 'Speaking...' : isThinking ? 'Thinking...' : 'Ready to help!'}
+                    {isThinking ? 'Thinking...' : 'Ready to help!'}
                   </p>
                 </div>
               </div>
               <div className="flex gap-1">
-                <Button
-                  onClick={toggleVoice}
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-background hover:bg-background/20"
-                  title={voiceEnabled ? 'Disable voice' : 'Enable voice'}
-                >
-                  {voiceEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
-                </Button>
                 <Button
                   onClick={() => setIsOpen(false)}
                   variant="ghost"
@@ -517,14 +479,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Voice Error Display */}
-            {error && (
-              <div className="px-4 py-2 bg-destructive/10 border-t border-destructive/20">
-                <p className="text-xs text-destructive">
-                  Voice unavailable: {error}
-                </p>
-              </div>
-            )}
+            {/* Text-only mode - no voice errors */}
 
             {/* Input */}
             <div className="p-4 border-t border-jamaica-green/20 bg-background/50">
@@ -535,13 +490,13 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
                   onKeyPress={handleKeyPress}
                   placeholder="Ask mi anything, bredrin..."
                   className="flex-1 text-sm border-jamaica-green/30 focus:border-jamaica-green bg-background/80"
-                  disabled={isThinking || isLoading}
+                  disabled={isThinking}
                 />
                 <Button 
                   onClick={handleSendMessage}
                   size="icon" 
                   className="bg-jamaica-green hover:bg-jamaica-green/80 text-background shadow-neon-green"
-                  disabled={isThinking || isLoading || !inputText.trim()}
+                  disabled={isThinking || !inputText.trim()}
                 >
                   <Send className="w-4 h-4" />
                 </Button>

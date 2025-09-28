@@ -20,29 +20,60 @@ const Game = () => {
   
   const integratedMode = location.state?.integratedMode || false;
 
-  // EMERGENCY AUDIO KILL SWITCH - Destroy any existing audio
+  // GLOBAL AUDIO KILLER - Prevent all audio sources
   useEffect(() => {
-    console.log('🔇 EMERGENCY AUDIO KILL SWITCH ACTIVATED');
+    console.log('🔇 GLOBAL AUDIO KILLER ACTIVATED');
     
-    // Emergency stop all audio contexts
-    if (window.AudioContext || (window as any).webkitAudioContext) {
-      const contexts = (window as any)._audioContexts || [];
-      contexts.forEach((ctx: AudioContext) => {
-        try {
-          ctx.close();
-          console.log('🔇 Closed AudioContext');
-        } catch (e) {
-          console.log('🔇 Error closing AudioContext:', e);
-        }
-      });
-    }
+    // Override AudioContext constructor to prevent ALL audio
+    const originalAudioContext = window.AudioContext;
+    const originalWebkitAudioContext = (window as any).webkitAudioContext;
     
-    // Stop all HTML audio elements
+    window.AudioContext = class {
+      constructor() {
+        console.log('🔇 AudioContext creation BLOCKED');
+        throw new Error('Audio disabled');
+      }
+    } as any;
+    
+    (window as any).webkitAudioContext = class {
+      constructor() {
+        console.log('🔇 webkitAudioContext creation BLOCKED');
+        throw new Error('Audio disabled');
+      }
+    };
+    
+    // Block HTML Audio element creation
+    const originalAudio = window.Audio;
+    window.Audio = class {
+      constructor() {
+        console.log('🔇 HTML Audio creation BLOCKED');
+        return document.createElement('audio');
+      }
+    } as any;
+    
+    // Stop existing audio
     document.querySelectorAll('audio').forEach(audio => {
       audio.pause();
       audio.currentTime = 0;
-      console.log('🔇 Stopped HTML audio element');
+      audio.volume = 0;
+      audio.muted = true;
     });
+    
+    // Block Web Speech API
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const originalSpeak = window.speechSynthesis.speak;
+      window.speechSynthesis.speak = () => {
+        console.log('🔇 Speech synthesis BLOCKED');
+      };
+    }
+    
+    return () => {
+      // Restore on cleanup
+      window.AudioContext = originalAudioContext;
+      (window as any).webkitAudioContext = originalWebkitAudioContext;
+      window.Audio = originalAudio;
+    };
     
     // Initialize integrated system if in integrated mode
     if (integratedMode && fighterData.player1 && fighterData.player2) {
