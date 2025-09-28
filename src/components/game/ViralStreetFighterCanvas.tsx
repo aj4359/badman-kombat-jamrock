@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
-import { useEnhancedAudioSystem } from '@/hooks/useEnhancedAudioSystem';
+// Audio system removed to eliminate all audio/bell sounds
 import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { renderAuthenticFighter } from './AuthenticFighterRenderer';
 import { MobileControls } from '@/components/ui/MobileControls';
@@ -37,7 +37,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     }
   }, []); // Empty dependency array - initialize only once on mount
   
-  const { processAudioEvent } = useEnhancedAudioSystem();
+  // Audio system removed to eliminate all audio/bell sounds
   const { 
     addScreenShake, 
     addHitSpark, 
@@ -138,7 +138,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         id: 'leroy',
         name: 'Leroy',
         x: 362,
-        y: 356,
+        y: 220,
         width: 70,
         height: 100,
         facing: 'right' as const,
@@ -149,7 +149,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         velocityX: 0,
         velocityY: 0,
         grounded: true,
-        hitbox: { x: 362, y: 356, width: 70, height: 100 },
+        hitbox: { x: 362, y: 220, width: 70, height: 100 },
         animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
         colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' }
       };
@@ -158,7 +158,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         id: 'jordan', 
         name: 'Jordan',
         x: 582,
-        y: 356,
+        y: 220,
         width: 70,
         height: 100,
         facing: 'left' as const,
@@ -169,7 +169,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         velocityX: 0,
         velocityY: 0,
         grounded: true,
-        hitbox: { x: 582, y: 356, width: 70, height: 100 },
+        hitbox: { x: 582, y: 220, width: 70, height: 100 },
         animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
         colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' }
       };
