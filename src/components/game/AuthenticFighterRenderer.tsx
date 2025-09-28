@@ -79,6 +79,17 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 export function renderAuthenticFighter({ ctx, fighter, effects = {} }: AuthenticFighterRendererProps) {
   ctx.save();
   
+  // DEBUG: Log fighter details
+  console.log('🔍 AuthenticFighterRenderer DEBUG:', {
+    id: fighter.id,
+    x: fighter.x,
+    y: fighter.y,
+    width: fighter.width,
+    height: fighter.height,
+    facing: fighter.facing,
+    state: fighter.state?.current
+  });
+  
   // Apply effects
   if (effects.alpha !== undefined) {
     ctx.globalAlpha = effects.alpha;
@@ -92,7 +103,7 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {} }: Authentic
     ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
   }
   
-  // Use actual fighter coordinates for proper positioning
+  // Use actual fighter coordinates - NO OFFSET
   ctx.translate(fighter.x, fighter.y);
   
   // Handle facing direction with simple scale
