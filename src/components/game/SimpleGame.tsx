@@ -7,7 +7,13 @@ interface Fighter {
   height: number;
   health: number;
   facing: 'left' | 'right';
-  state: 'idle' | 'walking' | 'attacking';
+  state: 'idle' | 'walking' | 'attacking' | 'hurt';
+  attackTimer: number;
+  hurtTimer: number;
+  knockbackX: number;
+  knockbackY: number;
+  comboCount: number;
+  lastHitTime: number;
   name: string;
 }
 
@@ -28,6 +34,12 @@ export const SimpleGame: React.FC = () => {
       health: 100,
       facing: 'right',
       state: 'idle',
+      attackTimer: 0,
+      hurtTimer: 0,
+      knockbackX: 0,
+      knockbackY: 0,
+      comboCount: 0,
+      lastHitTime: 0,
       name: 'LEROY'
     },
     player2: {
@@ -38,6 +50,12 @@ export const SimpleGame: React.FC = () => {
       health: 100,
       facing: 'left',
       state: 'idle',
+      attackTimer: 0,
+      hurtTimer: 0,
+      knockbackX: 0,
+      knockbackY: 0,
+      comboCount: 0,
+      lastHitTime: 0,
       name: 'JORDAN'
     },
     keys: {}
@@ -97,6 +115,20 @@ export const SimpleGame: React.FC = () => {
       ctx.fillRect(effectX, y + 40, 20, 20);
     }
 
+    // Hurt effect - red flash
+    if (fighter.state === 'hurt') {
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+      ctx.fillRect(x, y, width, height);
+    }
+
+    // Combo counter above fighter
+    if (fighter.comboCount > 1) {
+      ctx.fillStyle = 'yellow';
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${fighter.comboCount} HITS!`, x + width/2, y - 25);
+    }
+
     ctx.restore();
 
     // Name label
@@ -106,46 +138,113 @@ export const SimpleGame: React.FC = () => {
     ctx.fillText(name, x + width/2, y - 10);
   }, []);
 
+  // Check if two fighters are close enough for hit detection
+  const checkHitCollision = useCallback((attacker: Fighter, defender: Fighter): boolean => {
+    const distance = Math.abs(attacker.x - defender.x);
+    const verticalDistance = Math.abs(attacker.y - defender.y);
+    return distance < 100 && verticalDistance < 60;
+  }, []);
+
+  // Apply hit damage and effects
+  const applyHit = useCallback((attacker: Fighter, defender: Fighter) => {
+    const now = Date.now();
+    
+    // Check if this is a new combo or continuing one
+    if (now - defender.lastHitTime > 1000) {
+      defender.comboCount = 1; // Reset combo
+    } else {
+      defender.comboCount += 1; // Continue combo
+    }
+    
+    // Calculate damage (less damage for longer combos)
+    const damage = Math.max(5, 15 - (defender.comboCount * 2));
+    defender.health = Math.max(0, defender.health - damage);
+    defender.lastHitTime = now;
+    
+    // Apply knockback
+    const knockbackForce = 30;
+    if (attacker.x < defender.x) {
+      defender.knockbackX = knockbackForce;
+    } else {
+      defender.knockbackX = -knockbackForce;
+    }
+    
+    // Set hurt state
+    defender.state = 'hurt';
+    defender.hurtTimer = 20; // 20 frames of hurt
+    
+    // Screen shake effect (simple implementation)
+    console.log(`${defender.name} HIT! Combo: ${defender.comboCount}, Damage: ${damage}, Health: ${defender.health}`);
+  }, []);
+
   const updateGame = useCallback(() => {
     const gameState = gameStateRef.current;
     const speed = 4;
 
-    // Reset states
-    gameState.player1.state = 'idle';
-    gameState.player2.state = 'idle';
+    // Update timers
+    gameState.player1.attackTimer = Math.max(0, gameState.player1.attackTimer - 1);
+    gameState.player2.attackTimer = Math.max(0, gameState.player2.attackTimer - 1);
+    gameState.player1.hurtTimer = Math.max(0, gameState.player1.hurtTimer - 1);
+    gameState.player2.hurtTimer = Math.max(0, gameState.player2.hurtTimer - 1);
 
-    // Player 1 controls (WASD + JK for attacks)
-    if (gameState.keys['KeyW']) gameState.player1.y -= speed;
-    if (gameState.keys['KeyS']) gameState.player1.y += speed;
-    if (gameState.keys['KeyA']) {
-      gameState.player1.x -= speed;
-      gameState.player1.facing = 'left';
-      gameState.player1.state = 'walking';
-    }
-    if (gameState.keys['KeyD']) {
-      gameState.player1.x += speed;
-      gameState.player1.facing = 'right';
-      gameState.player1.state = 'walking';
-    }
-    if (gameState.keys['KeyJ'] || gameState.keys['KeyK']) {
-      gameState.player1.state = 'attacking';
+    // Apply knockback
+    gameState.player1.x += gameState.player1.knockbackX;
+    gameState.player2.x += gameState.player2.knockbackX;
+    gameState.player1.knockbackX *= 0.8; // Decay knockback
+    gameState.player2.knockbackX *= 0.8;
+
+    // Reset states if not in hurt
+    if (gameState.player1.hurtTimer === 0) gameState.player1.state = 'idle';
+    if (gameState.player2.hurtTimer === 0) gameState.player2.state = 'idle';
+
+    // Player 1 controls (WASD + JK for attacks) - only if not hurt
+    if (gameState.player1.hurtTimer === 0) {
+      if (gameState.keys['KeyW']) gameState.player1.y -= speed;
+      if (gameState.keys['KeyS']) gameState.player1.y += speed;
+      if (gameState.keys['KeyA']) {
+        gameState.player1.x -= speed;
+        gameState.player1.facing = 'left';
+        gameState.player1.state = 'walking';
+      }
+      if (gameState.keys['KeyD']) {
+        gameState.player1.x += speed;
+        gameState.player1.facing = 'right';
+        gameState.player1.state = 'walking';
+      }
+      if ((gameState.keys['KeyJ'] || gameState.keys['KeyK']) && gameState.player1.attackTimer === 0) {
+        gameState.player1.state = 'attacking';
+        gameState.player1.attackTimer = 15; // 15 frames of attack
+        
+        // Check for hit
+        if (checkHitCollision(gameState.player1, gameState.player2)) {
+          applyHit(gameState.player1, gameState.player2);
+        }
+      }
     }
 
-    // Player 2 controls (Arrow keys + Numpad 1,2 for attacks)
-    if (gameState.keys['ArrowUp']) gameState.player2.y -= speed;
-    if (gameState.keys['ArrowDown']) gameState.player2.y += speed;
-    if (gameState.keys['ArrowLeft']) {
-      gameState.player2.x -= speed;
-      gameState.player2.facing = 'left';
-      gameState.player2.state = 'walking';
-    }
-    if (gameState.keys['ArrowRight']) {
-      gameState.player2.x += speed;
-      gameState.player2.facing = 'right';
-      gameState.player2.state = 'walking';
-    }
-    if (gameState.keys['Numpad1'] || gameState.keys['Numpad2']) {
-      gameState.player2.state = 'attacking';
+    // Player 2 controls (Arrow keys + Numpad 1,2 for attacks) - only if not hurt
+    if (gameState.player2.hurtTimer === 0) {
+      if (gameState.keys['ArrowUp']) gameState.player2.y -= speed;
+      if (gameState.keys['ArrowDown']) gameState.player2.y += speed;
+      if (gameState.keys['ArrowLeft']) {
+        gameState.player2.x -= speed;
+        gameState.player2.facing = 'left';
+        gameState.player2.state = 'walking';
+      }
+      if (gameState.keys['ArrowRight']) {
+        gameState.player2.x += speed;
+        gameState.player2.facing = 'right';
+        gameState.player2.state = 'walking';
+      }
+      if ((gameState.keys['Numpad1'] || gameState.keys['Numpad2']) && gameState.player2.attackTimer === 0) {
+        gameState.player2.state = 'attacking';
+        gameState.player2.attackTimer = 15; // 15 frames of attack
+        
+        // Check for hit
+        if (checkHitCollision(gameState.player2, gameState.player1)) {
+          applyHit(gameState.player2, gameState.player1);
+        }
+      }
     }
 
     // Keep players on screen
