@@ -92,8 +92,8 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {} }: Authentic
     ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
   }
   
-  // FIXED POSITIONING - Center fighters in visible canvas area
-  ctx.translate(fighter.x, Math.max(50, fighter.y - 100));
+  // Use actual fighter coordinates for proper positioning
+  ctx.translate(fighter.x, fighter.y);
   
   // Handle facing direction with simple scale
   if (fighter.facing === 'left') {
