@@ -128,8 +128,8 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const { speak, stopSpeaking, isLoading, isSpeaking, error } = useWebSpeechAPI({
     voiceName: 'Google UK English Male', // Primary Caribbean-sounding voice
     rate: 0.7, // Slower for Caribbean rhythm  
-    pitch: 0.6, // Lower pitch for more authentic deep Caribbean voice
-    volume: 0.9 // Clear and confident volume
+    pitch: 0.6, // Lower pitch for authentic Caribbean depth
+    volume: 0.9 // Clear and confident volume for Caribbean authority
   });
 
   // Initialize with contextual welcome message

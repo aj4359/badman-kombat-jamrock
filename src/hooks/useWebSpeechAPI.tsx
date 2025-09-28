@@ -69,22 +69,27 @@ export const useWebSpeechAPI = (options: UseWebSpeechAPIOptions = {}) => {
       // Enhanced voice selection for authentic Caribbean/Jamaican sound
       const voices = speechSynthesis.getVoices();
       
-      // Priority voice selection for authentic Jamaican/Caribbean sound
+      // Enhanced voice selection for authentic Caribbean sound  
       const voiceOptions = [
-        voiceName, // User-specified voice first
-        // British/UK voices work best for Caribbean when pitch/rate adjusted
+        // Primary: Look for these exact voice names that work well
         'Google UK English Male',
-        'Microsoft Guy',           // Often deeper UK voice
-        'Microsoft James Desktop',
-        'Microsoft David Desktop', 
-        'Daniel',                  // Good depth
-        'Google British Male',
-        'Aaron',                   // Deep fallback
-        'Alex',                    // macOS deep voice
+        'Microsoft Guy',
+        'Google en-GB',
+        'Alex',                    // macOS deep voice works well
+        'Google UK English',
+        'Microsoft David Desktop',
+        'Microsoft James Desktop', 
+        'Daniel',                  // iOS/macOS deep voice
+        'Aaron',                   // US deep voice fallback
+        // User preference
+        voiceName,
+        // Any male voice as last resort
+        ...voices.filter(v => v.name.toLowerCase().includes('male')).map(v => v.name),
         'default'
       ].filter(Boolean);
 
       let selectedVoice = null;
+      console.log('🇯🇲 CARIBBEAN VOICE SEARCH - Available voices:', voices.map(v => `${v.name} (${v.lang})`));
       
       for (const voiceName of voiceOptions) {
         // Look for exact matches first, then partial matches

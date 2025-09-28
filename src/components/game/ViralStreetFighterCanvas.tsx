@@ -129,40 +129,72 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     renderProfessionalArena(ctx, canvas.width, canvas.height);
     
-    // PHASE 4: EMERGENCY FALLBACK FIGHTERS - Always render something visible
+    // AUTHENTIC FALLBACK - Always render something if fighters are missing
     if (!gameState.fighters.player1 || !gameState.fighters.player2) {
-      ctx.fillStyle = '#ff0000';
-      ctx.font = '32px Arial';
+      console.log('🔧 AUTHENTIC FALLBACK: Missing fighters, using AuthenticFighterRenderer fallback');
+      
+      // Create complete temporary fighters for rendering
+      const tempP1 = {
+        id: 'leroy',
+        name: 'Leroy',
+        x: 362,
+        y: 356,
+        width: 70,
+        height: 100,
+        facing: 'right' as const,
+        health: 100,
+        maxHealth: 100,
+        state: { current: 'idle' as const },
+        meter: 0,
+        velocityX: 0,
+        velocityY: 0,
+        grounded: true,
+        hitbox: { x: 362, y: 356, width: 70, height: 100 },
+        animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
+        colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' }
+      };
+      
+      const tempP2 = {
+        id: 'jordan', 
+        name: 'Jordan',
+        x: 582,
+        y: 356,
+        width: 70,
+        height: 100,
+        facing: 'left' as const,
+        health: 100,
+        maxHealth: 100,
+        state: { current: 'idle' as const },
+        meter: 0,
+        velocityX: 0,
+        velocityY: 0,
+        grounded: true,
+        hitbox: { x: 582, y: 356, width: 70, height: 100 },
+        animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
+        colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' }
+      };
+      
+      // Render using AuthenticFighterRenderer for consistent character display
+      renderAuthenticFighter({
+        ctx,
+        fighter: tempP1 as any,
+        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false }
+      });
+      
+      renderAuthenticFighter({
+        ctx,
+        fighter: tempP2 as any,
+        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false }
+      });
+      
+      // Show debug status but don't dominate screen
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '16px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('🚨 EMERGENCY FALLBACK FIGHTERS 🚨', canvas.width / 2, canvas.height / 2 - 100);
+      ctx.fillText('Loading fighters...', canvas.width / 2, 50);
       ctx.textAlign = 'start';
       
-      // MASSIVE emergency fighters that dominate the screen
-      const centerY = canvas.height / 2;
-      const fighterWidth = 120;
-      const fighterHeight = 180;
-      
-      // Emergency Player 1 - MASSIVE bright green with debug outline
-      ctx.fillStyle = '#00FF00';
-      ctx.fillRect(200, centerY - fighterHeight, fighterWidth, fighterHeight);
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(200, centerY - fighterHeight, fighterWidth, fighterHeight);
-      
-      // Emergency Player 2 - MASSIVE bright magenta with debug outline  
-      ctx.fillStyle = '#FF0080';
-      ctx.fillRect(700, centerY - fighterHeight, fighterWidth, fighterHeight);
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(700, centerY - fighterHeight, fighterWidth, fighterHeight);
-      
-      // Big bold labels
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '24px Arial';
-      ctx.fillText('EMERGENCY P1', 180, centerY - fighterHeight - 20);
-      ctx.fillText('EMERGENCY P2', 680, centerY - fighterHeight - 20);
-      
-      console.log('🚨 EMERGENCY: Rendering MASSIVE fallback fighters');
+      console.log('✅ AUTHENTIC FALLBACK: Rendered detailed fallback fighters');
       return;
     }
 
