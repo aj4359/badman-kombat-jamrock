@@ -8,7 +8,7 @@ import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
 const Hero = () => {
   const navigate = useNavigate();
-  const { isLoaded, currentLayer, settings, playLayer, stopAll, toggleMute } = useAudioManager();
+  const { isLoaded, currentLayer, settings, playLayer, emergencyAudioKillSwitch, toggleMute } = useAudioManager();
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Sync local state with AudioManager's global state
@@ -16,24 +16,19 @@ const Hero = () => {
     setIsPlaying(currentLayer === 'gameplay' || currentLayer === 'intro' || currentLayer === 'ambient');
   }, [currentLayer]);
 
-  const toggleAudio = () => {
-    if (isPlaying) {
-      stopAll();
-    } else {
-      playLayer('ambient');
-    }
+  const enableAudio = () => {
+    playLayer('ambient');
+    setIsPlaying(true);
+  };
+
+  const disableAudio = () => {
+    emergencyAudioKillSwitch();
+    setIsPlaying(false);
   };
 
   const handleStartKombat = () => {
-    if (isLoaded) {
-      playLayer('intro');
-      // Navigate to VS screen after intro starts
-      setTimeout(() => {
-        navigate('/vs-screen');
-      }, 500);
-    } else {
-      navigate('/vs-screen');
-    }
+    // No automatic audio - user must enable it manually first
+    navigate('/vs-screen');
   };
 
   return (
@@ -53,29 +48,27 @@ const Hero = () => {
 
       {/* Audio Controls */}
       <div className="absolute top-6 right-6 z-50 flex gap-2">
-        <Button
-          variant="cyber"
-          size="icon"
-          onClick={toggleAudio}
-          className="animate-neon-pulse"
-        >
-          {isPlaying ? (
-            <Pause className="h-4 w-4 text-neon-green" />
-          ) : (
-            <Play className="h-4 w-4 text-neon-cyan" />
-          )}
-        </Button>
-        <Button
-          variant="cyber"
-          size="icon"
-          onClick={toggleMute}
-        >
-          {settings.isMuted ? (
-            <VolumeX className="h-4 w-4 text-neon-pink" />
-          ) : (
-            <Volume2 className="h-4 w-4 text-neon-green" />
-          )}
-        </Button>
+        {!isPlaying ? (
+          <Button
+            variant="cyber"
+            size="lg"
+            onClick={enableAudio}
+            className="animate-neon-pulse px-6 py-2 text-sm"
+          >
+            <Play className="h-4 w-4 mr-2 text-neon-cyan" />
+            ENABLE AUDIO
+          </Button>
+        ) : (
+          <Button
+            variant="destructive"
+            size="lg"
+            onClick={disableAudio}
+            className="px-6 py-2 text-sm"
+          >
+            <VolumeX className="h-4 w-4 mr-2" />
+            DISABLE AUDIO
+          </Button>
+        )}
       </div>
 
       {/* Main Content */}

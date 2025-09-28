@@ -1,24 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAudioManager } from '@/hooks/useAudioManager';
 import Hero from '@/components/Hero';
 import FighterShowcase from '@/components/FighterShowcase';
 import GameplayTrailer from '@/components/GameplayTrailer';
 import KombatArena from '@/components/KombatArena';
 import Footer from '@/components/Footer';
 import { RastaChatbot } from '@/components/RastaChatbot';
-import { AdvancedAudioMixer } from '@/components/audio/AdvancedAudioMixer';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { playLayer, isLoaded } = useAudioManager();
-
-  // Initialize ambient audio on home page
-  useEffect(() => {
-    if (isLoaded) {
-      playLayer('ambient');
-    }
-  }, [isLoaded, playLayer]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,9 +26,6 @@ const Index = () => {
       
       {/* Footer */}
       <Footer />
-
-      {/* Advanced Audio Controls */}
-      <AdvancedAudioMixer />
 
       {/* Rasta Chatbot Navigator */}
       <RastaChatbot 
