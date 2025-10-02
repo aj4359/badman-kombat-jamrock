@@ -139,81 +139,81 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {} }: Authentic
 function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.jordan;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
-  // Shadow (slightly below feet)
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
+  // Shadow (flat, wide)
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Sneakers (at ground level)
   ctx.fillStyle = 'hsl(0, 0%, 15%)';
-  ctx.fillRect(25, -20, 40, 20); // Left shoe
-  ctx.fillRect(85, -20, 40, 20); // Right shoe
+  ctx.fillRect(-20, -12, 20, 12); // Left shoe
+  ctx.fillRect(0, -12, 20, 12); // Right shoe
   
-  // Legs - going upward
+  // Legs - thin, going upward
   ctx.fillStyle = 'hsl(220, 50%, 30%)'; // Jeans
-  ctx.fillRect(30, -90, 35, 70); // Left leg
-  ctx.fillRect(85, -90, 35, 70); // Right leg
+  ctx.fillRect(-18, -48, 16, 36); // Left leg
+  ctx.fillRect(2, -48, 16, 36); // Right leg
   
   // Torso - DJ shirt
   ctx.fillStyle = profile.colors.shirt;
-  ctx.fillRect(25, -190, 100, 100);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Sound wave graphics on shirt
   ctx.strokeStyle = profile.colors.aura;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.arc(75, -130, 20 + i * 8, 0, Math.PI);
+    ctx.arc(0, -72, 12 + i * 5, 0, Math.PI);
     ctx.stroke();
   }
   
-  // Arms
+  // Arms - thin, extending from sides
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(0, -170, 25, 70); // Left arm
-  ctx.fillRect(125, -190, 25, 80); // Right arm
+  ctx.fillRect(-36, -90, 12, 40); // Left arm
+  ctx.fillRect(24, -90, 12, 40); // Right arm
   
-  // Head - clearly visible
+  // Head - wider than tall
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(40, -210, 70, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
-  // Dreadlocks - visible strands
+  // Dreadlocks - SHORT visible strands (NOT 90px!)
   ctx.fillStyle = profile.colors.dreadlocks;
-  for (let i = 0; i < 8; i++) {
-    const x = 30 + i * 11;
-    ctx.fillRect(x, -215, 9, 90);
+  for (let i = 0; i < 7; i++) {
+    const x = -27 + i * 9;
+    ctx.fillRect(x, -135, 6, 25);
   }
   
   // Headphones
   ctx.fillStyle = profile.colors.headphones;
-  ctx.fillRect(40, -195, 70, 10); // Headband
-  ctx.fillRect(40, -195, 12, 25); // Left cup
-  ctx.fillRect(98, -195, 12, 25); // Right cup
+  ctx.fillRect(-21, -120, 42, 6); // Headband
+  ctx.fillRect(-21, -120, 8, 15); // Left cup
+  ctx.fillRect(13, -120, 8, 15); // Right cup
   
   // Gold chain
   ctx.strokeStyle = profile.colors.chain;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(75, -150, 20, 0, Math.PI);
+  ctx.arc(0, -84, 12, 0, Math.PI);
   ctx.stroke();
   
-  // Eyes - clearly visible
+  // Eyes - horizontal ovals
   ctx.fillStyle = 'white';
-  ctx.fillRect(50, -185, 18, 10); // Left eye
-  ctx.fillRect(82, -185, 18, 10); // Right eye
+  ctx.fillRect(-12, -115, 12, 6); // Left eye
+  ctx.fillRect(0, -115, 12, 6); // Right eye
   ctx.fillStyle = 'black';
-  ctx.fillRect(56, -182, 8, 5); // Left pupil
-  ctx.fillRect(88, -182, 8, 5); // Right pupil
+  ctx.fillRect(-9, -113, 5, 3); // Left pupil
+  ctx.fillRect(3, -113, 5, 3); // Right pupil
   
   // Special effects
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.aura;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
     ctx.shadowColor = profile.colors.aura;
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 10;
     
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
-      ctx.arc(75, -120, 45 + i * 15, 0, Math.PI * 2);
+      ctx.arc(0, -72, 25 + i * 8, 0, Math.PI * 2);
       ctx.stroke();
     }
     ctx.shadowBlur = 0;
@@ -223,60 +223,60 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
 function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.sifu;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Kung fu shoes
   ctx.fillStyle = 'hsl(0, 0%, 10%)';
-  ctx.fillRect(15, -16, 45, 16);
-  ctx.fillRect(90, -16, 45, 16);
+  ctx.fillRect(-25, -12, 20, 12);
+  ctx.fillRect(5, -12, 20, 12);
   
   // Legs - wide kung fu stance
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(15, -86, 45, 70); // Left leg
-  ctx.fillRect(90, -86, 45, 70); // Right leg
+  ctx.fillRect(-22, -48, 18, 36); // Left leg
+  ctx.fillRect(4, -48, 18, 36); // Right leg
   
   // Torso in traditional gi
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(23, -180, 105, 94);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Black belt
   ctx.fillStyle = profile.colors.belt;
-  ctx.fillRect(23, -106, 105, 16);
+  ctx.fillRect(-24, -60, 48, 8);
   
   // Arms in fighting pose
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(0, -170, 30, 70); // Left arm
-  ctx.fillRect(120, -180, 30, 80); // Right arm
+  ctx.fillRect(-36, -90, 12, 36); // Left arm
+  ctx.fillRect(24, -90, 12, 36); // Right arm
   
   // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(38, -220, 75, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
   // Traditional hair
   ctx.fillStyle = profile.colors.hair;
-  ctx.fillRect(42, -216, 66, 24);
+  ctx.fillRect(-18, -135, 36, 12);
   
   // Goatee
-  ctx.fillRect(68, -176, 15, 16);
+  ctx.fillRect(-6, -102, 8, 8);
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(53, -202, 18, 10);
-  ctx.fillRect(86, -202, 18, 10);
+  ctx.fillRect(-12, -118, 12, 6);
+  ctx.fillRect(0, -118, 12, 6);
   ctx.fillStyle = 'black';
-  ctx.fillRect(59, -199, 8, 5);
-  ctx.fillRect(92, -199, 8, 5);
+  ctx.fillRect(-9, -116, 5, 3);
+  ctx.fillRect(3, -116, 5, 3);
   
   // Steel wire weapon (when attacking)
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.steel_wire;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(135, -140);
-    ctx.quadraticCurveTo(180, -180, 210, -120);
+    ctx.moveTo(30, -84);
+    ctx.quadraticCurveTo(50, -108, 65, -72);
     ctx.stroke();
   }
   
@@ -284,13 +284,13 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   if (effects.special || fighter.state.current === 'special') {
     ctx.fillStyle = profile.colors.chi_aura;
     ctx.shadowColor = profile.colors.chi_aura;
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = 12;
     
     ctx.beginPath();
-    ctx.arc(18, -130, 12, 0, Math.PI * 2);
+    ctx.arc(-30, -78, 8, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(132, -126, 12, 0, Math.PI * 2);
+    ctx.arc(30, -78, 8, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.shadowBlur = 0;
@@ -300,40 +300,40 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
 function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.leroy;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Tech boots
   ctx.fillStyle = profile.colors.tech_accessories;
-  ctx.fillRect(30, -20, 38, 20);
-  ctx.fillRect(83, -20, 38, 20);
+  ctx.fillRect(-20, -12, 18, 12);
+  ctx.fillRect(2, -12, 18, 12);
   
   // Legs
   ctx.fillStyle = 'hsl(220, 40%, 25%)';
-  ctx.fillRect(38, -80, 30, 60);
-  ctx.fillRect(83, -80, 30, 60);
+  ctx.fillRect(-18, -48, 16, 36);
+  ctx.fillRect(2, -48, 16, 36);
   
   // Rasta shirt
   ctx.fillStyle = profile.colors.rasta_shirt;
-  ctx.fillRect(30, -170, 90, 90);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Arms
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(8, -150, 23, 50);
-  ctx.fillRect(120, -150, 23, 50);
+  ctx.fillRect(-36, -90, 12, 36);
+  ctx.fillRect(24, -90, 12, 36);
   
   // Cyber tattoos on arms
   ctx.strokeStyle = profile.colors.cyber_tattoos;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.shadowColor = profile.colors.circuit_glow;
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 8;
   
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.moveTo(12, -146 + i * 10);
-    ctx.lineTo(27, -146 + i * 10);
+    ctx.moveTo(-34, -86 + i * 8);
+    ctx.lineTo(-24, -86 + i * 8);
     ctx.stroke();
   }
   
@@ -341,35 +341,35 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
   
   // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(45, -210, 60, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
-  // Dreadlocks with rasta colors
+  // Dreadlocks with rasta colors - SHORT strands
   const rastaColors = ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     ctx.fillStyle = rastaColors[i % 3];
-    ctx.fillRect(33 + i * 11, -216, 9, 80);
+    ctx.fillRect(-27 + i * 9, -135, 6, 25);
   }
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(53, -196, 18, 10);
-  ctx.fillRect(86, -196, 18, 10);
+  ctx.fillRect(-12, -115, 12, 6);
+  ctx.fillRect(0, -115, 12, 6);
   ctx.fillStyle = 'black';
-  ctx.fillRect(56, -194, 8, 5);
-  ctx.fillRect(89, -194, 8, 5);
+  ctx.fillRect(-9, -113, 5, 3);
+  ctx.fillRect(3, -113, 5, 3);
   
   // Circuit glow effects
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.circuit_glow;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
     ctx.shadowColor = profile.colors.circuit_glow;
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 10;
     
     ctx.beginPath();
-    ctx.moveTo(30, -160);
-    ctx.lineTo(120, -160);
-    ctx.moveTo(75, -170);
-    ctx.lineTo(75, -80);
+    ctx.moveTo(-24, -96);
+    ctx.lineTo(24, -96);
+    ctx.moveTo(0, -96);
+    ctx.lineTo(0, -48);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -379,54 +379,54 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
 function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.razor;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Ninja boots
   ctx.fillStyle = 'hsl(0, 0%, 5%)';
-  ctx.fillRect(30, -16, 38, 16);
-  ctx.fillRect(83, -16, 38, 16);
+  ctx.fillRect(-20, -12, 18, 12);
+  ctx.fillRect(2, -12, 18, 12);
   
   // Ninja suit legs
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(38, -76, 30, 60);
-  ctx.fillRect(83, -76, 30, 60);
+  ctx.fillRect(-18, -48, 16, 36);
+  ctx.fillRect(2, -48, 16, 36);
   
   // Ninja suit torso
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(30, -166, 90, 90);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Arms
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(8, -146, 23, 50);
-  ctx.fillRect(120, -146, 23, 50);
+  ctx.fillRect(-36, -90, 12, 36);
+  ctx.fillRect(24, -90, 12, 36);
   
   // Head/mask
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(45, -206, 60, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
   // Glowing cyber eyes
   ctx.fillStyle = profile.colors.cyber_eyes;
   ctx.shadowColor = profile.colors.cyber_eyes;
-  ctx.shadowBlur = 10;
-  ctx.fillRect(53, -192, 18, 10);
-  ctx.fillRect(86, -192, 18, 10);
+  ctx.shadowBlur = 8;
+  ctx.fillRect(-12, -115, 12, 6);
+  ctx.fillRect(0, -115, 12, 6);
   ctx.shadowBlur = 0;
   
   // Katana (when attacking)
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
     ctx.fillStyle = profile.colors.katana;
     ctx.shadowColor = profile.colors.katana;
-    ctx.shadowBlur = 8;
-    ctx.fillRect(135, -196, 8, 100);
+    ctx.shadowBlur = 6;
+    ctx.fillRect(30, -126, 5, 60);
     
     ctx.strokeStyle = profile.colors.energy_field;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(138, -196);
-    ctx.lineTo(138, -96);
+    ctx.moveTo(32, -126);
+    ctx.lineTo(32, -66);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -435,12 +435,12 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
   // Energy field effects
   if (effects.special) {
     ctx.strokeStyle = profile.colors.energy_field;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.shadowColor = profile.colors.energy_field;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
     
     ctx.beginPath();
-    ctx.rect(23, -206, 105, 180);
+    ctx.rect(-27, -135, 54, 120);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -450,69 +450,69 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
 function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.rootsman;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Natural sandals
   ctx.fillStyle = 'hsl(30, 50%, 25%)';
-  ctx.fillRect(33, -16, 39, 16);
-  ctx.fillRect(78, -16, 39, 16);
+  ctx.fillRect(-22, -12, 20, 12);
+  ctx.fillRect(2, -12, 20, 12);
   
   // Legs
   ctx.fillStyle = 'hsl(30, 40%, 30%)';
-  ctx.fillRect(38, -76, 30, 60);
-  ctx.fillRect(83, -76, 30, 60);
+  ctx.fillRect(-18, -48, 16, 36);
+  ctx.fillRect(2, -48, 16, 36);
   
   // Earth-tone shirt with rasta accents
   const rastaColors = profile.colors.rasta_colors as string[];
   ctx.fillStyle = rastaColors[0];
-  ctx.fillRect(30, -166, 90, 90);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Rasta color stripes
   for (let i = 0; i < 3; i++) {
     ctx.fillStyle = rastaColors[i];
-    ctx.fillRect(30, -166 + i * 30, 90, 10);
+    ctx.fillRect(-24, -96 + i * 16, 48, 6);
   }
   
   // Arms
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(8, -146, 23, 50);
-  ctx.fillRect(120, -146, 23, 50);
+  ctx.fillRect(-36, -90, 12, 36);
+  ctx.fillRect(24, -90, 12, 36);
   
   // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(45, -206, 60, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
-  // Long flowing dreadlocks
+  // Long flowing dreadlocks - SHORT strands
   ctx.fillStyle = profile.colors.dreads;
-  for (let i = 0; i < 10; i++) {
-    const x = 27 + i * 10;
-    const length = 80 + Math.sin(i) * 20;
-    ctx.fillRect(x, -212, 6, length);
+  for (let i = 0; i < 8; i++) {
+    const x = -30 + i * 8;
+    const length = 25 + Math.sin(i) * 5;
+    ctx.fillRect(x, -138, 5, length);
   }
   
   // Eyes with mystical wisdom
   ctx.fillStyle = 'white';
-  ctx.fillRect(53, -192, 18, 10);
-  ctx.fillRect(86, -192, 18, 10);
+  ctx.fillRect(-12, -115, 12, 6);
+  ctx.fillRect(0, -115, 12, 6);
   ctx.fillStyle = profile.colors.mystical_energy;
-  ctx.fillRect(56, -190, 8, 5);
-  ctx.fillRect(89, -190, 8, 5);
+  ctx.fillRect(-9, -113, 5, 3);
+  ctx.fillRect(3, -113, 5, 3);
   
   // Nature's mystical aura
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.mystical_energy;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     ctx.shadowColor = profile.colors.mystical_energy;
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 10;
     
     for (let i = 0; i < 5; i++) {
       ctx.beginPath();
-      const startX = 15 + i * 30;
-      ctx.moveTo(startX, 16);
-      ctx.quadraticCurveTo(startX + 15, -116, startX + 8, -176);
+      const startX = -30 + i * 15;
+      ctx.moveTo(startX, 5);
+      ctx.quadraticCurveTo(startX + 8, -60, startX + 4, -96);
       ctx.stroke();
     }
     
@@ -521,33 +521,33 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
 }
 
 function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y
+  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 60x120 base size
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(15, 5, 120, 10);
+  ctx.fillRect(-15, 5, 90, 6);
   
   // Basic Street Fighter silhouette
   ctx.fillStyle = fighter.colors.primary;
   
   // Legs
-  ctx.fillRect(38, -76, 30, 60);
-  ctx.fillRect(83, -76, 30, 60);
+  ctx.fillRect(-18, -48, 16, 36);
+  ctx.fillRect(2, -48, 16, 36);
   
   // Torso
-  ctx.fillRect(30, -166, 90, 90);
+  ctx.fillRect(-24, -96, 48, 48);
   
   // Arms
-  ctx.fillRect(8, -146, 23, 50);
-  ctx.fillRect(120, -146, 23, 50);
+  ctx.fillRect(-36, -90, 12, 36);
+  ctx.fillRect(24, -90, 12, 36);
   
   // Head
-  ctx.fillRect(45, -206, 60, 50);
+  ctx.fillRect(-21, -132, 42, 36);
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(53, -192, 18, 10);
-  ctx.fillRect(86, -192, 18, 10);
+  ctx.fillRect(-12, -115, 12, 6);
+  ctx.fillRect(0, -115, 12, 6);
   ctx.fillStyle = 'black';
-  ctx.fillRect(56, -190, 8, 5);
-  ctx.fillRect(89, -190, 8, 5);
+  ctx.fillRect(-9, -113, 5, 3);
+  ctx.fillRect(3, -113, 5, 3);
 }
