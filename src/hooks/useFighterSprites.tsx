@@ -1,66 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Import sprite images
-import ashaSprite from '@/assets/asha-sprite.png';
-import ashaWarriorSprite from '@/assets/asha-warrior-sprite.png';
-import leroySprite from '@/assets/leroy-sprite.png';
-import jordanSprite from '@/assets/jordan-sprite.png';
-import razorSprite from '@/assets/razor-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
-import rootsmanSprite from '@/assets/rootsman-sprite.png';
-import elderZionSprite from '@/assets/elder-zion-sprite.png';
-import marcusSprite from '@/assets/marcus-sprite.png';
-import monkWuSprite from '@/assets/monk-wu-sprite.png';
+// Import ONLY valid sprite sheet images (not portraits)
+// NOTE: leroy-sprite.png, jordan-sprite.png etc are portraits, not sprite sheets
+// These will use geometric fallback rendering instead
 
 interface SpriteMap {
   [key: string]: HTMLImageElement | null;
 }
 
-const SPRITE_SOURCES: Record<string, string> = {
-  asha: ashaWarriorSprite,
-  asha_warrior: ashaWarriorSprite,
-  leroy: leroySprite,
-  jordan: jordanSprite,
-  razor: razorSprite,
-  sifu: sifuSprite,
-  rootsman: rootsmanSprite,
-  elder_zion: elderZionSprite,
-  elderzion: elderZionSprite, // Alternative naming
-  marcus: marcusSprite,
-  monk_wu: monkWuSprite,
-  monkwu: monkWuSprite, // Alternative naming
-};
+// EMPTY - No valid sprite sheets available
+// All fighters will use geometric fallback rendering
+const SPRITE_SOURCES: Record<string, string> = {};
 
 export const useFighterSprites = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const spritesRef = useRef<SpriteMap>({});
 
   useEffect(() => {
-    const loadSprites = async () => {
-      const promises = Object.entries(SPRITE_SOURCES).map(
-        ([id, src]) =>
-          new Promise<void>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-              spritesRef.current[id] = img;
-              console.log(`✅ Loaded sprite for ${id}`);
-              resolve();
-            };
-            img.onerror = () => {
-              console.warn(`⚠️ Failed to load sprite for ${id}, will use fallback`);
-              spritesRef.current[id] = null;
-              resolve(); // Don't reject, just use fallback
-            };
-            img.src = src;
-          })
-      );
-
-      await Promise.all(promises);
-      setIsLoaded(true);
-      console.log('✅ All fighter sprites loaded');
-    };
-
-    loadSprites();
+    // No sprites to load - all fighters use geometric rendering
+    console.log('🎨 No sprite sheets available - using geometric fallback for all fighters');
+    setIsLoaded(true);
   }, []);
 
   const getSprite = (fighterId: string): HTMLImageElement | null => {
