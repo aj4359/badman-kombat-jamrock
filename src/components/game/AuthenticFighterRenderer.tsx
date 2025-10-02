@@ -82,7 +82,7 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
   
   // If we have a sprite image, use it instead of geometric rendering
   if (spriteImage && spriteImage.complete) {
-    console.log('🎨 Using sprite image for', fighter.id);
+    console.log('🎨 Rendering sprite for', fighter.id, 'at', fighter.x, fighter.y);
     
     // Apply effects
     if (effects.alpha !== undefined) {
@@ -97,9 +97,14 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
     }
     
-    // Draw sprite at fighter position
+    // CRITICAL FIX: Draw sprite at correct canvas position
+    // Fighter Y is from top of canvas (0 at top, increases downward)
+    // We need to draw the sprite so its BOTTOM is at ground level (420)
+    const GROUND_LEVEL = 420;
     const drawX = fighter.x;
-    const drawY = fighter.y;
+    const drawY = GROUND_LEVEL - fighter.height; // Position sprite so bottom touches ground
+    
+    console.log('📍 Sprite draw position:', { drawX, drawY, width: fighter.width, height: fighter.height });
     
     // Handle flipping for facing direction
     if (fighter.facing === 'left') {
