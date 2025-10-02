@@ -7,6 +7,9 @@ import jordanSprite from '@/assets/jordan-sprite.png';
 import razorSprite from '@/assets/razor-sprite.png';
 import sifuSprite from '@/assets/sifu-sprite.png';
 import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import elderZionSprite from '@/assets/elder-zion-sprite.png';
+import marcusSprite from '@/assets/marcus-sprite.png';
+import monkWuSprite from '@/assets/monk-wu-sprite.png';
 
 interface SpriteMap {
   [key: string]: HTMLImageElement | null;
@@ -19,6 +22,11 @@ const SPRITE_SOURCES: Record<string, string> = {
   razor: razorSprite,
   sifu: sifuSprite,
   rootsman: rootsmanSprite,
+  elder_zion: elderZionSprite,
+  elderzion: elderZionSprite, // Alternative naming
+  marcus: marcusSprite,
+  monk_wu: monkWuSprite,
+  monkwu: monkWuSprite, // Alternative naming
 };
 
 export const useFighterSprites = () => {
