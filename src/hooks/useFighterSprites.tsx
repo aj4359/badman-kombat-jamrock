@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // Import sprite images
 import ashaSprite from '@/assets/asha-sprite.png';
+import ashaWarriorSprite from '@/assets/asha-warrior-sprite.png';
 import leroySprite from '@/assets/leroy-sprite.png';
 import jordanSprite from '@/assets/jordan-sprite.png';
 import razorSprite from '@/assets/razor-sprite.png';
@@ -16,7 +17,8 @@ interface SpriteMap {
 }
 
 const SPRITE_SOURCES: Record<string, string> = {
-  asha: ashaSprite,
+  asha: ashaWarriorSprite,
+  asha_warrior: ashaWarriorSprite,
   leroy: leroySprite,
   jordan: jordanSprite,
   razor: razorSprite,
