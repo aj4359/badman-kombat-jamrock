@@ -138,85 +138,74 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {} }: Authentic
 
 function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.jordan;
-  const w = fighter.width;
-  const h = fighter.height;
   
-  // Authentic Street Fighter proportions - muscular fighter build
-  const headSize = h * 0.4;   // Large head with strong jawline
-  const torsoSize = h * 0.45; // Broad muscular chest
-  const legSize = h * 0.4;    // Thick powerful legs
-  
+  // ABSOLUTE PIXEL MEASUREMENTS (based on 150x200 fighter size)
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
-  // Thicker muscular legs with Street Fighter stance
+  // Legs - clear, visible
   ctx.fillStyle = 'hsl(220, 50%, 30%)'; // Jeans
-  // Left leg - thicker and more muscular
-  ctx.fillRect(w * 0.2, h * 0.65, w * 0.25, legSize);
-  // Right leg - fighting stance, bigger
-  ctx.fillRect(w * 0.55, h * 0.65, w * 0.25, legSize);
+  ctx.fillRect(30, 130, 35, 70); // Left leg
+  ctx.fillRect(85, 130, 35, 70); // Right leg
   
-  // Street Fighter style sneakers - bigger
+  // Sneakers
   ctx.fillStyle = 'hsl(0, 0%, 15%)';
-  ctx.fillRect(w * 0.15, h * 0.9, w * 0.35, h * 0.1);
-  ctx.fillRect(w * 0.5, h * 0.9, w * 0.35, h * 0.1);
+  ctx.fillRect(25, 180, 40, 20); // Left shoe
+  ctx.fillRect(85, 180, 40, 20); // Right shoe
   
-  // Muscular torso - DJ shirt with sound waves, Street Fighter style
+  // Torso - DJ shirt
   ctx.fillStyle = profile.colors.shirt;
-  ctx.fillRect(w * 0.15, h * 0.15, w * 0.7, torsoSize);
+  ctx.fillRect(25, 30, 100, 100);
   
   // Sound wave graphics on shirt
   ctx.strokeStyle = profile.colors.aura;
   ctx.lineWidth = 2;
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.45, w * (0.15 + i * 0.05), 0, Math.PI);
+    ctx.arc(75, 90, 20 + i * 8, 0, Math.PI);
     ctx.stroke();
   }
   
-  // Muscular arms in DJ fighting pose - Street Fighter proportions
+  // Arms
   ctx.fillStyle = profile.colors.skin;
-  // Left arm - bigger and more muscular
-  ctx.fillRect(w * 0.0, h * 0.25, w * 0.2, h * 0.35);
-  // Right arm - raised fighting stance, bigger
-  ctx.fillRect(w * 0.8, h * 0.15, w * 0.2, h * 0.4);
+  ctx.fillRect(0, 50, 25, 70); // Left arm
+  ctx.fillRect(125, 30, 25, 80); // Right arm
   
-  // Larger head with Street Fighter proportions
+  // Head - clearly visible
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.25, h * 0.0, w * 0.5, headSize);
+  ctx.fillRect(40, -10, 70, 50);
   
-  // Flowing dreadlocks - Street Fighter style
+  // Dreadlocks - visible strands
   ctx.fillStyle = profile.colors.dreadlocks;
   for (let i = 0; i < 8; i++) {
-    const x = w * (0.2 + i * 0.075);
-    ctx.fillRect(x, h * 0.0, w * 0.06, h * 0.45);
+    const x = 30 + i * 11;
+    ctx.fillRect(x, -15, 9, 90);
   }
   
-  // Headphones (iconic DJ element)
+  // Headphones
   ctx.fillStyle = profile.colors.headphones;
-  ctx.fillRect(w * 0.25, h * 0.08, w * 0.5, h * 0.06);
-  ctx.fillRect(w * 0.25, h * 0.08, w * 0.08, h * 0.15);
-  ctx.fillRect(w * 0.67, h * 0.08, w * 0.08, h * 0.15);
+  ctx.fillRect(40, 5, 70, 10); // Headband
+  ctx.fillRect(40, 5, 12, 25); // Left cup
+  ctx.fillRect(98, 5, 12, 25); // Right cup
   
-  // Gold chain (cultural element)
+  // Gold chain
   ctx.strokeStyle = profile.colors.chain;
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.arc(w * 0.5, h * 0.35, w * 0.15, 0, Math.PI);
+  ctx.arc(75, 70, 20, 0, Math.PI);
   ctx.stroke();
   
-  // Eyes with Street Fighter style
+  // Eyes - clearly visible
   ctx.fillStyle = 'white';
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(50, 15, 18, 10); // Left eye
+  ctx.fillRect(82, 15, 18, 10); // Right eye
   ctx.fillStyle = 'black';
-  ctx.fillRect(w * 0.37, h * 0.13, w * 0.04, h * 0.02);
-  ctx.fillRect(w * 0.59, h * 0.13, w * 0.04, h * 0.02);
+  ctx.fillRect(56, 18, 8, 5); // Left pupil
+  ctx.fillRect(88, 18, 8, 5); // Right pupil
   
   // Special effects
   if (effects.special || fighter.state.current === 'special') {
-    // Sound wave aura
     ctx.strokeStyle = profile.colors.aura;
     ctx.lineWidth = 3;
     ctx.shadowColor = profile.colors.aura;
@@ -224,7 +213,7 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
     
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
-      ctx.arc(w * 0.5, h * 0.5, w * (0.3 + i * 0.1), 0, Math.PI * 2);
+      ctx.arc(75, 100, 45 + i * 15, 0, Math.PI * 2);
       ctx.stroke();
     }
     ctx.shadowBlur = 0;
@@ -233,70 +222,61 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
 
 function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.sifu;
-  const w = fighter.width;
-  const h = fighter.height;
   
-  // Street Fighter master proportions - wise but powerful
-  const headSize = h * 0.38;  // Mature facial features
-  const torsoSize = h * 0.47; // Strong martial artist build
-  const legSize = h * 0.38;   // Stable stance legs
-  
+  // ABSOLUTE PIXEL MEASUREMENTS
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
-  // Muscular legs in wide kung fu stance - Street Fighter style
+  // Legs - wide kung fu stance
   ctx.fillStyle = profile.colors.gi;
-  // Wider, more muscular stance
-  ctx.fillRect(w * 0.1, h * 0.65, w * 0.3, legSize);
-  ctx.fillRect(w * 0.6, h * 0.65, w * 0.3, legSize);
+  ctx.fillRect(15, 130, 45, 70); // Left leg
+  ctx.fillRect(90, 130, 45, 70); // Right leg
   
   // Kung fu shoes
   ctx.fillStyle = 'hsl(0, 0%, 10%)';
-  ctx.fillRect(w * 0.1, h * 0.92, w * 0.3, h * 0.08);
-  ctx.fillRect(w * 0.6, h * 0.92, w * 0.3, h * 0.08);
+  ctx.fillRect(15, 184, 45, 16);
+  ctx.fillRect(90, 184, 45, 16);
   
-  // Muscular torso in traditional gi - Street Fighter proportions
+  // Torso in traditional gi
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(w * 0.15, h * 0.15, w * 0.7, torsoSize);
+  ctx.fillRect(23, 30, 105, 94);
   
   // Black belt
   ctx.fillStyle = profile.colors.belt;
-  ctx.fillRect(w * 0.15, h * 0.55, w * 0.7, h * 0.08);
+  ctx.fillRect(23, 110, 105, 16);
   
-  // Powerful muscular arms in kung fu fighting pose
+  // Arms in fighting pose
   ctx.fillStyle = profile.colors.skin;
-  // Left arm - defensive, bigger and stronger
-  ctx.fillRect(w * 0.0, h * 0.25, w * 0.2, h * 0.35);
-  // Right arm - attacking, Street Fighter proportions
-  ctx.fillRect(w * 0.8, h * 0.2, w * 0.2, h * 0.4);
+  ctx.fillRect(0, 50, 30, 70); // Left arm
+  ctx.fillRect(120, 40, 30, 80); // Right arm
   
-  // Larger head with wise master features
+  // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.25, h * 0.0, w * 0.5, headSize);
+  ctx.fillRect(38, 0, 75, 50);
   
   // Traditional hair
   ctx.fillStyle = profile.colors.hair;
-  ctx.fillRect(w * 0.28, h * 0.02, w * 0.44, h * 0.12);
+  ctx.fillRect(42, 4, 66, 24);
   
-  // Goatee (traditional master look)
-  ctx.fillRect(w * 0.45, h * 0.22, w * 0.1, h * 0.08);
+  // Goatee
+  ctx.fillRect(68, 44, 15, 16);
   
-  // Eyes with wisdom
+  // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(53, 18, 18, 10);
+  ctx.fillRect(86, 18, 18, 10);
   ctx.fillStyle = 'black';
-  ctx.fillRect(w * 0.37, h * 0.13, w * 0.04, h * 0.02);
-  ctx.fillRect(w * 0.59, h * 0.13, w * 0.04, h * 0.02);
+  ctx.fillRect(59, 21, 8, 5);
+  ctx.fillRect(92, 21, 8, 5);
   
   // Steel wire weapon (when attacking)
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.steel_wire;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(w * 0.9, h * 0.4);
-    ctx.quadraticCurveTo(w * 1.2, h * 0.2, w * 1.4, h * 0.5);
+    ctx.moveTo(135, 80);
+    ctx.quadraticCurveTo(180, 40, 210, 100);
     ctx.stroke();
   }
   
@@ -306,12 +286,11 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
     ctx.shadowColor = profile.colors.chi_aura;
     ctx.shadowBlur = 20;
     
-    // Chi energy around hands
     ctx.beginPath();
-    ctx.arc(w * 0.12, h * 0.45, w * 0.08, 0, Math.PI * 2);
+    ctx.arc(18, 90, 12, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(w * 0.88, h * 0.47, w * 0.08, 0, Math.PI * 2);
+    ctx.arc(132, 94, 12, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.shadowBlur = 0;
@@ -320,31 +299,30 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
 
 function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.leroy;
-  const w = fighter.width;
-  const h = fighter.height;
   
+  // ABSOLUTE PIXEL MEASUREMENTS
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
   // Legs
-  ctx.fillStyle = 'hsl(220, 40%, 25%)'; // Dark pants
-  ctx.fillRect(w * 0.25, h * 0.7, w * 0.2, h * 0.3);
-  ctx.fillRect(w * 0.55, h * 0.7, w * 0.2, h * 0.3);
+  ctx.fillStyle = 'hsl(220, 40%, 25%)';
+  ctx.fillRect(38, 140, 30, 60);
+  ctx.fillRect(83, 140, 30, 60);
   
   // Tech boots
   ctx.fillStyle = profile.colors.tech_accessories;
-  ctx.fillRect(w * 0.2, h * 0.9, w * 0.25, h * 0.1);
-  ctx.fillRect(w * 0.55, h * 0.9, w * 0.25, h * 0.1);
+  ctx.fillRect(30, 180, 38, 20);
+  ctx.fillRect(83, 180, 38, 20);
   
-  // Rasta colored shirt
+  // Rasta shirt
   ctx.fillStyle = profile.colors.rasta_shirt;
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.45);
+  ctx.fillRect(30, 50, 90, 90);
   
   // Arms
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.05, h * 0.35, w * 0.15, h * 0.25);
-  ctx.fillRect(w * 0.8, h * 0.35, w * 0.15, h * 0.25);
+  ctx.fillRect(8, 70, 23, 50);
+  ctx.fillRect(120, 70, 23, 50);
   
   // Cyber tattoos on arms
   ctx.strokeStyle = profile.colors.cyber_tattoos;
@@ -352,11 +330,10 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
   ctx.shadowColor = profile.colors.circuit_glow;
   ctx.shadowBlur = 10;
   
-  // Circuit patterns on left arm
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.moveTo(w * 0.08, h * (0.37 + i * 0.05));
-    ctx.lineTo(w * 0.18, h * (0.37 + i * 0.05));
+    ctx.moveTo(12, 74 + i * 10);
+    ctx.lineTo(27, 74 + i * 10);
     ctx.stroke();
   }
   
@@ -364,23 +341,22 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
   
   // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, h * 0.25);
+  ctx.fillRect(45, 10, 60, 50);
   
   // Dreadlocks with rasta colors
   const rastaColors = ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'];
   for (let i = 0; i < 8; i++) {
     ctx.fillStyle = rastaColors[i % 3];
-    const x = w * (0.22 + i * 0.07);
-    ctx.fillRect(x, h * 0.02, w * 0.03, h * 0.4);
+    ctx.fillRect(33 + i * 11, 4, 9, 80);
   }
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(53, 24, 18, 10);
+  ctx.fillRect(86, 24, 18, 10);
   ctx.fillStyle = 'black';
-  ctx.fillRect(w * 0.37, h * 0.13, w * 0.04, h * 0.02);
-  ctx.fillRect(w * 0.59, h * 0.13, w * 0.04, h * 0.02);
+  ctx.fillRect(56, 26, 8, 5);
+  ctx.fillRect(89, 26, 8, 5);
   
   // Circuit glow effects
   if (effects.special || fighter.state.current === 'special') {
@@ -389,12 +365,11 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
     ctx.shadowColor = profile.colors.circuit_glow;
     ctx.shadowBlur = 15;
     
-    // Glowing circuit patterns across body
     ctx.beginPath();
-    ctx.moveTo(w * 0.2, h * 0.3);
-    ctx.lineTo(w * 0.8, h * 0.3);
-    ctx.moveTo(w * 0.5, h * 0.25);
-    ctx.lineTo(w * 0.5, h * 0.7);
+    ctx.moveTo(30, 60);
+    ctx.lineTo(120, 60);
+    ctx.moveTo(75, 50);
+    ctx.lineTo(75, 140);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -403,58 +378,55 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
 
 function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.razor;
-  const w = fighter.width;
-  const h = fighter.height;
   
+  // ABSOLUTE PIXEL MEASUREMENTS
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
   // Ninja suit legs
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(w * 0.25, h * 0.7, w * 0.2, h * 0.3);
-  ctx.fillRect(w * 0.55, h * 0.7, w * 0.2, h * 0.3);
+  ctx.fillRect(38, 140, 30, 60);
+  ctx.fillRect(83, 140, 30, 60);
   
   // Ninja boots
   ctx.fillStyle = 'hsl(0, 0%, 5%)';
-  ctx.fillRect(w * 0.2, h * 0.92, w * 0.25, h * 0.08);
-  ctx.fillRect(w * 0.55, h * 0.92, w * 0.25, h * 0.08);
+  ctx.fillRect(30, 184, 38, 16);
+  ctx.fillRect(83, 184, 38, 16);
   
   // Ninja suit torso
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.45);
+  ctx.fillRect(30, 50, 90, 90);
   
   // Arms
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(w * 0.05, h * 0.35, w * 0.15, h * 0.25);
-  ctx.fillRect(w * 0.8, h * 0.35, w * 0.15, h * 0.25);
+  ctx.fillRect(8, 70, 23, 50);
+  ctx.fillRect(120, 70, 23, 50);
   
   // Head/mask
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, h * 0.25);
+  ctx.fillRect(45, 10, 60, 50);
   
   // Glowing cyber eyes
   ctx.fillStyle = profile.colors.cyber_eyes;
   ctx.shadowColor = profile.colors.cyber_eyes;
   ctx.shadowBlur = 10;
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(53, 24, 18, 10);
+  ctx.fillRect(86, 24, 18, 10);
   ctx.shadowBlur = 0;
   
   // Katana (when attacking)
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
-    // Katana blade
     ctx.fillStyle = profile.colors.katana;
     ctx.shadowColor = profile.colors.katana;
     ctx.shadowBlur = 8;
-    ctx.fillRect(w * 0.9, h * 0.1, w * 0.05, h * 0.5);
+    ctx.fillRect(135, 20, 8, 100);
     
-    // Energy trail
     ctx.strokeStyle = profile.colors.energy_field;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(w * 0.92, h * 0.1);
-    ctx.lineTo(w * 0.92, h * 0.6);
+    ctx.moveTo(138, 20);
+    ctx.lineTo(138, 120);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -467,9 +439,8 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
     ctx.shadowColor = profile.colors.energy_field;
     ctx.shadowBlur = 12;
     
-    // Energy aura around character
     ctx.beginPath();
-    ctx.rect(w * 0.15, h * 0.05, w * 0.7, h * 0.9);
+    ctx.rect(23, 10, 105, 180);
     ctx.stroke();
     
     ctx.shadowBlur = 0;
@@ -478,58 +449,57 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
 
 function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.rootsman;
-  const w = fighter.width;
-  const h = fighter.height;
   
+  // ABSOLUTE PIXEL MEASUREMENTS
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
   // Legs
-  ctx.fillStyle = 'hsl(30, 40%, 30%)'; // Earth tone pants
-  ctx.fillRect(w * 0.25, h * 0.7, w * 0.2, h * 0.3);
-  ctx.fillRect(w * 0.55, h * 0.7, w * 0.2, h * 0.3);
+  ctx.fillStyle = 'hsl(30, 40%, 30%)';
+  ctx.fillRect(38, 140, 30, 60);
+  ctx.fillRect(83, 140, 30, 60);
   
   // Natural sandals
   ctx.fillStyle = 'hsl(30, 50%, 25%)';
-  ctx.fillRect(w * 0.22, h * 0.92, w * 0.26, h * 0.08);
-  ctx.fillRect(w * 0.52, h * 0.92, w * 0.26, h * 0.08);
+  ctx.fillRect(33, 184, 39, 16);
+  ctx.fillRect(78, 184, 39, 16);
   
   // Earth-tone shirt with rasta accents
   const rastaColors = profile.colors.rasta_colors as string[];
-  ctx.fillStyle = rastaColors[0]; // Green base
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.45);
+  ctx.fillStyle = rastaColors[0];
+  ctx.fillRect(30, 50, 90, 90);
   
   // Rasta color stripes
   for (let i = 0; i < 3; i++) {
     ctx.fillStyle = rastaColors[i];
-    ctx.fillRect(w * 0.2, h * (0.25 + i * 0.15), w * 0.6, h * 0.05);
+    ctx.fillRect(30, 50 + i * 30, 90, 10);
   }
   
   // Arms
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.05, h * 0.35, w * 0.15, h * 0.25);
-  ctx.fillRect(w * 0.8, h * 0.35, w * 0.15, h * 0.25);
+  ctx.fillRect(8, 70, 23, 50);
+  ctx.fillRect(120, 70, 23, 50);
   
   // Head
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, h * 0.25);
+  ctx.fillRect(45, 10, 60, 50);
   
   // Long flowing dreadlocks
   ctx.fillStyle = profile.colors.dreads;
   for (let i = 0; i < 10; i++) {
-    const x = w * (0.18 + i * 0.064);
-    const length = h * (0.4 + Math.sin(i) * 0.1);
-    ctx.fillRect(x, h * 0.02, w * 0.025, length);
+    const x = 27 + i * 10;
+    const length = 80 + Math.sin(i) * 20;
+    ctx.fillRect(x, 4, 6, length);
   }
   
   // Eyes with mystical wisdom
   ctx.fillStyle = 'white';
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(53, 24, 18, 10);
+  ctx.fillRect(86, 24, 18, 10);
   ctx.fillStyle = profile.colors.mystical_energy;
-  ctx.fillRect(w * 0.37, h * 0.13, w * 0.04, h * 0.02);
-  ctx.fillRect(w * 0.59, h * 0.13, w * 0.04, h * 0.02);
+  ctx.fillRect(56, 26, 8, 5);
+  ctx.fillRect(89, 26, 8, 5);
   
   // Nature's mystical aura
   if (effects.special || fighter.state.current === 'special') {
@@ -538,12 +508,11 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
     ctx.shadowColor = profile.colors.mystical_energy;
     ctx.shadowBlur = 15;
     
-    // Mystical energy vines
     for (let i = 0; i < 5; i++) {
       ctx.beginPath();
-      const startX = w * (0.1 + i * 0.2);
-      ctx.moveTo(startX, h);
-      ctx.quadraticCurveTo(startX + w * 0.1, h * 0.5, startX + w * 0.05, h * 0.2);
+      const startX = 15 + i * 30;
+      ctx.moveTo(startX, 200);
+      ctx.quadraticCurveTo(startX + 15, 100, startX + 8, 40);
       ctx.stroke();
     }
     
@@ -552,35 +521,33 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
 }
 
 function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
-  const w = fighter.width;
-  const h = fighter.height;
-  
+  // ABSOLUTE PIXEL MEASUREMENTS
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(w * 0.1, h * 0.95, w * 0.8, h * 0.05);
+  ctx.fillRect(15, 190, 120, 10);
   
   // Basic Street Fighter silhouette
   ctx.fillStyle = fighter.colors.primary;
   
   // Legs
-  ctx.fillRect(w * 0.25, h * 0.7, w * 0.2, h * 0.3);
-  ctx.fillRect(w * 0.55, h * 0.7, w * 0.2, h * 0.3);
+  ctx.fillRect(38, 140, 30, 60);
+  ctx.fillRect(83, 140, 30, 60);
   
   // Torso
-  ctx.fillRect(w * 0.2, h * 0.25, w * 0.6, h * 0.45);
+  ctx.fillRect(30, 50, 90, 90);
   
   // Arms
-  ctx.fillRect(w * 0.05, h * 0.35, w * 0.15, h * 0.25);
-  ctx.fillRect(w * 0.8, h * 0.35, w * 0.15, h * 0.25);
+  ctx.fillRect(8, 70, 23, 50);
+  ctx.fillRect(120, 70, 23, 50);
   
   // Head
-  ctx.fillRect(w * 0.3, h * 0.05, w * 0.4, h * 0.25);
+  ctx.fillRect(45, 10, 60, 50);
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(w * 0.35, h * 0.12, w * 0.08, h * 0.04);
-  ctx.fillRect(w * 0.57, h * 0.12, w * 0.08, h * 0.04);
+  ctx.fillRect(53, 24, 18, 10);
+  ctx.fillRect(86, 24, 18, 10);
   ctx.fillStyle = 'black';
-  ctx.fillRect(w * 0.37, h * 0.13, w * 0.04, h * 0.02);
-  ctx.fillRect(w * 0.59, h * 0.13, w * 0.04, h * 0.02);
+  ctx.fillRect(56, 26, 8, 5);
+  ctx.fillRect(89, 26, 8, 5);
 }
