@@ -48,74 +48,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   
   // Removed problematic sprite system - using direct rendering
 
-  // Render authentic Street Fighter characters with proper proportions
-  const renderStreetFighter = useCallback((
-    ctx: CanvasRenderingContext2D,
-    fighter: any,
-    x: number,
-    y: number,
-    facing: 'left' | 'right'
-  ) => {
-    if (!fighter) {
-      console.log('ViralStreetFighterCanvas: renderStreetFighter called with null fighter');
-      return;
-    }
-    
-    console.log(`ViralStreetFighterCanvas: Rendering fallback ${fighter.name} at (${x}, ${y}) facing ${facing}`);
-    
-    const scale = 2; // Visible but not overwhelming
-    const width = 80 * scale;
-    const height = 120 * scale;
-    
-    // Apply screen shake
-    const shake = getShakeOffset();
-    ctx.save();
-    ctx.translate(shake.x, shake.y);
-    
-    // Debug: Fighter bounding box with bright color
-    ctx.strokeStyle = '#ff0000';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(x - 10, y - height, width + 20, height + 20);
-    
-    if (facing === 'left') {
-      ctx.scale(-1, 1);
-      ctx.translate(-x - width, 0);
-    }
-    
-    // Body (thick and muscular) - bright distinctive colors
-    ctx.fillStyle = fighter.id === 'leroy' ? '#FF6B6B' : '#4ECDC4';
-    ctx.fillRect(x + width * 0.25, y - height * 0.7, width * 0.5, height * 0.6);
-    
-    // Head (oversized like SF) - very visible
-    ctx.fillStyle = '#F7FAFC';
-    ctx.fillRect(x + width * 0.3, y - height, width * 0.4, height * 0.35);
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x + width * 0.3, y - height, width * 0.4, height * 0.35);
-    
-    // Arms (thick and visible)
-    ctx.fillStyle = fighter.id === 'leroy' ? '#FF8E53' : '#95E1D3';
-    ctx.fillRect(x, y - height * 0.65, width * 0.2, height * 0.4);
-    ctx.fillRect(x + width * 0.8, y - height * 0.65, width * 0.2, height * 0.4);
-    
-    // Legs (powerful stance)
-    ctx.fillStyle = fighter.id === 'leroy' ? '#2E86AB' : '#F18F01';
-    ctx.fillRect(x + width * 0.3, y - height * 0.25, width * 0.15, height * 0.25);
-    ctx.fillRect(x + width * 0.55, y - height * 0.25, width * 0.15, height * 0.25);
-    
-    // Character-specific details
-    if (fighter.id === 'leroy') {
-      // Dreadlocks
-      ctx.fillStyle = '#2F4F2F';
-      ctx.fillRect(x + width * 0.3, y - height * 0.1, width * 0.4, height * 0.15);
-    } else if (fighter.id === 'razor') {
-      // Mohawk
-      ctx.fillStyle = '#FF4500';
-      ctx.fillRect(x + width * 0.4, y - height * 0.05, width * 0.2, height * 0.1);
-    }
-    
-    ctx.restore();
-  }, [getShakeOffset]);
+  // Removed fallback block renderer - using AuthenticFighterRenderer only
 
   // Game render loop with Street Fighter visual effects
   const render = useCallback(() => {
@@ -270,7 +203,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     renderProfessionalHealthBars(ctx, canvas.width, gameState.fighters);
     renderFighterNames(ctx, canvas.width, gameState.fighters);
     
-  }, [gameState, streetFighterCombat, renderStreetFighter, drawHitSparks]);
+  }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset]);
 
   // Animation loop
   useEffect(() => {
