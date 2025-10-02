@@ -151,10 +151,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
   }
   
-  // CRITICAL FIX: Translate to ground level for geometric rendering
+  // CRITICAL FIX: Translate to fighter's feet position for geometric rendering
   // Geometric functions draw UPWARD from y=0 using negative Y coords
-  const GROUND_LEVEL = 420;
-  ctx.translate(fighter.x, GROUND_LEVEL);
+  ctx.translate(fighter.x, fighter.y + fighter.height);
   
   // Handle facing direction with simple scale
   if (fighter.facing === 'left') {
