@@ -211,8 +211,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     
   }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset, getSprite]);
 
-  // Animation loop
+  // Animation loop - only run when sprites are loaded
   useEffect(() => {
+    if (!spritesLoaded) {
+      console.log('⏳ Waiting for sprites to load...');
+      return;
+    }
+
     let animationId: number;
     
     const animate = () => {
@@ -228,7 +233,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         cancelAnimationFrame(animationId);
       }
     };
-  }, [render, updateEffects]);
+  }, [render, updateEffects, spritesLoaded]);
 
   // Combat event handlers - BELL ELIMINATION: Audio disabled
   useEffect(() => {
@@ -285,30 +290,38 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black">
-      <canvas
-        ref={canvasRef}
-        className="border border-primary rounded-lg shadow-2xl max-w-full max-h-full"
-        style={{ 
-          imageRendering: 'crisp-edges',
-          aspectRatio: '16/9'
-        }}
-      />
-      
-      {/* Debug Panel - Remove this once fighters are working */}
-      <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
-        <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
-        <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✓' : '✗'} P2</div>
-        <div>Sprites: ✓ Direct Rendering</div>
-        <div>Game State: {gameState.screen}</div>
-        <div className="text-xs mt-1">
-          Initialization: {initializationRef.current ? '✅ DONE' : '⏳ PENDING'}
+      {!spritesLoaded ? (
+        <div className="text-white text-2xl font-bold animate-pulse">
+          Loading Sprites...
         </div>
-      </div>
-      
-      {isMobile && (
-        <MobileControls 
-          onTouch={(action, pressed) => handleMobileInput(1, action, pressed)}
-        />
+      ) : (
+        <>
+          <canvas
+            ref={canvasRef}
+            className="border border-primary rounded-lg shadow-2xl max-w-full max-h-full"
+            style={{ 
+              imageRendering: 'crisp-edges',
+              aspectRatio: '16/9'
+            }}
+          />
+          
+          {/* Debug Panel - Remove this once fighters are working */}
+          <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
+            <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
+            <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✓' : '✗'} P2</div>
+            <div>Sprites: ✓ Loaded ({spritesLoaded ? 'Ready' : 'Loading...'})</div>
+            <div>Game State: {gameState.screen}</div>
+            <div className="text-xs mt-1">
+              Initialization: {initializationRef.current ? '✅ DONE' : '⏳ PENDING'}
+            </div>
+          </div>
+          
+          {isMobile && (
+            <MobileControls 
+              onTouch={(action, pressed) => handleMobileInput(1, action, pressed)}
+            />
+          )}
+        </>
       )}
     </div>
   );
