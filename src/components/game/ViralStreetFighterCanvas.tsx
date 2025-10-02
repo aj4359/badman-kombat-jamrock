@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 // Audio system removed to eliminate all audio/bell sounds
 import { useVisualEffects } from '@/hooks/useVisualEffects';
+import { useFighterSprites } from '@/hooks/useFighterSprites';
 import { renderAuthenticFighter } from './AuthenticFighterRenderer';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -46,9 +47,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     updateEffects 
   } = useVisualEffects();
   
-  // Removed problematic sprite system - using direct rendering
-
-  // Removed fallback block renderer - using AuthenticFighterRenderer only
+  // Sprite loading system
+  const { isLoaded: spritesLoaded, getSprite } = useFighterSprites();
 
   // Game render loop with Street Fighter visual effects
   const render = useCallback(() => {
@@ -107,17 +107,19 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' }
       };
       
-      // Render using AuthenticFighterRenderer for consistent character display
+      // Render using AuthenticFighterRenderer with sprites
       renderAuthenticFighter({
         ctx,
         fighter: tempP1 as any,
-        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false }
+        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false },
+        spriteImage: getSprite('leroy')
       });
       
       renderAuthenticFighter({
         ctx,
         fighter: tempP2 as any,
-        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false }
+        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false },
+        spriteImage: getSprite('jordan')
       });
       
       // Show debug status but don't dominate screen
@@ -146,7 +148,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const p1 = gameState.fighters.player1;
     const p2 = gameState.fighters.player2;
     
-    // Render Player 1 with authentic sprite rendering
+    // Render Player 1 with sprite or fallback
+    const p1Sprite = getSprite(p1.id);
     renderAuthenticFighter({
       ctx,
       fighter: p1,
@@ -157,10 +160,12 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         glow: false,
         flash: false,
         special: p1.state.current === 'special'
-      }
+      },
+      spriteImage: p1Sprite
     });
     
-    // Render Player 2 with authentic sprite rendering
+    // Render Player 2 with sprite or fallback
+    const p2Sprite = getSprite(p2.id);
     renderAuthenticFighter({
       ctx,
       fighter: p2,
@@ -171,7 +176,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         glow: false,
         flash: false,
         special: p2.state.current === 'special'
-      }
+      },
+      spriteImage: p2Sprite
     });
     
     console.log('✅ PHASE 2: Rendering BRIGHT fighters:', { 
@@ -203,7 +209,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     renderProfessionalHealthBars(ctx, canvas.width, gameState.fighters);
     renderFighterNames(ctx, canvas.width, gameState.fighters);
     
-  }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset]);
+  }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset, getSprite]);
 
   // Animation loop
   useEffect(() => {

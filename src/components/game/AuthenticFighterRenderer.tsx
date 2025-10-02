@@ -11,6 +11,7 @@ export interface AuthenticFighterRendererProps {
     shake?: { x: number; y: number };
     special?: boolean;
   };
+  spriteImage?: HTMLImageElement | null;
 }
 
 // Street Fighter-style character profiles
@@ -76,11 +77,53 @@ const AUTHENTIC_FIGHTER_PROFILES = {
   }
 };
 
-export function renderAuthenticFighter({ ctx, fighter, effects = {} }: AuthenticFighterRendererProps) {
+export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
-  // DEBUG: Log fighter details
-  console.log('🔍 AuthenticFighterRenderer DEBUG:', {
+  // If we have a sprite image, use it instead of geometric rendering
+  if (spriteImage && spriteImage.complete) {
+    console.log('🎨 Using sprite image for', fighter.id);
+    
+    // Apply effects
+    if (effects.alpha !== undefined) {
+      ctx.globalAlpha = effects.alpha;
+    }
+    
+    if (effects.shake) {
+      ctx.translate(effects.shake.x, effects.shake.y);
+    }
+    
+    if (effects.hueRotation) {
+      ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
+    }
+    
+    // Draw sprite at fighter position
+    const drawX = fighter.x;
+    const drawY = fighter.y;
+    
+    // Handle flipping for facing direction
+    if (fighter.facing === 'left') {
+      ctx.save();
+      ctx.translate(drawX + fighter.width / 2, drawY + fighter.height / 2);
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        spriteImage,
+        -fighter.width / 2,
+        -fighter.height / 2,
+        fighter.width,
+        fighter.height
+      );
+      ctx.restore();
+    } else {
+      ctx.drawImage(spriteImage, drawX, drawY, fighter.width, fighter.height);
+    }
+    
+    ctx.restore();
+    return;
+  }
+  
+  // Fallback to geometric rendering if no sprite
+  console.log('🔍 AuthenticFighterRenderer DEBUG (fallback):', {
     id: fighter.id,
     x: fighter.x,
     y: fighter.y,

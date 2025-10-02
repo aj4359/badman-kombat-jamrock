@@ -244,7 +244,7 @@ export const useEnhancedGameEngine = () => {
       superMeter: 0,
       maxSuperMeter: 100,
       x,
-      y: 456,
+      y: GROUND_Y - 200, // Position fighter so bottom aligns with ground
       width: 150,
       height: 200,
       facing: (x < CANVAS_WIDTH / 2 ? 'right' : 'left') as 'left' | 'right',
