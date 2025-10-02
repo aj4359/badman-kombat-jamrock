@@ -139,8 +139,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         name: 'Leroy',
         x: 362,
         y: 220,
-        width: 70,
-        height: 100,
+        width: 150,
+        height: 200,
         facing: 'right' as const,
         health: 100,
         maxHealth: 100,
@@ -149,7 +149,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         velocityX: 0,
         velocityY: 0,
         grounded: true,
-        hitbox: { x: 362, y: 220, width: 70, height: 100 },
+        hitbox: { x: 362, y: 220, width: 150, height: 200 },
         animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
         colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' }
       };
@@ -159,8 +159,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         name: 'Jordan',
         x: 582,
         y: 220,
-        width: 70,
-        height: 100,
+        width: 150,
+        height: 200,
         facing: 'left' as const,
         health: 100,
         maxHealth: 100,
@@ -169,7 +169,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         velocityX: 0,
         velocityY: 0,
         grounded: true,
-        hitbox: { x: 582, y: 220, width: 70, height: 100 },
+        hitbox: { x: 582, y: 220, width: 150, height: 200 },
         animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
         colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' }
       };
@@ -320,15 +320,37 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [addScreenShake, addHitSpark]);
 
+  // Setup canvas with DPI scaling
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Get device pixel ratio for crisp rendering
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Set actual size in memory (scaled to account for extra pixel density)
+    canvas.width = 1024 * dpr;
+    canvas.height = 576 * dpr;
+    
+    // Scale all drawing operations by dpr
+    ctx.scale(dpr, dpr);
+    
+    // Set display size (CSS pixels)
+    canvas.style.width = '1024px';
+    canvas.style.height = '576px';
+  }, []);
+
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black">
       <canvas
         ref={canvasRef}
-        width={1024}
-        height={576}
         className="border border-primary rounded-lg shadow-2xl max-w-full max-h-full"
         style={{ 
-          imageRendering: 'pixelated',
+          imageRendering: 'crisp-edges',
           aspectRatio: '16/9'
         }}
       />
