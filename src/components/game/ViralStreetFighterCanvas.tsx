@@ -50,8 +50,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   // Sprite loading system
   const { isLoaded: spritesLoaded, getSprite } = useFighterSprites();
 
-  // PHASE 1: ABSOLUTE MINIMUM RENDERING TEST
   const frameCountRef = useRef(0);
+  const lastTimeRef = useRef(Date.now());
   
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -61,46 +61,92 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     if (!ctx) return;
     
     frameCountRef.current++;
+    const now = Date.now();
+    const deltaTime = now - lastTimeRef.current;
+    lastTimeRef.current = now;
     
-    // Log canvas dimensions every 60 frames
-    if (frameCountRef.current % 60 === 0) {
-      console.log('🎨 PHASE 1 DEBUG:', {
-        canvasWidth: canvas.width,
-        canvasHeight: canvas.height,
-        styleWidth: canvas.style.width,
-        styleHeight: canvas.style.height,
-        frameCount: frameCountRef.current
+    // Update visual effects
+    updateEffects(deltaTime);
+    
+    // Apply screen shake
+    const shake = getShakeOffset();
+    ctx.save();
+    ctx.translate(shake.x, shake.y);
+    
+    // 1. DRAW ARENA BACKGROUND
+    renderProfessionalArena(ctx, 1024, 576);
+    
+    // 2. DRAW DEBUG RECTANGLES (temporary - to verify positioning)
+    if (gameState.fighters.player1 && gameState.fighters.player2) {
+      // P1 debug rectangle (blue)
+      ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
+      ctx.fillRect(
+        gameState.fighters.player1.x,
+        gameState.fighters.player1.y,
+        gameState.fighters.player1.width,
+        gameState.fighters.player1.height
+      );
+      
+      // P2 debug rectangle (red)
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+      ctx.fillRect(
+        gameState.fighters.player2.x,
+        gameState.fighters.player2.y,
+        gameState.fighters.player2.width,
+        gameState.fighters.player2.height
+      );
+      
+      // Ground line
+      ctx.strokeStyle = '#00FF00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 456);
+      ctx.lineTo(1024, 456);
+      ctx.stroke();
+    }
+    
+    // 3. DRAW FIGHTERS
+    if (gameState.fighters.player1) {
+      const p1Sprite = getSprite(gameState.fighters.player1.id);
+      renderAuthenticFighter({
+        ctx,
+        fighter: gameState.fighters.player1,
+        spriteImage: p1Sprite
       });
     }
     
-    // 1. SOLID BACKGROUND - Bright blue to prove something is rendering
-    ctx.fillStyle = '#0066FF';
-    ctx.fillRect(0, 0, 1024, 576);
+    if (gameState.fighters.player2) {
+      const p2Sprite = getSprite(gameState.fighters.player2.id);
+      renderAuthenticFighter({
+        ctx,
+        fighter: gameState.fighters.player2,
+        spriteImage: p2Sprite
+      });
+    }
     
-    // 2. TEST TEXT - Center of screen
-    ctx.fillStyle = '#FFFF00';
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('CANVAS WORKING', 512, 288);
+    ctx.restore();
     
-    // 3. SINGLE RED RECTANGLE - Center
-    ctx.fillStyle = '#FF0000';
-    ctx.fillRect(462, 238, 100, 100);
+    // 4. DRAW UI ELEMENTS (no screen shake)
+    if (gameState.fighters.player1 && gameState.fighters.player2) {
+      renderProfessionalHealthBars(ctx, 1024, gameState.fighters);
+      renderFighterNames(ctx, 1024, gameState.fighters);
+    }
     
-    // 4. FPS COUNTER - Top left
+    // 5. DRAW VISUAL EFFECTS
+    drawHitSparks(ctx);
+    
+    // 6. FPS COUNTER (debug)
     ctx.fillStyle = '#00FF00';
-    ctx.font = 'bold 24px Arial';
+    ctx.font = 'bold 16px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText(`FRAME: ${frameCountRef.current}`, 20, 40);
+    const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
+    ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-    // 5. TIMESTAMP - Top left
-    ctx.fillText(`TIME: ${Date.now()}`, 20, 70);
-    
-  }, []);
+  }, [gameState, getSprite, getShakeOffset, updateEffects, drawHitSparks]);
 
-  // PHASE 1: SIMPLIFIED ANIMATION LOOP - No dependencies on sprites
+  // Animation loop
   useEffect(() => {
-    console.log('🚀 PHASE 1: Starting animation loop');
+    console.log('🚀 Starting game rendering loop');
     let animationId: number;
     
     const animate = () => {
@@ -111,7 +157,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     animate();
     
     return () => {
-      console.log('🛑 PHASE 1: Stopping animation loop');
+      console.log('🛑 Stopping game rendering loop');
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
@@ -182,9 +228,17 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         }}
       />
       
-      {/* PHASE 1 DEBUG STATUS */}
-      <div className="absolute top-4 right-4 bg-green-500 text-black p-4 rounded font-bold text-xl">
-        PHASE 1: TESTING CANVAS
+      {isMobile && gameState.fighters.player1 && gameState.fighters.player2 && (
+        <MobileControls
+          onTouch={(action, pressed) => {
+            handleMobileInput(1, action, pressed);
+          }}
+        />
+      )}
+      
+      {/* Debug Status */}
+      <div className="absolute top-4 right-4 bg-black/70 text-green-400 px-3 py-2 rounded text-sm font-mono">
+        Sprites: {spritesLoaded ? '✓' : '⏳'} | Fighters: {gameState.fighters.player1 && gameState.fighters.player2 ? '✓' : '✗'}
       </div>
     </div>
   );
