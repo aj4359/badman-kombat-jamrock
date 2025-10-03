@@ -180,9 +180,51 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       spriteImage: p2Sprite
     });
     
-    console.log('✅ PHASE 2: Rendering BRIGHT fighters:', { 
-      p1: { x: p1.x, y: p1.y, health: p1.health },
-      p2: { x: p2.x, y: p2.y, health: p2.health }
+    // =====================================================
+    // EMERGENCY DEBUG PHASE 1: MASSIVE VISUAL INDICATORS
+    // =====================================================
+    
+    // Draw HUGE bright rectangles at fighter positions
+    const GROUND_Y = 456;
+    
+    // P1 DEBUG - BRIGHT RED RECTANGLE
+    ctx.fillStyle = '#FF0000';
+    ctx.fillRect(p1.x, GROUND_Y - p1.height, p1.width, p1.height);
+    ctx.strokeStyle = '#FFFF00';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(p1.x, GROUND_Y - p1.height, p1.width, p1.height);
+    
+    // P1 LABEL
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`P1 @ (${Math.round(p1.x)}, ${Math.round(p1.y)})`, p1.x, GROUND_Y - p1.height - 10);
+    ctx.fillText(`Ground: ${GROUND_Y}`, p1.x, GROUND_Y - p1.height - 35);
+    
+    // P2 DEBUG - BRIGHT GREEN RECTANGLE
+    ctx.fillStyle = '#00FF00';
+    ctx.fillRect(p2.x, GROUND_Y - p2.height, p2.width, p2.height);
+    ctx.strokeStyle = '#00FFFF';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(p2.x, GROUND_Y - p2.height, p2.width, p2.height);
+    
+    // P2 LABEL
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`P2 @ (${Math.round(p2.x)}, ${Math.round(p2.y)})`, p2.x, GROUND_Y - p2.height - 10);
+    ctx.fillText(`Ground: ${GROUND_Y}`, p2.x, GROUND_Y - p2.height - 35);
+    
+    // Draw ground line for reference
+    ctx.strokeStyle = '#FF00FF';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, GROUND_Y);
+    ctx.lineTo(1024, GROUND_Y);
+    ctx.stroke();
+    
+    console.log('🚨 EMERGENCY DEBUG: Drew MASSIVE rectangles at:', { 
+      p1: { x: p1.x, y: p1.y, drawY: GROUND_Y - p1.height, health: p1.health },
+      p2: { x: p2.x, y: p2.y, drawY: GROUND_Y - p2.height, health: p2.health },
+      groundY: GROUND_Y
     });
     
     // Render projectiles (Hadoken-style)

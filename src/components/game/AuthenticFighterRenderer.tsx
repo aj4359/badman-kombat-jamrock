@@ -80,6 +80,29 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
+  // =====================================================
+  // EMERGENCY DEBUG: Draw bright rectangle BEFORE anything else
+  // =====================================================
+  const GROUND_LEVEL = 456;
+  const debugDrawX = fighter.x;
+  const debugDrawY = GROUND_LEVEL - fighter.height;
+  
+  console.log('🔴 EMERGENCY: AuthenticFighterRenderer called for', fighter.id, {
+    fighterX: fighter.x,
+    fighterY: fighter.y,
+    fighterWidth: fighter.width,
+    fighterHeight: fighter.height,
+    debugDrawX,
+    debugDrawY,
+    GROUND_LEVEL,
+    hasSpriteImage: !!spriteImage,
+    spriteComplete: spriteImage?.complete
+  });
+  
+  // Draw emergency background rectangle to PROVE we're drawing
+  ctx.fillStyle = fighter.id === 'leroy' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
+  ctx.fillRect(debugDrawX, debugDrawY, fighter.width, fighter.height);
+  
   // If we have a sprite image, use it instead of geometric rendering
   if (spriteImage && spriteImage.complete) {
     console.log('🎨 Rendering sprite for', fighter.id, 'at', fighter.x, fighter.y);
@@ -100,7 +123,6 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     // CRITICAL FIX: Draw sprite at correct canvas position
     // Fighter Y is from top of canvas (0 at top, increases downward)
     // We need to draw the sprite so its BOTTOM is at ground level (456)
-    const GROUND_LEVEL = 456;
     const drawX = fighter.x;
     const drawY = GROUND_LEVEL - fighter.height; // Position sprite so bottom touches ground
     
@@ -153,8 +175,17 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
   
   // CRITICAL FIX: Translate to fighter's actual feet position for geometric rendering
   // Geometric functions draw UPWARD from y=0 using negative Y coords
-  // Use fighter.y + fighter.height to get the actual feet position (matches Python approach)
-  ctx.translate(fighter.x, fighter.y + fighter.height);
+  // Use GROUND_LEVEL as the feet position (matches Python approach)
+  const feetY = GROUND_LEVEL;
+  
+  console.log('🔧 Geometric rendering translate:', {
+    id: fighter.id,
+    translateX: fighter.x,
+    translateY: feetY,
+    originalFighterY: fighter.y
+  });
+  
+  ctx.translate(fighter.x, feetY);
   
   // Handle facing direction with simple scale
   if (fighter.facing === 'left') {
