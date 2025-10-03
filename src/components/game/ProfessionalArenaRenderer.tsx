@@ -34,8 +34,8 @@ export const renderProfessionalArena = (ctx: CanvasRenderingContext2D, width: nu
   // Crowd silhouettes
   drawCrowdSilhouettes(ctx, width, height);
   
-  // Stage lighting effects
-  drawStageLighting(ctx, width, height);
+  // Stage lighting effects - DISABLED: was covering fighters
+  // drawStageLighting(ctx, width, height);
   
   // Neon signs and street elements
   drawStreetElements(ctx, width, height);
