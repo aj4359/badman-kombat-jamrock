@@ -169,40 +169,10 @@ export const useAudioManager = () => {
   }, [settings]);
 
   const playLayer = useCallback((layer: 'intro' | 'gameplay' | 'ambient', autoTransition: boolean = true) => {
-    const { intro, gameplay, ambient } = audioRefs.current;
-    
-    if (currentLayer === layer && isPlaying) return;
-    
-    const targetAudio = audioRefs.current[layer];
-    
-    if (currentAudioRef.current && currentAudioRef.current !== targetAudio) {
-      if (autoTransition) {
-        crossFade(currentAudioRef.current, targetAudio);
-      } else {
-        currentAudioRef.current.pause();
-        currentAudioRef.current.currentTime = 0;
-        targetAudio.play();
-      }
-    } else {
-      targetAudio.play();
-    }
-    
-    currentAudioRef.current = targetAudio;
-    setCurrentLayer(layer);
-    setIsPlaying(true);
-    
-    if (layer === 'intro') {
-      setIntroPlaying(true);
-      
-      // Auto-transition to gameplay when intro ends
-      if (autoTransition) {
-        targetAudio.addEventListener('ended', () => {
-          setIntroPlaying(false);
-          playLayer('gameplay', false);
-        }, { once: true });
-      }
-    }
-  }, [currentLayer, isPlaying, crossFade]);
+    // BELL ELIMINATION: All audio playback completely disabled
+    console.log('🔇 playLayer disabled to prevent bell sounds:', layer);
+    return;
+  }, []);
 
   const playEffect = useCallback((effectType: string) => {
     // BELL ELIMINATION: All audio effects completely disabled
@@ -257,15 +227,9 @@ export const useAudioManager = () => {
   }, []);
 
   const initializeAudioContext = useCallback(() => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioContext();
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-    } catch (error) {
-      console.warn('Audio context initialization failed:', error);
-    }
+    // BELL ELIMINATION: AudioContext creation completely disabled
+    console.log('🔇 initializeAudioContext disabled to prevent bell sounds');
+    return;
   }, []);
 
   return {
