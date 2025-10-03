@@ -50,7 +50,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   // Sprite loading system
   const { isLoaded: spritesLoaded, getSprite } = useFighterSprites();
 
-  // Game render loop with Street Fighter visual effects
+  // PHASE 1: ABSOLUTE MINIMUM RENDERING TEST
+  const frameCountRef = useRef(0);
+  
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -58,212 +60,50 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas and render professional arena
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    renderProfessionalArena(ctx, 1024, 576);
+    frameCountRef.current++;
     
-    // AUTHENTIC FALLBACK - Always render something if fighters are missing
-    if (!gameState.fighters.player1 || !gameState.fighters.player2) {
-      console.log('🔧 AUTHENTIC FALLBACK: Missing fighters, using AuthenticFighterRenderer fallback');
-      
-      // Create complete temporary fighters for rendering
-      const tempP1 = {
-        id: 'leroy',
-        name: 'Leroy',
-        x: 362,
-        y: 220,
-        width: 150,
-        height: 200,
-        facing: 'right' as const,
-        health: 100,
-        maxHealth: 100,
-        state: { current: 'idle' as const },
-        meter: 0,
-        velocityX: 0,
-        velocityY: 0,
-        grounded: true,
-        hitbox: { x: 362, y: 220, width: 150, height: 200 },
-        animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
-        colors: { primary: 'hsl(180, 100%, 50%)', secondary: 'hsl(180, 100%, 30%)' }
-      };
-      
-      const tempP2 = {
-        id: 'jordan', 
-        name: 'Jordan',
-        x: 582,
-        y: 220,
-        width: 150,
-        height: 200,
-        facing: 'left' as const,
-        health: 100,
-        maxHealth: 100,
-        state: { current: 'idle' as const },
-        meter: 0,
-        velocityX: 0,
-        velocityY: 0,
-        grounded: true,
-        hitbox: { x: 582, y: 220, width: 150, height: 200 },
-        animation: { currentFrame: 0, frameTimer: 0, sequence: 'idle' },
-        colors: { primary: 'hsl(270, 100%, 60%)', secondary: 'hsl(270, 100%, 40%)' }
-      };
-      
-      // Render using AuthenticFighterRenderer with sprites
-      renderAuthenticFighter({
-        ctx,
-        fighter: tempP1 as any,
-        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false },
-        spriteImage: getSprite('leroy')
+    // Log canvas dimensions every 60 frames
+    if (frameCountRef.current % 60 === 0) {
+      console.log('🎨 PHASE 1 DEBUG:', {
+        canvasWidth: canvas.width,
+        canvasHeight: canvas.height,
+        styleWidth: canvas.style.width,
+        styleHeight: canvas.style.height,
+        frameCount: frameCountRef.current
       });
-      
-      renderAuthenticFighter({
-        ctx,
-        fighter: tempP2 as any,
-        effects: { alpha: 1.0, hueRotation: 0, shake: { x: 0, y: 0 }, glow: false, flash: false, special: false },
-        spriteImage: getSprite('jordan')
-      });
-      
-      // Show debug status but don't dominate screen
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '16px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Loading fighters...', canvas.width / 2, 50);
-      ctx.textAlign = 'start';
-      
-      console.log('✅ AUTHENTIC FALLBACK: Rendered detailed fallback fighters');
-      return;
     }
-
-    console.log('ViralStreetFighterCanvas: Rendering fighters', { 
-      player1: { x: gameState.fighters.player1.x, y: gameState.fighters.player1.y, health: gameState.fighters.player1.health },
-      player2: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y, health: gameState.fighters.player2.health }
-    });
-
-    // Render fighters with enhanced logging and debugging
-    console.log('ViralStreetFighterCanvas: About to render fighters', { 
-      player1Pos: { x: gameState.fighters.player1.x, y: gameState.fighters.player1.y },
-      player2Pos: { x: gameState.fighters.player2.x, y: gameState.fighters.player2.y }
-    });
     
-    // PHASE 2: RENDER AUTHENTIC FIGHTERS using AuthenticFighterRenderer
-    const p1 = gameState.fighters.player1;
-    const p2 = gameState.fighters.player2;
+    // 1. SOLID BACKGROUND - Bright blue to prove something is rendering
+    ctx.fillStyle = '#0066FF';
+    ctx.fillRect(0, 0, 1024, 576);
     
-    // Render Player 1 with sprite or fallback
-    const p1Sprite = getSprite(p1.id);
-    renderAuthenticFighter({
-      ctx,
-      fighter: p1,
-      effects: {
-        alpha: 1.0,
-        hueRotation: 0,
-        shake: getShakeOffset(),
-        glow: false,
-        flash: false,
-        special: p1.state.current === 'special'
-      },
-      spriteImage: p1Sprite
-    });
+    // 2. TEST TEXT - Center of screen
+    ctx.fillStyle = '#FFFF00';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('CANVAS WORKING', 512, 288);
     
-    // Render Player 2 with sprite or fallback
-    const p2Sprite = getSprite(p2.id);
-    renderAuthenticFighter({
-      ctx,
-      fighter: p2,
-      effects: {
-        alpha: 1.0,
-        hueRotation: 0,
-        shake: getShakeOffset(),
-        glow: false,
-        flash: false,
-        special: p2.state.current === 'special'
-      },
-      spriteImage: p2Sprite
-    });
-    
-    // =====================================================
-    // EMERGENCY DEBUG PHASE 1: MASSIVE VISUAL INDICATORS
-    // =====================================================
-    
-    // Draw HUGE bright rectangles at fighter positions
-    const GROUND_Y = 456;
-    
-    // P1 DEBUG - BRIGHT RED RECTANGLE
+    // 3. SINGLE RED RECTANGLE - Center
     ctx.fillStyle = '#FF0000';
-    ctx.fillRect(p1.x, GROUND_Y - p1.height, p1.width, p1.height);
-    ctx.strokeStyle = '#FFFF00';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(p1.x, GROUND_Y - p1.height, p1.width, p1.height);
+    ctx.fillRect(462, 238, 100, 100);
     
-    // P1 LABEL
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 24px Arial';
-    ctx.fillText(`P1 @ (${Math.round(p1.x)}, ${Math.round(p1.y)})`, p1.x, GROUND_Y - p1.height - 10);
-    ctx.fillText(`Ground: ${GROUND_Y}`, p1.x, GROUND_Y - p1.height - 35);
-    
-    // P2 DEBUG - BRIGHT GREEN RECTANGLE
+    // 4. FPS COUNTER - Top left
     ctx.fillStyle = '#00FF00';
-    ctx.fillRect(p2.x, GROUND_Y - p2.height, p2.width, p2.height);
-    ctx.strokeStyle = '#00FFFF';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(p2.x, GROUND_Y - p2.height, p2.width, p2.height);
-    
-    // P2 LABEL
-    ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 24px Arial';
-    ctx.fillText(`P2 @ (${Math.round(p2.x)}, ${Math.round(p2.y)})`, p2.x, GROUND_Y - p2.height - 10);
-    ctx.fillText(`Ground: ${GROUND_Y}`, p2.x, GROUND_Y - p2.height - 35);
+    ctx.textAlign = 'left';
+    ctx.fillText(`FRAME: ${frameCountRef.current}`, 20, 40);
     
-    // Draw ground line for reference
-    ctx.strokeStyle = '#FF00FF';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, GROUND_Y);
-    ctx.lineTo(1024, GROUND_Y);
-    ctx.stroke();
+    // 5. TIMESTAMP - Top left
+    ctx.fillText(`TIME: ${Date.now()}`, 20, 70);
     
-    console.log('🚨 EMERGENCY DEBUG: Drew MASSIVE rectangles at:', { 
-      p1: { x: p1.x, y: p1.y, drawY: GROUND_Y - p1.height, health: p1.health },
-      p2: { x: p2.x, y: p2.y, drawY: GROUND_Y - p2.height, health: p2.health },
-      groundY: GROUND_Y
-    });
-    
-    // Render projectiles (Hadoken-style)
-    streetFighterCombat.projectiles.forEach(projectile => {
-      ctx.save();
-      ctx.fillStyle = projectile.type === 'fireball' ? '#FF4500' : '#00BFFF';
-      ctx.beginPath();
-      ctx.arc(projectile.x, projectile.y, projectile.width / 2, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Energy trail effect
-      ctx.fillStyle = projectile.type === 'fireball' ? '#FF6500' : '#40E0D0';
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.arc(projectile.x - projectile.velocityX * 2, projectile.y, projectile.width * 0.35, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-    
-    // Render hit sparks and effects
-    drawHitSparks(ctx);
-    
-    // Professional UI elements
-    renderProfessionalHealthBars(ctx, 1024, gameState.fighters);
-    renderFighterNames(ctx, 1024, gameState.fighters);
-    
-  }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset, getSprite]);
+  }, []);
 
-  // Animation loop - only run when sprites are loaded
+  // PHASE 1: SIMPLIFIED ANIMATION LOOP - No dependencies on sprites
   useEffect(() => {
-    if (!spritesLoaded) {
-      console.log('⏳ Waiting for sprites to load...');
-      return;
-    }
-
+    console.log('🚀 PHASE 1: Starting animation loop');
     let animationId: number;
     
     const animate = () => {
-      updateEffects(16); // 60fps
       render();
       animationId = requestAnimationFrame(animate);
     };
@@ -271,11 +111,12 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     animate();
     
     return () => {
+      console.log('🛑 PHASE 1: Stopping animation loop');
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [render, updateEffects, spritesLoaded]);
+  }, [render]);
 
   // Combat event handlers - BELL ELIMINATION: Audio disabled
   useEffect(() => {
@@ -332,39 +173,19 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black">
-      {!spritesLoaded ? (
-        <div className="text-white text-2xl font-bold animate-pulse">
-          Loading Sprites...
-        </div>
-      ) : (
-        <>
-          <canvas
-            ref={canvasRef}
-            className="border border-primary rounded-lg shadow-2xl max-w-full max-h-full"
-            style={{ 
-              imageRendering: 'crisp-edges',
-              aspectRatio: '16/9'
-            }}
-          />
-          
-          {/* Debug Panel - Remove this once fighters are working */}
-          <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded border border-gray-600 text-sm font-mono">
-            <div className="mb-2 text-yellow-400">DEBUG PANEL</div>
-            <div>Fighters: {gameState.fighters?.player1 ? '✓' : '✗'} P1, {gameState.fighters?.player2 ? '✓' : '✗'} P2</div>
-            <div>Sprites: ✓ Loaded ({spritesLoaded ? 'Ready' : 'Loading...'})</div>
-            <div>Game State: {gameState.screen}</div>
-            <div className="text-xs mt-1">
-              Initialization: {initializationRef.current ? '✅ DONE' : '⏳ PENDING'}
-            </div>
-          </div>
-          
-          {isMobile && (
-            <MobileControls 
-              onTouch={(action, pressed) => handleMobileInput(1, action, pressed)}
-            />
-          )}
-        </>
-      )}
+      <canvas
+        ref={canvasRef}
+        className="border border-yellow-400 rounded-lg shadow-2xl"
+        style={{ 
+          width: '1024px',
+          height: '576px'
+        }}
+      />
+      
+      {/* PHASE 1 DEBUG STATUS */}
+      <div className="absolute top-4 right-4 bg-green-500 text-black p-4 rounded font-bold text-xl">
+        PHASE 1: TESTING CANVAS
+      </div>
     </div>
   );
 };
