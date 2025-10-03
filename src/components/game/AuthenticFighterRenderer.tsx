@@ -99,8 +99,8 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     
     // CRITICAL FIX: Draw sprite at correct canvas position
     // Fighter Y is from top of canvas (0 at top, increases downward)
-    // We need to draw the sprite so its BOTTOM is at ground level (420)
-    const GROUND_LEVEL = 420;
+    // We need to draw the sprite so its BOTTOM is at ground level (456)
+    const GROUND_LEVEL = 456;
     const drawX = fighter.x;
     const drawY = GROUND_LEVEL - fighter.height; // Position sprite so bottom touches ground
     

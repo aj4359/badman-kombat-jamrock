@@ -60,7 +60,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     
     // Clear canvas and render professional arena
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    renderProfessionalArena(ctx, canvas.width, canvas.height);
+    renderProfessionalArena(ctx, 1024, 576);
     
     // AUTHENTIC FALLBACK - Always render something if fighters are missing
     if (!gameState.fighters.player1 || !gameState.fighters.player2) {
@@ -206,8 +206,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     drawHitSparks(ctx);
     
     // Professional UI elements
-    renderProfessionalHealthBars(ctx, canvas.width, gameState.fighters);
-    renderFighterNames(ctx, canvas.width, gameState.fighters);
+    renderProfessionalHealthBars(ctx, 1024, gameState.fighters);
+    renderFighterNames(ctx, 1024, gameState.fighters);
     
   }, [gameState, streetFighterCombat, drawHitSparks, getShakeOffset, getSprite]);
 
