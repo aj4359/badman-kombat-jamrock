@@ -1,4 +1,5 @@
 import { Fighter } from '@/types/gameTypes';
+import { getCurrentPose, type Pose } from '@/utils/fighterPoses';
 
 export interface AuthenticFighterRendererProps {
   ctx: CanvasRenderingContext2D;
@@ -80,28 +81,18 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
-  // =====================================================
-  // EMERGENCY DEBUG: Draw bright rectangle BEFORE anything else
-  // =====================================================
   const GROUND_LEVEL = 456;
-  const debugDrawX = fighter.x;
-  const debugDrawY = GROUND_LEVEL - fighter.height;
   
-  console.log('🔴 EMERGENCY: AuthenticFighterRenderer called for', fighter.id, {
-    fighterX: fighter.x,
-    fighterY: fighter.y,
-    fighterWidth: fighter.width,
-    fighterHeight: fighter.height,
-    debugDrawX,
-    debugDrawY,
-    GROUND_LEVEL,
-    hasSpriteImage: !!spriteImage,
-    spriteComplete: spriteImage?.complete
-  });
+  // Get current pose based on fighter state and animation
+  const attackType = fighter.state?.current === 'attacking' ? 'medium' : undefined;
+  const moveType = fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'kick' : 'punch';
   
-  // Draw emergency background rectangle to PROVE we're drawing
-  ctx.fillStyle = fighter.id === 'leroy' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
-  ctx.fillRect(debugDrawX, debugDrawY, fighter.width, fighter.height);
+  const pose = getCurrentPose(
+    fighter.state?.current || 'idle',
+    fighter.animationTimer || 0,
+    attackType as 'light' | 'medium' | 'heavy' | undefined,
+    moveType
+  );
   
   // If we have a sprite image, use it instead of geometric rendering
   if (spriteImage && spriteImage.complete) {
@@ -193,34 +184,39 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     ctx.scale(-1, 1);
   }
   
-  // Choose rendering function based on fighter ID
+  // Choose rendering function based on fighter ID with pose
   switch (fighter.id) {
     case 'jordan':
-      renderJordanSoundMaster(ctx, fighter, effects);
+      renderJordanSoundMaster(ctx, fighter, effects, pose);
       break;
     case 'sifu':
-      renderSifuMaster(ctx, fighter, effects);
+      renderSifuMaster(ctx, fighter, effects, pose);
       break;
     case 'leroy':
-      renderLeroyRootsman(ctx, fighter, effects);
+      renderLeroyRootsman(ctx, fighter, effects, pose);
       break;
     case 'razor':
-      renderRazorCyberSamurai(ctx, fighter, effects);
+      renderRazorCyberSamurai(ctx, fighter, effects, pose);
       break;
     case 'rootsman':
-      renderRootsmanMystic(ctx, fighter, effects);
+      renderRootsmanMystic(ctx, fighter, effects, pose);
       break;
     default:
-      renderDefaultStreetFighter(ctx, fighter, effects);
+      renderDefaultStreetFighter(ctx, fighter, effects, pose);
   }
   
   ctx.restore();
 }
 
-function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.jordan;
   
-  // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
+  // Apply pose transformations
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
+  
   // Shadow (flat, wide)
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
   ctx.fillRect(-37.5, 12.5, 225, 15);
@@ -230,10 +226,15 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.fillRect(-50, -30, 50, 30); // Left shoe
   ctx.fillRect(0, -30, 50, 30); // Right shoe
   
-  // Legs - thin, going upward
+  // Legs with pose animation
   ctx.fillStyle = 'hsl(220, 50%, 30%)'; // Jeans
-  ctx.fillRect(-45, -120, 40, 90); // Left leg
-  ctx.fillRect(5, -120, 40, 90); // Right leg
+  const leftLegY = -120 + pose.leftLegOffsetY;
+  const rightLegY = -120 + pose.rightLegOffsetY;
+  const leftLegHeight = 90 + pose.leftLegBend;
+  const rightLegHeight = 90 + pose.rightLegBend;
+  
+  ctx.fillRect(-45, leftLegY, 40, leftLegHeight);
+  ctx.fillRect(5, rightLegY, 40, rightLegHeight);
   
   // Torso - DJ shirt
   ctx.fillStyle = profile.colors.shirt;
@@ -248,14 +249,27 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
     ctx.stroke();
   }
   
-  // Arms - thin, extending from sides
+  // Arms with pose animation
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-90, -225, 30, 100); // Left arm
-  ctx.fillRect(60, -225, 30, 100); // Right arm
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 100 + pose.leftArmExtension);
+  ctx.restore();
   
-  // Head - wider than tall
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 100 + pose.rightArmExtension);
+  ctx.restore();
+  
+  // Head with pose animation
   ctx.fillStyle = profile.colors.skin;
+  ctx.save();
+  ctx.translate(pose.headOffsetX, pose.headOffsetY);
+  ctx.rotate((pose.headTilt * Math.PI) / 180);
   ctx.fillRect(-52.5, -330, 105, 90);
+  ctx.restore();
   
   // Dreadlocks - SHORT visible strands
   ctx.fillStyle = profile.colors.dreadlocks;
@@ -299,10 +313,17 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
     }
     ctx.shadowBlur = 0;
   }
+  
+  ctx.restore(); // Restore pose transformations
 }
 
-function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.sifu;
+  
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
   // Shadow
@@ -314,10 +335,10 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   ctx.fillRect(-62.5, -30, 50, 30);
   ctx.fillRect(12.5, -30, 50, 30);
   
-  // Legs - wide kung fu stance
+  // Legs with animation
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(-55, -120, 45, 90); // Left leg
-  ctx.fillRect(10, -120, 45, 90); // Right leg
+  ctx.fillRect(-55, -120 + pose.leftLegOffsetY, 45, 90 + pose.leftLegBend);
+  ctx.fillRect(10, -120 + pose.rightLegOffsetY, 45, 90 + pose.rightLegBend);
   
   // Torso in traditional gi
   ctx.fillStyle = profile.colors.gi;
@@ -327,10 +348,19 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   ctx.fillStyle = profile.colors.belt;
   ctx.fillRect(-60, -150, 120, 20);
   
-  // Arms in fighting pose
+  // Arms with animation
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-90, -225, 30, 90); // Left arm
-  ctx.fillRect(60, -225, 30, 90); // Right arm
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  ctx.restore();
   
   // Head
   ctx.fillStyle = profile.colors.skin;
@@ -376,10 +406,17 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
     
     ctx.shadowBlur = 0;
   }
+  
+  ctx.restore();
 }
 
-function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.leroy;
+  
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
   // Shadow
@@ -391,19 +428,28 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
   ctx.fillRect(-50, -30, 45, 30);
   ctx.fillRect(5, -30, 45, 30);
   
-  // Legs
+  // Legs with animation
   ctx.fillStyle = 'hsl(220, 40%, 25%)';
-  ctx.fillRect(-45, -120, 40, 90);
-  ctx.fillRect(5, -120, 40, 90);
+  ctx.fillRect(-45, -120 + pose.leftLegOffsetY, 40, 90 + pose.leftLegBend);
+  ctx.fillRect(5, -120 + pose.rightLegOffsetY, 40, 90 + pose.rightLegBend);
   
   // Rasta shirt
   ctx.fillStyle = profile.colors.rasta_shirt;
   ctx.fillRect(-60, -240, 120, 120);
   
-  // Arms
+  // Arms with animation
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-90, -225, 30, 90);
-  ctx.fillRect(60, -225, 30, 90);
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  ctx.restore();
   
   // Cyber tattoos on arms
   ctx.strokeStyle = profile.colors.cyber_tattoos;
@@ -455,10 +501,17 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
     
     ctx.shadowBlur = 0;
   }
+  
+  ctx.restore();
 }
 
-function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.razor;
+  
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
   // Shadow
@@ -470,19 +523,28 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.fillRect(-50, -30, 45, 30);
   ctx.fillRect(5, -30, 45, 30);
   
-  // Ninja suit legs
+  // Ninja suit legs with animation
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-45, -120, 40, 90);
-  ctx.fillRect(5, -120, 40, 90);
+  ctx.fillRect(-45, -120 + pose.leftLegOffsetY, 40, 90 + pose.leftLegBend);
+  ctx.fillRect(5, -120 + pose.rightLegOffsetY, 40, 90 + pose.rightLegBend);
   
   // Ninja suit torso
   ctx.fillStyle = profile.colors.ninja_suit;
   ctx.fillRect(-60, -240, 120, 120);
   
-  // Arms
+  // Arms with animation
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-90, -225, 30, 90);
-  ctx.fillRect(60, -225, 30, 90);
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  ctx.restore();
   
   // Head/mask
   ctx.fillStyle = profile.colors.ninja_suit;
@@ -526,10 +588,17 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
     
     ctx.shadowBlur = 0;
   }
+  
+  ctx.restore();
 }
 
-function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
   const profile = AUTHENTIC_FIGHTER_PROFILES.rootsman;
+  
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
   // Shadow
@@ -541,10 +610,10 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
   ctx.fillRect(-55, -30, 50, 30);
   ctx.fillRect(5, -30, 50, 30);
   
-  // Legs
+  // Legs with animation
   ctx.fillStyle = 'hsl(30, 40%, 30%)';
-  ctx.fillRect(-45, -120, 40, 90);
-  ctx.fillRect(5, -120, 40, 90);
+  ctx.fillRect(-45, -120 + pose.leftLegOffsetY, 40, 90 + pose.leftLegBend);
+  ctx.fillRect(5, -120 + pose.rightLegOffsetY, 40, 90 + pose.rightLegBend);
   
   // Earth-tone shirt with rasta accents
   const rastaColors = profile.colors.rasta_colors as string[];
@@ -557,10 +626,19 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
     ctx.fillRect(-60, -240 + i * 40, 120, 15);
   }
   
-  // Arms
+  // Arms with animation
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-90, -225, 30, 90);
-  ctx.fillRect(60, -225, 30, 90);
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  ctx.restore();
   
   // Head
   ctx.fillStyle = profile.colors.skin;
@@ -599,9 +677,15 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
     
     ctx.shadowBlur = 0;
   }
+  
+  ctx.restore();
 }
 
-function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any) {
+function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   // Draw from feet (0,0) UPWARD using NEGATIVE Y - 150x200 scaled (2.5x)
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
@@ -610,16 +694,25 @@ function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Figh
   // Basic Street Fighter silhouette
   ctx.fillStyle = fighter.colors.primary;
   
-  // Legs
-  ctx.fillRect(-45, -120, 40, 90);
-  ctx.fillRect(5, -120, 40, 90);
+  // Legs with animation
+  ctx.fillRect(-45, -120 + pose.leftLegOffsetY, 40, 90 + pose.leftLegBend);
+  ctx.fillRect(5, -120 + pose.rightLegOffsetY, 40, 90 + pose.rightLegBend);
   
   // Torso
   ctx.fillRect(-60, -240, 120, 120);
   
-  // Arms
-  ctx.fillRect(-90, -225, 30, 90);
-  ctx.fillRect(60, -225, 30, 90);
+  // Arms with animation
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  ctx.restore();
   
   // Head
   ctx.fillRect(-52.5, -330, 105, 90);
@@ -631,4 +724,6 @@ function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Figh
   ctx.fillStyle = 'black';
   ctx.fillRect(-22.5, -282.5, 12.5, 7.5);
   ctx.fillRect(7.5, -282.5, 12.5, 7.5);
+  
+  ctx.restore();
 }
