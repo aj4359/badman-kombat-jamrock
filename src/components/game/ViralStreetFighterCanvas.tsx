@@ -48,7 +48,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   } = useVisualEffects();
   
   // Sprite loading system
-  const { isLoaded: spritesLoaded, getSprite } = useFighterSprites();
+  const { isLoaded: spritesLoaded, getSpriteData } = useFighterSprites();
 
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(Date.now());
@@ -105,23 +105,133 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       ctx.stroke();
     }
     
-    // 3. DRAW FIGHTERS
+    // 3. DRAW FIGHTERS WITH SPRITE ANIMATION
     if (gameState.fighters.player1) {
-      const p1Sprite = getSprite(gameState.fighters.player1.id);
-      renderAuthenticFighter({
-        ctx,
-        fighter: gameState.fighters.player1,
-        spriteImage: p1Sprite
-      });
+      const p1SpriteData = getSpriteData(gameState.fighters.player1.id);
+      
+      if (p1SpriteData && p1SpriteData.controller) {
+        // Map fighter state to animation name
+        let animName = 'idle';
+        const state = gameState.fighters.player1.state?.current;
+        
+        if (state === 'jumping') animName = 'jumping';
+        else if (state === 'crouching') animName = 'crouching';
+        else if (state === 'blocking') animName = 'blocking';
+        else if (state === 'hurt') animName = 'hit';
+        else if (state === 'attacking') {
+          // Try to determine attack type from animation or default to punch
+          animName = gameState.fighters.player1.animation?.currentMove || 'lightPunch';
+        } else if (state === 'special') {
+          animName = 'special';
+        } else if (Math.abs(gameState.fighters.player1.velocityX || 0) > 0.1) {
+          animName = 'walking';
+        }
+
+        // Update animation controller
+        p1SpriteData.controller.setAnimation(animName);
+        p1SpriteData.controller.update();
+
+        // Get current frame
+        const currentFrame = p1SpriteData.controller.getCurrentFrame();
+        
+        if (currentFrame) {
+          ctx.save();
+          
+          // Flip for direction
+          const facingRight = gameState.fighters.player1.facing === 'right';
+          if (!facingRight) {
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+              currentFrame.image,
+              -(gameState.fighters.player1.x + currentFrame.width / 2),
+              gameState.fighters.player1.y - currentFrame.height + 50,
+              currentFrame.width,
+              currentFrame.height
+            );
+          } else {
+            ctx.drawImage(
+              currentFrame.image,
+              gameState.fighters.player1.x - currentFrame.width / 2,
+              gameState.fighters.player1.y - currentFrame.height + 50,
+              currentFrame.width,
+              currentFrame.height
+            );
+          }
+          
+          ctx.restore();
+        }
+      } else {
+        // Fallback to geometric rendering
+        renderAuthenticFighter({
+          ctx,
+          fighter: gameState.fighters.player1,
+          spriteImage: null
+        });
+      }
     }
     
     if (gameState.fighters.player2) {
-      const p2Sprite = getSprite(gameState.fighters.player2.id);
-      renderAuthenticFighter({
-        ctx,
-        fighter: gameState.fighters.player2,
-        spriteImage: p2Sprite
-      });
+      const p2SpriteData = getSpriteData(gameState.fighters.player2.id);
+      
+      if (p2SpriteData && p2SpriteData.controller) {
+        // Map fighter state to animation name
+        let animName = 'idle';
+        const state = gameState.fighters.player2.state?.current;
+        
+        if (state === 'jumping') animName = 'jumping';
+        else if (state === 'crouching') animName = 'crouching';
+        else if (state === 'blocking') animName = 'blocking';
+        else if (state === 'hurt') animName = 'hit';
+        else if (state === 'attacking') {
+          // Try to determine attack type from animation or default to punch
+          animName = gameState.fighters.player2.animation?.currentMove || 'lightPunch';
+        } else if (state === 'special') {
+          animName = 'special';
+        } else if (Math.abs(gameState.fighters.player2.velocityX || 0) > 0.1) {
+          animName = 'walking';
+        }
+
+        // Update animation controller
+        p2SpriteData.controller.setAnimation(animName);
+        p2SpriteData.controller.update();
+
+        // Get current frame
+        const currentFrame = p2SpriteData.controller.getCurrentFrame();
+        
+        if (currentFrame) {
+          ctx.save();
+          
+          // Flip for direction
+          const facingRight = gameState.fighters.player2.facing === 'right';
+          if (!facingRight) {
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+              currentFrame.image,
+              -(gameState.fighters.player2.x + currentFrame.width / 2),
+              gameState.fighters.player2.y - currentFrame.height + 50,
+              currentFrame.width,
+              currentFrame.height
+            );
+          } else {
+            ctx.drawImage(
+              currentFrame.image,
+              gameState.fighters.player2.x - currentFrame.width / 2,
+              gameState.fighters.player2.y - currentFrame.height + 50,
+              currentFrame.width,
+              currentFrame.height
+            );
+          }
+          
+          ctx.restore();
+        }
+      } else {
+        // Fallback to geometric rendering
+        renderAuthenticFighter({
+          ctx,
+          fighter: gameState.fighters.player2,
+          spriteImage: null
+        });
+      }
     }
     
     ctx.restore();
@@ -142,7 +252,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
     ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-  }, [gameState, getSprite, getShakeOffset, updateEffects, drawHitSparks]);
+  }, [gameState, getSpriteData, getShakeOffset, updateEffects, drawHitSparks]);
 
   // Animation loop
   useEffect(() => {
