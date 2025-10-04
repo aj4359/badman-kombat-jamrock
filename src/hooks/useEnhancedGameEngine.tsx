@@ -104,6 +104,7 @@ const MAX_COMBO_DECAY = 60;
 export const useEnhancedGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
+  const frameCountRef = useRef(0); // ✅ FIXED: Moved up for proper scope
   // Audio manager removed to eliminate bell sounds
   const crowdAudio = useCrowdAudio();
   const fightAudio = useFightAudio();
@@ -331,6 +332,11 @@ export const useEnhancedGameEngine = () => {
     const keys = isPlayer1 ? player1Keys.current : player2Keys.current;
     const fighterData = ENHANCED_FIGHTER_DATA[fighter.id] || ENHANCED_FIGHTER_DATA.leroy;
     
+    // 🐛 DEBUG: Log position changes every 60 frames
+    if (frameCountRef.current % 60 === 0) {
+      console.log(`🎮 Fighter ${isPlayer1 ? 'P1' : 'P2'}: x=${newFighter.x.toFixed(0)}, state=${newFighter.state.current}, keys=`, keys);
+    }
+    
     // Enhanced frame-perfect timing for 60fps gameplay
     const deltaTime = 16.67; // Target 60fps frame time
     
@@ -376,17 +382,23 @@ export const useEnhancedGameEngine = () => {
       // Enhanced Movement with frame-perfect responsiveness
       const moveSpeed = fighterData.stats.walkSpeed * (deltaTime / 16.67); // Normalize to 60fps
       if (keys.left && newFighter.x > 50) {
+        const oldX = newFighter.x;
         newFighter.x -= moveSpeed;
         newFighter.facing = 'left';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
         }
+        // 🐛 DEBUG: Log movement
+        if (Math.random() < 0.01) console.log(`⬅️ Moving LEFT: ${oldX.toFixed(0)} → ${newFighter.x.toFixed(0)}`);
       } else if (keys.right && newFighter.x < CANVAS_WIDTH - 50 - newFighter.width) {
+        const oldX = newFighter.x;
         newFighter.x += moveSpeed;
         newFighter.facing = 'right';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
         }
+        // 🐛 DEBUG: Log movement
+        if (Math.random() < 0.01) console.log(`➡️ Moving RIGHT: ${oldX.toFixed(0)} → ${newFighter.x.toFixed(0)}`);
       } else if (newFighter.state.current === 'walking') {
         newFighter.state.current = 'idle';
         newFighter.animationTimer = 0;
@@ -541,6 +553,8 @@ export const useEnhancedGameEngine = () => {
   const gameLoop = useCallback(() => {
     if (gameState.screen !== 'fighting') return;
     
+    frameCountRef.current++; // ✅ FIXED: Increment frame counter
+    
     // Update visual effects
     visualEffects.updateEffects(16);
     
@@ -648,6 +662,18 @@ export const useEnhancedGameEngine = () => {
             }
           }
 
+          // 🐛 DEBUG: Log state updates every 60 frames
+          if (frameCountRef.current % 60 === 0) {
+            console.log(`🔄 Game Loop Update #${frameCountRef.current}:`, {
+              p1_x: newFighter1.x.toFixed(0),
+              p2_x: newFighter2.x.toFixed(0),
+              p1_state: newFighter1.state.current,
+              p2_state: newFighter2.state.current,
+              p1_keys: player1Keys.current,
+              p2_keys: player2Keys.current
+            });
+          }
+
           newState.fighters.player1 = newFighter1;
           newState.fighters.player2 = newFighter2;
         }
@@ -713,27 +739,29 @@ export const useEnhancedGameEngine = () => {
       const key = e.key.toLowerCase();
       
       // Player 1 controls
-      if (['w', 'a', 's', 'd', 'j', 'k'].includes(key)) {
+      if (['w', 'a', 's', 'd', 'j', 'k', 'l'].includes(key)) {
         const mapping: Record<string, string> = {
           'w': 'up',
           'a': 'left', 
           's': 'down',
           'd': 'right',
           'j': 'punch',
-          'k': 'block'
+          'k': 'block',
+          'l': 'kick' // ✅ FIXED: Added kick
         };
         player1Keys.current[mapping[key]] = true;
       }
 
       // Player 2 controls
-      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2'].includes(key)) {
+      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2', '3'].includes(key)) {
         const mapping: Record<string, string> = {
           'arrowup': 'up',
           'arrowleft': 'left',
           'arrowdown': 'down', 
           'arrowright': 'right',
           '1': 'punch',
-          '2': 'block'
+          '2': 'block',
+          '3': 'kick' // ✅ FIXED: Added kick
         };
         player2Keys.current[mapping[key]] = true;
       }
@@ -743,27 +771,29 @@ export const useEnhancedGameEngine = () => {
       const key = e.key.toLowerCase();
       
       // Player 1 controls
-      if (['w', 'a', 's', 'd', 'j', 'k'].includes(key)) {
+      if (['w', 'a', 's', 'd', 'j', 'k', 'l'].includes(key)) {
         const mapping: Record<string, string> = {
           'w': 'up',
           'a': 'left',
           's': 'down',
           'd': 'right',
           'j': 'punch',
-          'k': 'block'
+          'k': 'block',
+          'l': 'kick' // ✅ FIXED: Added kick
         };
         player1Keys.current[mapping[key]] = false;
       }
 
       // Player 2 controls
-      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2'].includes(key)) {
+      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2', '3'].includes(key)) {
         const mapping: Record<string, string> = {
           'arrowup': 'up',
           'arrowleft': 'left',
           'arrowdown': 'down',
           'arrowright': 'right', 
           '1': 'punch',
-          '2': 'block'
+          '2': 'block',
+          '3': 'kick' // ✅ FIXED: Added kick
         };
         player2Keys.current[mapping[key]] = false;
       }

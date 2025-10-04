@@ -52,6 +52,20 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(Date.now());
+  const gameStateRef = useRef(gameState);
+  
+  // ✅ FIXED: Update ref when gameState changes
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    
+    // 🐛 DEBUG: Log render state updates every 60 frames
+    if (frameCountRef.current % 60 === 0 && gameState.fighters.player1 && gameState.fighters.player2) {
+      console.log(`🎨 Render sees positions:`, {
+        p1_x: gameState.fighters.player1.x.toFixed(0),
+        p2_x: gameState.fighters.player2.x.toFixed(0)
+      });
+    }
+  }, [gameState]);
   
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -65,6 +79,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const deltaTime = now - lastTimeRef.current;
     lastTimeRef.current = now;
     
+    // ✅ FIXED: Use ref to get latest state without recreating render callback
+    const currentGameState = gameStateRef.current;
+    
     // Update visual effects
     updateEffects(deltaTime);
     
@@ -77,23 +94,23 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     renderProfessionalArena(ctx, 1024, 576);
     
     // 2. DRAW DEBUG RECTANGLES (temporary - to verify positioning)
-    if (gameState.fighters.player1 && gameState.fighters.player2) {
+    if (currentGameState.fighters.player1 && currentGameState.fighters.player2) {
       // P1 debug rectangle (blue)
       ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
       ctx.fillRect(
-        gameState.fighters.player1.x,
-        gameState.fighters.player1.y,
-        gameState.fighters.player1.width,
-        gameState.fighters.player1.height
+        currentGameState.fighters.player1.x,
+        currentGameState.fighters.player1.y,
+        currentGameState.fighters.player1.width,
+        currentGameState.fighters.player1.height
       );
       
       // P2 debug rectangle (red)
       ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
       ctx.fillRect(
-        gameState.fighters.player2.x,
-        gameState.fighters.player2.y,
-        gameState.fighters.player2.width,
-        gameState.fighters.player2.height
+        currentGameState.fighters.player2.x,
+        currentGameState.fighters.player2.y,
+        currentGameState.fighters.player2.width,
+        currentGameState.fighters.player2.height
       );
       
       // Ground line
@@ -106,18 +123,18 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     }
     
     // 3. DRAW FIGHTERS WITH PROCEDURAL GEOMETRIC ANIMATION
-    if (gameState.fighters.player1) {
+    if (currentGameState.fighters.player1) {
       renderAuthenticFighter({
         ctx,
-        fighter: gameState.fighters.player1,
+        fighter: currentGameState.fighters.player1,
         spriteImage: null
       });
     }
     
-    if (gameState.fighters.player2) {
+    if (currentGameState.fighters.player2) {
       renderAuthenticFighter({
         ctx,
-        fighter: gameState.fighters.player2,
+        fighter: currentGameState.fighters.player2,
         spriteImage: null
       });
     }
@@ -125,9 +142,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.restore();
     
     // 4. DRAW UI ELEMENTS (no screen shake)
-    if (gameState.fighters.player1 && gameState.fighters.player2) {
-      renderProfessionalHealthBars(ctx, 1024, gameState.fighters);
-      renderFighterNames(ctx, 1024, gameState.fighters);
+    if (currentGameState.fighters.player1 && currentGameState.fighters.player2) {
+      renderProfessionalHealthBars(ctx, 1024, currentGameState.fighters);
+      renderFighterNames(ctx, 1024, currentGameState.fighters);
     }
     
     // 5. DRAW VISUAL EFFECTS
@@ -140,7 +157,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
     ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-  }, [gameState, getSpriteData, getShakeOffset, updateEffects, drawHitSparks]);
+  }, [getSpriteData, getShakeOffset, updateEffects, drawHitSparks]); // ✅ FIXED: Removed gameState dependency
 
   // Animation loop
   useEffect(() => {
