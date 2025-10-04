@@ -3,11 +3,17 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 // Audio system removed to eliminate all audio/bell sounds
 import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { useFighterSprites } from '@/hooks/useFighterSprites';
-import { renderAuthenticFighter } from './AuthenticFighterRenderer';
+import { renderAuthenticFighter } from './ScaledAuthenticFighter';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { renderProfessionalArena } from './ProfessionalArenaRenderer';
 import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
+import { 
+  renderMotionBlur, 
+  renderSpeedLines, 
+  renderImpactWave,
+  renderComboCounter 
+} from '@/utils/visualEffects';
 
 interface ViralStreetFighterCanvasProps {
   fighterData?: {

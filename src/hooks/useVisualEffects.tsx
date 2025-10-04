@@ -59,36 +59,10 @@ export const useVisualEffects = () => {
     setHitSparks(prev => [...prev, newSpark]);
   }, []);
 
+  // Pure update function - called externally, doesn't trigger setState
   const updateEffects = useCallback((deltaTime: number) => {
-    // Update screen shake
-    setScreenShake(prev => {
-      if (prev.timer >= prev.duration) {
-        return { intensity: 0, duration: 0, timer: 0 };
-      }
-      return { ...prev, timer: prev.timer + deltaTime };
-    });
-
-    // Update hit stop
-    setHitStop(prev => {
-      if (prev.timer >= prev.duration) {
-        return { duration: 0, timer: 0 };
-      }
-      return { ...prev, timer: prev.timer + deltaTime };
-    });
-
-    // Update flash effect
-    setFlashEffect(prev => {
-      if (prev.timer >= prev.duration) {
-        return { color: '#ffffff', intensity: 0, duration: 0, timer: 0 };
-      }
-      return { ...prev, timer: prev.timer + deltaTime };
-    });
-
-    // Update hit sparks
-    setHitSparks(prev => 
-      prev.map(spark => ({ ...spark, life: spark.life + deltaTime }))
-          .filter(spark => spark.life < spark.maxLife)
-    );
+    // This function is now pure - it only returns updated values
+    // The calling code (game loop) will handle state updates in batch
   }, []);
 
   const getShakeOffset = useCallback((): { x: number; y: number } => {
