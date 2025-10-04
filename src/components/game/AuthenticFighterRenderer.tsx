@@ -299,19 +299,33 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.fillRect(-22.5, -282.5, 12.5, 7.5); // Left pupil
   ctx.fillRect(7.5, -282.5, 12.5, 7.5); // Right pupil
   
-  // Special effects
+  // Special effects with enhanced glow
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.aura;
     ctx.lineWidth = 5;
     ctx.shadowColor = profile.colors.aura;
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = 30;
     
+    // Pulsing energy rings
+    const pulseOffset = Math.sin(Date.now() / 100) * 10;
     for (let i = 0; i < 4; i++) {
+      ctx.globalAlpha = 0.8 - i * 0.15;
       ctx.beginPath();
-      ctx.arc(0, -180, 62.5 + i * 20, 0, Math.PI * 2);
+      ctx.arc(0, -180, 62.5 + i * 20 + pulseOffset, 0, Math.PI * 2);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
+  }
+  
+  // Motion blur for fast movements
+  if (Math.abs(fighter.velocityX || 0) > 5) {
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = profile.colors.aura;
+    const blurOffset = (fighter.velocityX || 0) * -3;
+    ctx.fillRect(blurOffset - 60, -240, 120, 240);
+    ctx.restore();
   }
   
   ctx.restore(); // Restore pose transformations

@@ -44,17 +44,29 @@ export const DEFAULT_POSE: Pose = {
   rightLegBend: 0,
 };
 
-// Idle breathing animation
+// Idle breathing animation - Enhanced with 8 frames for smooth motion
 export const IDLE_POSES: Pose[] = [
-  { ...DEFAULT_POSE, bodyOffsetY: 0 },
-  { ...DEFAULT_POSE, bodyOffsetY: -3 },
-  { ...DEFAULT_POSE, bodyOffsetY: -5 },
-  { ...DEFAULT_POSE, bodyOffsetY: -3 },
-  { ...DEFAULT_POSE, bodyOffsetY: 0 },
+  { ...DEFAULT_POSE, bodyOffsetY: 0, headOffsetY: 0 },
+  { ...DEFAULT_POSE, bodyOffsetY: -1, headOffsetY: -1 },
+  { ...DEFAULT_POSE, bodyOffsetY: -2, headOffsetY: -1.5 },
+  { ...DEFAULT_POSE, bodyOffsetY: -3, headOffsetY: -2 },
+  { ...DEFAULT_POSE, bodyOffsetY: -4, headOffsetY: -2.5 },
+  { ...DEFAULT_POSE, bodyOffsetY: -3, headOffsetY: -2 },
+  { ...DEFAULT_POSE, bodyOffsetY: -2, headOffsetY: -1.5 },
+  { ...DEFAULT_POSE, bodyOffsetY: -1, headOffsetY: -1 },
 ];
 
-// Walking cycle
+// Walking cycle - Enhanced with 10 frames for smoother movement
 export const WALK_POSES: Pose[] = [
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: -18,
+    rightLegOffsetY: 12,
+    leftArmAngle: -50,
+    rightArmAngle: 10,
+    bodyTilt: 2,
+  },
   {
     ...DEFAULT_POSE,
     bodyOffsetY: -2,
@@ -62,12 +74,31 @@ export const WALK_POSES: Pose[] = [
     rightLegOffsetY: 10,
     leftArmAngle: -45,
     rightArmAngle: 15,
+    bodyTilt: 1,
+  },
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: -8,
+    rightLegOffsetY: 5,
+    leftArmAngle: -35,
+    rightArmAngle: 20,
   },
   {
     ...DEFAULT_POSE,
     bodyOffsetY: 0,
     leftLegOffsetY: 0,
     rightLegOffsetY: 0,
+    leftArmAngle: -25,
+    rightArmAngle: 25,
+  },
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: 5,
+    rightLegOffsetY: -8,
+    leftArmAngle: -20,
+    rightArmAngle: 35,
   },
   {
     ...DEFAULT_POSE,
@@ -76,12 +107,40 @@ export const WALK_POSES: Pose[] = [
     rightLegOffsetY: -15,
     leftArmAngle: -15,
     rightArmAngle: 45,
+    bodyTilt: -1,
+  },
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: 12,
+    rightLegOffsetY: -18,
+    leftArmAngle: -10,
+    rightArmAngle: 50,
+    bodyTilt: -2,
+  },
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: 8,
+    rightLegOffsetY: -12,
+    leftArmAngle: -15,
+    rightArmAngle: 40,
   },
   {
     ...DEFAULT_POSE,
     bodyOffsetY: 0,
     leftLegOffsetY: 0,
     rightLegOffsetY: 0,
+    leftArmAngle: -25,
+    rightArmAngle: 25,
+  },
+  {
+    ...DEFAULT_POSE,
+    bodyOffsetY: -1,
+    leftLegOffsetY: -5,
+    rightLegOffsetY: 8,
+    leftArmAngle: -35,
+    rightArmAngle: 20,
   },
 ];
 
@@ -211,14 +270,16 @@ export const JUMP_POSES: Pose[] = [
   { ...DEFAULT_POSE },
 ];
 
-// Hit reaction
+// Hit reaction - Enhanced with impact frames
 export const HIT_POSES: Pose[] = [
-  { ...DEFAULT_POSE, bodyTilt: -20, headOffsetX: -10, bodyOffsetY: 5 },
-  { ...DEFAULT_POSE, bodyTilt: -25, headOffsetX: -15, bodyOffsetY: 8 },
-  { ...DEFAULT_POSE, bodyTilt: -20, headOffsetX: -12, bodyOffsetY: 5 },
-  { ...DEFAULT_POSE, bodyTilt: -15, headOffsetX: -8, bodyOffsetY: 3 },
-  { ...DEFAULT_POSE, bodyTilt: -10, headOffsetX: -5, bodyOffsetY: 2 },
-  { ...DEFAULT_POSE, bodyTilt: -5, headOffsetX: -2 },
+  { ...DEFAULT_POSE, bodyTilt: -25, headOffsetX: -15, bodyOffsetY: 8, bodySquash: 0.9 },
+  { ...DEFAULT_POSE, bodyTilt: -30, headOffsetX: -18, bodyOffsetY: 10, bodySquash: 0.88 },
+  { ...DEFAULT_POSE, bodyTilt: -25, headOffsetX: -15, bodyOffsetY: 8, bodySquash: 0.9 },
+  { ...DEFAULT_POSE, bodyTilt: -20, headOffsetX: -12, bodyOffsetY: 6, bodySquash: 0.92 },
+  { ...DEFAULT_POSE, bodyTilt: -15, headOffsetX: -10, bodyOffsetY: 4, bodySquash: 0.94 },
+  { ...DEFAULT_POSE, bodyTilt: -10, headOffsetX: -7, bodyOffsetY: 3, bodySquash: 0.96 },
+  { ...DEFAULT_POSE, bodyTilt: -5, headOffsetX: -4, bodyOffsetY: 2, bodySquash: 0.98 },
+  { ...DEFAULT_POSE, bodyTilt: -2, headOffsetX: -2, bodyOffsetY: 1 },
   { ...DEFAULT_POSE },
 ];
 
