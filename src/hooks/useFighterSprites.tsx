@@ -9,11 +9,11 @@ interface SpriteMap {
 }
 
 // Import sprite sheet images
-import leroySprite from '@/assets/leroy-sprite-sheet.png';
-import jordanSprite from '@/assets/jordan-sprite-sheet.png';
-import razorSprite from '@/assets/razor-sprite-sheet.png';
-import sifuSprite from '@/assets/sifu-sprite-sheet.png';
-import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
+import leroySprite from '@/assets/leroy-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite.png';
+import razorSprite from '@/assets/razor-sprite.png';
+import sifuSprite from '@/assets/sifu-sprite.png';
+import rootsmanSprite from '@/assets/rootsman-sprite.png';
 
 const SPRITE_SOURCES: Record<string, string> = {
   leroy: leroySprite,
