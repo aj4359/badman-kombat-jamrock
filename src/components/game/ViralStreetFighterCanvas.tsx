@@ -128,21 +128,63 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       ctx.stroke();
     }
     
-    // 3. DRAW FIGHTERS WITH PROCEDURAL GEOMETRIC ANIMATION
-    if (currentGameState.fighters.player1) {
-      renderAuthenticFighter({
-        ctx,
-        fighter: currentGameState.fighters.player1,
-        spriteImage: null
-      });
-    }
+    // 3. DRAW FIGHTERS WITH PROCEDURAL GEOMETRIC ANIMATION + VISUAL EFFECTS
+    const p1 = currentGameState.fighters.player1;
+    const p2 = currentGameState.fighters.player2;
     
-    if (currentGameState.fighters.player2) {
+    if (p1 && p2) {
+      // Add motion blur for fast-moving fighters
+      const p1Speed = Math.sqrt((p1.velocityX || 0) ** 2 + (p1.velocityY || 0) ** 2);
+      const p2Speed = Math.sqrt((p2.velocityX || 0) ** 2 + (p2.velocityY || 0) ** 2);
+      
+      if (p1Speed > 3) {
+        renderMotionBlur(ctx, {
+          x: p1.x,
+          y: p1.y,
+          velocityX: p1.velocityX || 0,
+          velocityY: p1.velocityY || 0,
+          intensity: 0.6
+        });
+      }
+      
+      if (p2Speed > 3) {
+        renderMotionBlur(ctx, {
+          x: p2.x,
+          y: p2.y,
+          velocityX: p2.velocityX || 0,
+          velocityY: p2.velocityY || 0,
+          intensity: 0.6
+        });
+      }
+      
+      // Add speed lines during attacks
+      if (p1.state.current === 'attacking') {
+        renderSpeedLines(ctx, p1.x + p1.width/2, p1.y + p1.height/2, p1.facing, 1.2);
+      }
+      if (p2.state.current === 'attacking') {
+        renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
+      }
+      
+      // Render fighters
       renderAuthenticFighter({
         ctx,
-        fighter: currentGameState.fighters.player2,
+        fighter: p1,
         spriteImage: null
       });
+      
+      renderAuthenticFighter({
+        ctx,
+        fighter: p2,
+        spriteImage: null
+      });
+      
+      // Add combo counter display above fighters
+      if (p1.comboCount && p1.comboCount > 1) {
+        renderComboCounter(ctx, p1.x + p1.width/2, p1.y - 60, p1.comboCount, 1);
+      }
+      if (p2.comboCount && p2.comboCount > 1) {
+        renderComboCounter(ctx, p2.x + p2.width/2, p2.y - 60, p2.comboCount, 1);
+      }
     }
     
     ctx.restore();

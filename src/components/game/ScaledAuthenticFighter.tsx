@@ -188,43 +188,43 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   
   // Shadow
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   // Sneakers
   ctx.fillStyle = 'hsl(0, 0%, 15%)';
-  ctx.fillRect(-20, -12, 20, 12);
-  ctx.fillRect(0, -12, 20, 12);
+  ctx.fillRect(-20*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(0, -12*SCALE, 20*SCALE, 12*SCALE);
   
   // Legs
   ctx.fillStyle = 'hsl(220, 50%, 30%)';
-  ctx.fillRect(-18, -48 + pose.leftLegOffsetY * SCALE, 16, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(2, -48 + pose.rightLegOffsetY * SCALE, 16, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   // Torso
   ctx.fillStyle = profile.colors.shirt;
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   // Sound wave graphics
   ctx.strokeStyle = profile.colors.aura;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.5*SCALE;
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.arc(0, -72, 12 + i * 5, 0, Math.PI);
+    ctx.arc(0, -72*SCALE, (12 + i * 5)*SCALE, 0, Math.PI);
     ctx.stroke();
   }
   
   // Arms
   ctx.fillStyle = profile.colors.skin;
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 40 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (40 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 40 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (40 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   // Head
@@ -232,48 +232,48 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.save();
   ctx.translate(pose.headOffsetX * SCALE, pose.headOffsetY * SCALE);
   ctx.rotate((pose.headTilt * Math.PI) / 180);
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   ctx.restore();
   
   // Dreadlocks
   ctx.fillStyle = profile.colors.dreadlocks;
   for (let i = 0; i < 7; i++) {
-    ctx.fillRect(-27 + i * 9, -135, 6, 25);
+    ctx.fillRect((-27 + i * 9)*SCALE, -135*SCALE, 6*SCALE, 25*SCALE);
   }
   
   // Headphones
   ctx.fillStyle = profile.colors.headphones;
-  ctx.fillRect(-21, -120, 42, 6);
-  ctx.fillRect(-21, -120, 8, 15);
-  ctx.fillRect(13, -120, 8, 15);
+  ctx.fillRect(-21*SCALE, -120*SCALE, 42*SCALE, 6*SCALE);
+  ctx.fillRect(-21*SCALE, -120*SCALE, 8*SCALE, 15*SCALE);
+  ctx.fillRect(13*SCALE, -120*SCALE, 8*SCALE, 15*SCALE);
   
   // Gold chain
   ctx.strokeStyle = profile.colors.chain;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2*SCALE;
   ctx.beginPath();
-  ctx.arc(0, -84, 12, 0, Math.PI);
+  ctx.arc(0, -84*SCALE, 12*SCALE, 0, Math.PI);
   ctx.stroke();
   
   // Eyes
   ctx.fillStyle = 'white';
-  ctx.fillRect(-12, -115, 12, 6);
-  ctx.fillRect(0, -115, 12, 6);
+  ctx.fillRect(-12*SCALE, -115*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -115*SCALE, 12*SCALE, 6*SCALE);
   ctx.fillStyle = 'black';
-  ctx.fillRect(-9, -113, 5, 3);
-  ctx.fillRect(3, -113, 5, 3);
+  ctx.fillRect(-9*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
   
   // Special effects
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.aura;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2*SCALE;
     ctx.shadowColor = profile.colors.aura;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 12*SCALE;
     
-    const pulseOffset = Math.sin(Date.now() / 100) * 4;
+    const pulseOffset = Math.sin(Date.now() / 100) * 4 * SCALE;
     for (let i = 0; i < 4; i++) {
       ctx.globalAlpha = 0.8 - i * 0.15;
       ctx.beginPath();
-      ctx.arc(0, -72, 25 + i * 8 + pulseOffset, 0, Math.PI * 2);
+      ctx.arc(0, -72*SCALE, (25 + i * 8)*SCALE + pulseOffset, 0, Math.PI * 2);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -292,69 +292,69 @@ function renderSifuMaster(ctx: CanvasRenderingContext2D, fighter: Fighter, effec
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   ctx.fillStyle = 'hsl(0, 0%, 10%)';
-  ctx.fillRect(-25, -12, 20, 12);
-  ctx.fillRect(5, -12, 20, 12);
+  ctx.fillRect(-25*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(5*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
   
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(-22, -48 + pose.leftLegOffsetY * SCALE, 18, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(4, -48 + pose.rightLegOffsetY * SCALE, 18, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-22*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 18*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(4*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 18*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   ctx.fillStyle = profile.colors.gi;
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   ctx.fillStyle = profile.colors.belt;
-  ctx.fillRect(-24, -60, 48, 8);
+  ctx.fillRect(-24*SCALE, -60*SCALE, 48*SCALE, 8*SCALE);
   
   ctx.fillStyle = profile.colors.skin;
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   
   ctx.fillStyle = profile.colors.hair;
-  ctx.fillRect(-18, -135, 36, 12);
+  ctx.fillRect(-18*SCALE, -135*SCALE, 36*SCALE, 12*SCALE);
   
-  ctx.fillRect(-6, -102, 8, 8);
+  ctx.fillRect(-6*SCALE, -102*SCALE, 8*SCALE, 8*SCALE);
   
   ctx.fillStyle = 'white';
-  ctx.fillRect(-12, -118, 12, 6);
-  ctx.fillRect(0, -118, 12, 6);
+  ctx.fillRect(-12*SCALE, -118*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -118*SCALE, 12*SCALE, 6*SCALE);
   ctx.fillStyle = 'black';
-  ctx.fillRect(-9, -116, 5, 3);
-  ctx.fillRect(3, -116, 5, 3);
+  ctx.fillRect(-9*SCALE, -116*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -116*SCALE, 5*SCALE, 3*SCALE);
   
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.steel_wire;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.5*SCALE;
     ctx.beginPath();
-    ctx.moveTo(30, -84);
-    ctx.quadraticCurveTo(50, -108, 65, -72);
+    ctx.moveTo(30*SCALE, -84*SCALE);
+    ctx.quadraticCurveTo(50*SCALE, -108*SCALE, 65*SCALE, -72*SCALE);
     ctx.stroke();
   }
   
   if (effects.special || fighter.state.current === 'special') {
     ctx.fillStyle = profile.colors.chi_aura;
     ctx.shadowColor = profile.colors.chi_aura;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 12*SCALE;
     
     ctx.beginPath();
-    ctx.arc(-30, -78, 8, 0, Math.PI * 2);
+    ctx.arc(-30*SCALE, -78*SCALE, 8*SCALE, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(30, -78, 8, 0, Math.PI * 2);
+    ctx.arc(30*SCALE, -78*SCALE, 8*SCALE, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.shadowBlur = 0;
@@ -372,61 +372,61 @@ function renderLeroyRootsman(ctx: CanvasRenderingContext2D, fighter: Fighter, ef
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   ctx.fillStyle = profile.colors.tech_accessories;
-  ctx.fillRect(-20, -12, 18, 12);
-  ctx.fillRect(2, -12, 18, 12);
+  ctx.fillRect(-20*SCALE, -12*SCALE, 18*SCALE, 12*SCALE);
+  ctx.fillRect(2*SCALE, -12*SCALE, 18*SCALE, 12*SCALE);
   
   ctx.fillStyle = 'hsl(220, 40%, 25%)';
-  ctx.fillRect(-18, -48 + pose.leftLegOffsetY * SCALE, 16, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(2, -48 + pose.rightLegOffsetY * SCALE, 16, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   ctx.fillStyle = profile.colors.rasta_shirt;
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   ctx.fillStyle = profile.colors.skin;
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   ctx.strokeStyle = profile.colors.cyber_tattoos;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.5*SCALE;
   ctx.shadowColor = profile.colors.circuit_glow;
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = 8*SCALE;
   
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.moveTo(-34, -86 + i * 8);
-    ctx.lineTo(-24, -86 + i * 8);
+    ctx.moveTo(-34*SCALE, (-86 + i * 8)*SCALE);
+    ctx.lineTo(-24*SCALE, (-86 + i * 8)*SCALE);
     ctx.stroke();
   }
   
   ctx.shadowBlur = 0;
   
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   
   const rastaColors = ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'];
   for (let i = 0; i < 7; i++) {
     ctx.fillStyle = rastaColors[i % 3];
-    ctx.fillRect(-27 + i * 9, -135, 6, 25);
+    ctx.fillRect((-27 + i * 9)*SCALE, -135*SCALE, 6*SCALE, 25*SCALE);
   }
   
   ctx.fillStyle = 'white';
-  ctx.fillRect(-12, -115, 12, 6);
-  ctx.fillRect(0, -115, 12, 6);
+  ctx.fillRect(-12*SCALE, -115*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -115*SCALE, 12*SCALE, 6*SCALE);
   ctx.fillStyle = 'black';
-  ctx.fillRect(-9, -113, 5, 3);
-  ctx.fillRect(3, -113, 5, 3);
+  ctx.fillRect(-9*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
   
   ctx.restore();
 }
@@ -440,50 +440,50 @@ function renderRazorCyberSamurai(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-20, -12, 20, 12);
-  ctx.fillRect(0, -12, 20, 12);
+  ctx.fillRect(-20*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(0, -12*SCALE, 20*SCALE, 12*SCALE);
   
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-18, -48 + pose.leftLegOffsetY * SCALE, 16, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(2, -48 + pose.rightLegOffsetY * SCALE, 16, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   ctx.fillStyle = profile.colors.skin;
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   
   ctx.fillStyle = profile.colors.ninja_suit;
-  ctx.fillRect(-21, -105, 42, 15);
+  ctx.fillRect(-21*SCALE, -105*SCALE, 42*SCALE, 15*SCALE);
   
   ctx.fillStyle = profile.colors.cyber_eyes;
-  ctx.fillRect(-12, -115, 8, 4);
-  ctx.fillRect(4, -115, 8, 4);
+  ctx.fillRect(-12*SCALE, -115*SCALE, 8*SCALE, 4*SCALE);
+  ctx.fillRect(4*SCALE, -115*SCALE, 8*SCALE, 4*SCALE);
   
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.katana;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2*SCALE;
     ctx.shadowColor = profile.colors.katana;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 10*SCALE;
     ctx.beginPath();
-    ctx.moveTo(30, -90);
-    ctx.lineTo(60, -120);
+    ctx.moveTo(30*SCALE, -90*SCALE);
+    ctx.lineTo(60*SCALE, -120*SCALE);
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
@@ -500,58 +500,58 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   ctx.fillStyle = 'hsl(25, 50%, 25%)';
-  ctx.fillRect(-20, -12, 20, 12);
-  ctx.fillRect(0, -12, 20, 12);
+  ctx.fillRect(-20*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(0, -12*SCALE, 20*SCALE, 12*SCALE);
   
   ctx.fillStyle = 'hsl(120, 80%, 30%)';
-  ctx.fillRect(-18, -48 + pose.leftLegOffsetY * SCALE, 16, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(2, -48 + pose.rightLegOffsetY * SCALE, 16, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   ctx.fillStyle = profile.colors.nature_aura;
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   ctx.fillStyle = profile.colors.skin;
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 36 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   ctx.fillStyle = profile.colors.skin;
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   
   const rastaColors = ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'];
   for (let i = 0; i < 7; i++) {
     ctx.fillStyle = rastaColors[i % 3];
-    ctx.fillRect(-27 + i * 9, -135, 6, 25);
+    ctx.fillRect((-27 + i * 9)*SCALE, -135*SCALE, 6*SCALE, 25*SCALE);
   }
   
   ctx.fillStyle = 'white';
-  ctx.fillRect(-12, -115, 12, 6);
-  ctx.fillRect(0, -115, 12, 6);
+  ctx.fillRect(-12*SCALE, -115*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -115*SCALE, 12*SCALE, 6*SCALE);
   ctx.fillStyle = 'black';
-  ctx.fillRect(-9, -113, 5, 3);
-  ctx.fillRect(3, -113, 5, 3);
+  ctx.fillRect(-9*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
   
   if (effects.special || fighter.state.current === 'special') {
     ctx.strokeStyle = profile.colors.mystical_energy;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2*SCALE;
     ctx.shadowColor = profile.colors.mystical_energy;
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 15*SCALE;
     
     for (let i = 0; i < 3; i++) {
       ctx.globalAlpha = 0.6 - i * 0.15;
       ctx.beginPath();
-      ctx.arc(0, -96, 30 + i * 10, 0, Math.PI * 2);
+      ctx.arc(0, -96*SCALE, (30 + i * 10)*SCALE, 0, Math.PI * 2);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -568,41 +568,41 @@ function renderDefaultStreetFighter(ctx: CanvasRenderingContext2D, fighter: Figh
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15, 5, 90, 6);
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
   
   ctx.fillStyle = 'hsl(0, 0%, 15%)';
-  ctx.fillRect(-20, -12, 20, 12);
-  ctx.fillRect(0, -12, 20, 12);
+  ctx.fillRect(-20*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(0, -12*SCALE, 20*SCALE, 12*SCALE);
   
   ctx.fillStyle = 'hsl(220, 50%, 30%)';
-  ctx.fillRect(-18, -48 + pose.leftLegOffsetY * SCALE, 16, 36 + pose.leftLegBend * SCALE);
-  ctx.fillRect(2, -48 + pose.rightLegOffsetY * SCALE, 16, 36 + pose.rightLegBend * SCALE);
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
   
   ctx.fillStyle = 'hsl(200, 80%, 30%)';
-  ctx.fillRect(-24, -96, 48, 48);
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
   
   ctx.fillStyle = 'hsl(30, 45%, 35%)';
   ctx.save();
-  ctx.translate(-30, -90);
+  ctx.translate(-30*SCALE, -90*SCALE);
   ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 40 + pose.leftArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (40 + pose.leftArmExtension) * SCALE);
   ctx.restore();
   
   ctx.save();
-  ctx.translate(30, -90);
+  ctx.translate(30*SCALE, -90*SCALE);
   ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
-  ctx.fillRect(0, 0, 12, 40 + pose.rightArmExtension * SCALE);
+  ctx.fillRect(0, 0, 12*SCALE, (40 + pose.rightArmExtension) * SCALE);
   ctx.restore();
   
   ctx.fillStyle = 'hsl(30, 45%, 35%)';
-  ctx.fillRect(-21, -132, 42, 36);
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
   
   ctx.fillStyle = 'white';
-  ctx.fillRect(-12, -115, 12, 6);
-  ctx.fillRect(0, -115, 12, 6);
+  ctx.fillRect(-12*SCALE, -115*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -115*SCALE, 12*SCALE, 6*SCALE);
   ctx.fillStyle = 'black';
-  ctx.fillRect(-9, -113, 5, 3);
-  ctx.fillRect(3, -113, 5, 3);
+  ctx.fillRect(-9*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -113*SCALE, 5*SCALE, 3*SCALE);
   
   ctx.restore();
 }

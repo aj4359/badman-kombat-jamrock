@@ -404,6 +404,11 @@ export const useEnhancedGameEngine = () => {
         newFighter.animationTimer = 0;
       }
 
+      // Increment animation timer slowly for smooth pose transitions
+      if (newFighter.animationTimer !== undefined) {
+        newFighter.animationTimer += 0.25; // Slow animation speed (was incrementing every frame)
+      }
+
       // Jumping
       if (keys.up && newFighter.grounded) {
         newFighter.velocityY = fighterData.stats.jumpForce;
