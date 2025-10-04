@@ -272,10 +272,13 @@ const CharacterSelect = () => {
   }, [isLoaded, playLayer]);
 
   const handleFighterSelect = (fighterId: string, player: 1 | 2) => {
+    console.log(`🎮 Fighter Selected: ${fighterId} for Player ${player}`);
     if (player === 1) {
       setSelectedP1(fighterId);
+      console.log('✅ Player 1 Selection:', fighterId);
     } else {
       setSelectedP2(fighterId);
+      console.log('✅ Player 2 Selection:', fighterId);
     }
   };
 
@@ -388,29 +391,29 @@ const CharacterSelect = () => {
                   </Button>
                   <Button 
                     size="sm" 
-                    variant="outline"
-                    className="flex-1 text-xs hover:bg-pink-500/10"
-                    style={{ 
-                      borderColor: 'hsl(320 100% 60% / 0.5)',
-                      color: 'hsl(320 100% 60%)'
-                    }}
+                    variant={selectedP1 === fighter.id ? 'default' : 'outline'}
+                    className={`flex-1 text-xs font-bold transition-all ${
+                      selectedP1 === fighter.id 
+                        ? 'bg-pink-600 text-white border-pink-400 shadow-lg shadow-pink-500/50 scale-105' 
+                        : 'hover:bg-pink-500/10 border-pink-500/50 text-pink-400'
+                    }`}
                     onClick={() => handleFighterSelect(fighter.id, 1)}
                     disabled={selectedP2 === fighter.id || !isUnlocked}
                   >
-                    P1
+                    {selectedP1 === fighter.id ? '✓ P1' : 'P1'}
                   </Button>
                   <Button 
                     size="sm" 
-                    variant="outline"
-                    className="flex-1 text-xs hover:bg-green-500/10"
-                    style={{ 
-                      borderColor: 'hsl(120 100% 50% / 0.5)',
-                      color: 'hsl(120 100% 50%)'
-                    }}
+                    variant={selectedP2 === fighter.id ? 'default' : 'outline'}
+                    className={`flex-1 text-xs font-bold transition-all ${
+                      selectedP2 === fighter.id 
+                        ? 'bg-green-600 text-white border-green-400 shadow-lg shadow-green-500/50 scale-105' 
+                        : 'hover:bg-green-500/10 border-green-500/50 text-green-400'
+                    }`}
                     onClick={() => handleFighterSelect(fighter.id, 2)}
                     disabled={selectedP1 === fighter.id || !isUnlocked}
                   >
-                    P2
+                    {selectedP2 === fighter.id ? '✓ P2' : 'P2'}
                   </Button>
                 </div>
               </div>
@@ -487,7 +490,11 @@ const CharacterSelect = () => {
         <Button 
           disabled={!canProceed}
           onClick={() => {
-            console.log('Starting combat with:', { selectedP1, selectedP2 });
+            console.log('🎮 Starting combat with:', { selectedP1, selectedP2 });
+            console.log('🥊 Fighter Data:', { 
+              player1: selectedP1Fighter?.name, 
+              player2: selectedP2Fighter?.name 
+            });
             navigate('/game', { 
               state: { 
                 selectedP1, 
@@ -499,9 +506,13 @@ const CharacterSelect = () => {
               } 
             });
           }}
-          className="text-lg px-8 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold transform hover:scale-105 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`text-lg px-8 font-bold transform transition-all shadow-lg ${
+            canProceed 
+              ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black hover:scale-105 animate-neon-pulse' 
+              : 'opacity-50 cursor-not-allowed bg-gray-600 text-gray-400'
+          }`}
         >
-          START KOMBAT!
+          {canProceed ? '⚡ START KOMBAT! ⚡' : 'SELECT BOTH FIGHTERS'}
         </Button>
       </div>
 

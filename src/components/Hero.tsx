@@ -106,13 +106,28 @@ const Hero = () => {
           <Button 
             variant="combat" 
             size="lg" 
+            className="text-lg px-8 py-4 animate-neon-pulse"
+            onClick={() => navigate('/game', {
+              state: {
+                fighterData: {
+                  player1: { id: 'leroy', name: 'LEROY' },
+                  player2: { id: 'jordan', name: 'JORDAN' }
+                }
+              }
+            })}
+          >
+            ⚡ QUICK PLAY ⚡
+          </Button>
+          <Button 
+            variant="neon" 
+            size="lg" 
             className="text-lg px-8 py-4"
             onClick={handleStartKombat}
           >
             START KOMBAT
           </Button>
           <Button 
-            variant="neon" 
+            variant="jamaica" 
             size="lg" 
             className="text-lg px-8 py-4"
             onClick={() => {
@@ -123,20 +138,12 @@ const Hero = () => {
             WATCH TRAILER
           </Button>
           <Button 
-            variant="jamaica" 
+            variant="retro" 
             size="lg" 
             className="text-lg px-8 py-4"
             onClick={() => navigate('/character-select')}
           >
             SELECT FIGHTER
-          </Button>
-          <Button 
-            variant="retro" 
-            size="lg" 
-            className="text-lg px-8 py-4"
-            onClick={() => navigate('/teaser')}
-          >
-            CREATE TEASER
           </Button>
         </div>
 
