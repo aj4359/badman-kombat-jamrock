@@ -8,18 +8,56 @@ interface SpriteMap {
   [key: string]: HTMLImageElement | null;
 }
 
-// EMPTY - No valid sprite sheets available
-// All fighters will use geometric fallback rendering
-const SPRITE_SOURCES: Record<string, string> = {};
+// Import sprite sheet images
+import leroySprite from '@/assets/leroy-sprite-sheet.png';
+import jordanSprite from '@/assets/jordan-sprite-sheet.png';
+import razorSprite from '@/assets/razor-sprite-sheet.png';
+import sifuSprite from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
+
+const SPRITE_SOURCES: Record<string, string> = {
+  leroy: leroySprite,
+  jordan: jordanSprite,
+  razor: razorSprite,
+  sifu: sifuSprite,
+  rootsman: rootsmanSprite,
+};
 
 export const useFighterSprites = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const spritesRef = useRef<SpriteMap>({});
 
   useEffect(() => {
-    // No sprites to load - all fighters use geometric rendering
-    console.log('🎨 No sprite sheets available - using geometric fallback for all fighters');
-    setIsLoaded(true);
+    const loadSprites = async () => {
+      console.log('🎨 Loading fighter sprite sheets...');
+      
+      const spritePromises = Object.entries(SPRITE_SOURCES).map(([fighterId, src]) => {
+        return new Promise<void>((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            spritesRef.current[fighterId] = img;
+            console.log(`✅ Loaded sprite for ${fighterId}`);
+            resolve();
+          };
+          img.onerror = () => {
+            console.error(`❌ Failed to load sprite for ${fighterId}`);
+            reject(new Error(`Failed to load ${fighterId}`));
+          };
+          img.src = src;
+        });
+      });
+
+      try {
+        await Promise.all(spritePromises);
+        console.log('🎉 All fighter sprites loaded successfully!');
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('⚠️ Some sprites failed to load:', error);
+        setIsLoaded(true); // Still set loaded to allow geometric fallback
+      }
+    };
+
+    loadSprites();
   }, []);
 
   const getSprite = (fighterId: string): HTMLImageElement | null => {
