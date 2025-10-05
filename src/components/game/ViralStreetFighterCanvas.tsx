@@ -22,6 +22,28 @@ interface ViralStreetFighterCanvasProps {
   };
 }
 
+// Map fighter state to sprite animation name
+const mapFighterStateToAnimation = (state: string): string => {
+  const stateMap: Record<string, string> = {
+    idle: 'idle',
+    walking: 'walking',
+    running: 'walking',
+    jumping: 'jumping',
+    crouching: 'crouching',
+    attacking: 'lightPunch',
+    lightPunch: 'lightPunch',
+    mediumPunch: 'mediumPunch',
+    heavyPunch: 'heavyPunch',
+    lightKick: 'lightKick',
+    mediumKick: 'mediumKick',
+    heavyKick: 'heavyKick',
+    blocking: 'blocking',
+    hit: 'hit',
+    special: 'special',
+  };
+  return stateMap[state] || 'idle';
+};
+
 export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> = ({ 
   fighterData 
 }) => {
@@ -53,8 +75,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     updateEffects 
   } = useVisualEffects();
   
-  // Sprite loading system
-  const { isLoaded: spritesLoaded, getSpriteData } = useFighterSprites();
+  // Sprite loading system - NOW LOADS REAL PIXEL ART
+  const { isLoaded: spritesLoaded, getSpriteData, getAnimationController } = useFighterSprites();
 
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(Date.now());
@@ -165,17 +187,38 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // Render fighters
+      // Update and render fighters with PIXEL ART SPRITES
+      const p1Controller = getAnimationController?.(p1.id);
+      const p2Controller = getAnimationController?.(p2.id);
+      
+      // Update animation controllers based on fighter state
+      if (p1Controller) {
+        const animState = mapFighterStateToAnimation(p1.state.current);
+        p1Controller.setAnimation(animState);
+        p1Controller.update();
+      }
+      
+      if (p2Controller) {
+        const animState = mapFighterStateToAnimation(p2.state.current);
+        p2Controller.setAnimation(animState);
+        p2Controller.update();
+      }
+
+      // Get current animation frames
+      const p1Frame = p1Controller?.getCurrentFrame();
+      const p2Frame = p2Controller?.getCurrentFrame();
+      
+      // Render fighters with sprite frames
       renderAuthenticFighter({
         ctx,
         fighter: p1,
-        spriteImage: null
+        spriteImage: p1Frame?.image || getSpriteData?.(p1.id)
       });
       
       renderAuthenticFighter({
         ctx,
         fighter: p2,
-        spriteImage: null
+        spriteImage: p2Frame?.image || getSpriteData?.(p2.id)
       });
       
       // Add combo counter display above fighters
