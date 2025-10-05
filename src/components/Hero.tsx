@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { useAudioManager } from "@/hooks/useAudioManager";
-import heroImage from "@/assets/fighter-hero.jpg";
+import heroImage from "@/assets/leroy-poster.png";
 import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
 const Hero = () => {
