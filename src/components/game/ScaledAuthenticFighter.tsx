@@ -15,8 +15,8 @@ export interface AuthenticFighterRendererProps {
   spriteImage?: HTMLImageElement | null;
 }
 
-// Scale factor: Make fighters visible at proper Street Fighter size
-const SCALE = 1.8;
+// Scale factor: Match 200px fighter height (200 / 135 ≈ 1.48, rounded to 1.5)
+const SCALE = 1.5;
 
 // Street Fighter-style character profiles
 const AUTHENTIC_FIGHTER_PROFILES = {
