@@ -29,13 +29,13 @@ export const useFighterSprites = () => {
         ([fighterId, path]) =>
           new Promise<void>((resolve, reject) => {
             const img = new Image();
-            img.onload = () => {
+            img.onload = async () => {
               spriteImages.current[fighterId] = img;
               
               // Extract frames from sprite sheet
               const config = FIGHTER_SPRITE_CONFIGS[fighterId];
               if (config) {
-                const frames = extractFramesFromSpriteSheet(img, config);
+                const frames = await extractFramesFromSpriteSheet(img, config);
                 spriteFrames.current[fighterId] = frames;
                 
                 // Create animation sequences

@@ -30,49 +30,54 @@ export interface AnimationSequence {
 /**
  * Extract individual frames from a sprite sheet image
  */
-export function extractFramesFromSpriteSheet(
+export async function extractFramesFromSpriteSheet(
   image: HTMLImageElement,
   config: SpriteSheetConfig
-): SpriteFrame[] {
-  const frames: SpriteFrame[] = [];
+): Promise<SpriteFrame[]> {
   const { frameWidth, frameHeight, rows, cols, scale = 1 } = config;
+  const framePromises: Promise<SpriteFrame>[] = [];
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      // Create a canvas for this frame
-      const canvas = document.createElement('canvas');
-      canvas.width = frameWidth * scale;
-      canvas.height = frameHeight * scale;
-      const ctx = canvas.getContext('2d')!;
+      const framePromise = new Promise<SpriteFrame>((resolve) => {
+        // Create a canvas for this frame
+        const canvas = document.createElement('canvas');
+        canvas.width = frameWidth * scale;
+        canvas.height = frameHeight * scale;
+        const ctx = canvas.getContext('2d')!;
 
-      // Extract the frame from sprite sheet
-      ctx.drawImage(
-        image,
-        col * frameWidth,  // source X
-        row * frameHeight, // source Y
-        frameWidth,        // source width
-        frameHeight,       // source height
-        0,                 // dest X
-        0,                 // dest Y
-        frameWidth * scale, // dest width
-        frameHeight * scale // dest height
-      );
+        // Extract the frame from sprite sheet
+        ctx.drawImage(
+          image,
+          col * frameWidth,  // source X
+          row * frameHeight, // source Y
+          frameWidth,        // source width
+          frameHeight,       // source height
+          0,                 // dest X
+          0,                 // dest Y
+          frameWidth * scale, // dest width
+          frameHeight * scale // dest height
+        );
 
-      // Create an image from the canvas
-      const frameImage = new Image();
-      frameImage.src = canvas.toDataURL();
-
-      frames.push({
-        image: frameImage,
-        sourceX: col * frameWidth,
-        sourceY: row * frameHeight,
-        width: frameWidth,
-        height: frameHeight,
+        // Create an image from the canvas and wait for it to load
+        const frameImage = new Image();
+        frameImage.onload = () => {
+          resolve({
+            image: frameImage,
+            sourceX: col * frameWidth,
+            sourceY: row * frameHeight,
+            width: frameWidth,
+            height: frameHeight,
+          });
+        };
+        frameImage.src = canvas.toDataURL();
       });
+
+      framePromises.push(framePromise);
     }
   }
 
-  return frames;
+  return Promise.all(framePromises);
 }
 
 /**
