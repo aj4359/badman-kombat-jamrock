@@ -248,7 +248,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
     ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-  }, [getSpriteData, getShakeOffset, updateEffects, drawHitSparks]); // ✅ FIXED: Removed gameState dependency
+  }, [getSpriteData, getAnimationController, getShakeOffset, updateEffects, drawHitSparks]);
 
   // Animation loop
   useEffect(() => {
