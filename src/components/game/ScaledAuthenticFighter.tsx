@@ -15,8 +15,8 @@ export interface AuthenticFighterRendererProps {
   spriteImage?: HTMLImageElement | null;
 }
 
-// Scale factor: 60% of original (0.4x instead of 2.5x)
-const SCALE = 0.4;
+// Scale factor: Make fighters visible at proper Street Fighter size
+const SCALE = 1.8;
 
 // Street Fighter-style character profiles
 const AUTHENTIC_FIGHTER_PROFILES = {
@@ -84,7 +84,7 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
-  const GROUND_LEVEL = 456;
+  const GROUND_LEVEL = 456; // 576 (canvas height) - 120 (ground offset) = 456
   
   const attackType = fighter.state?.current === 'attacking' ? 'medium' : undefined;
   const moveType = fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'kick' : 'punch';
