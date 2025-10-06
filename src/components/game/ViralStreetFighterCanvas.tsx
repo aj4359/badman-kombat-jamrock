@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 // Audio system removed to eliminate all audio/bell sounds
 import { useVisualEffects } from '@/hooks/useVisualEffects';
@@ -8,6 +8,8 @@ import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { renderProfessionalArena } from './ProfessionalArenaRenderer';
 import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
+import { ControlDisplay } from './ControlDisplay';
+import { FocusPrompt } from './FocusPrompt';
 import { 
   renderMotionBlur, 
   renderSpeedLines, 
@@ -48,8 +50,10 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   fighterData 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const initializationRef = useRef(false);
+  const [showPrompt, setShowPrompt] = useState(true);
   
   const { 
     gameState, 
@@ -299,9 +303,10 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [addScreenShake, addHitSpark]);
 
-  // Setup canvas with DPI scaling
+  // Setup canvas with DPI scaling and focus
   useEffect(() => {
     const canvas = canvasRef.current;
+    const container = containerRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
@@ -321,10 +326,21 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // Set display size (CSS pixels)
     canvas.style.width = '1024px';
     canvas.style.height = '576px';
-  }, []);
+    
+    // Auto-focus container for keyboard input
+    if (container && !showPrompt) {
+      container.focus();
+    }
+  }, [showPrompt]);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center bg-black">
+    <div 
+      ref={containerRef}
+      className="relative w-full h-full flex items-center justify-center bg-black outline-none"
+      tabIndex={0}
+    >
+      {showPrompt && <FocusPrompt onDismiss={() => setShowPrompt(false)} />}
+      
       <canvas
         ref={canvasRef}
         className="border border-yellow-400 rounded-lg shadow-2xl"
@@ -333,6 +349,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           height: '576px'
         }}
       />
+      
+      {!isMobile && <ControlDisplay />}
       
       {isMobile && gameState.fighters.player1 && gameState.fighters.player2 && (
         <MobileControls
