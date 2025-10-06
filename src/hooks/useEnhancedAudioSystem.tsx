@@ -25,10 +25,38 @@ export const useEnhancedAudioSystem = () => {
   }, []);
 
   const processAudioEvent = useCallback((event: AudioEvent) => {
-    // BELL ELIMINATION: All audio event processing disabled
-    console.log('processAudioEvent disabled to prevent bell sounds:', event.type);
-    return;
-  }, []);
+    const now = Date.now();
+    const lastEvent = lastAudioEventRef.current;
+    
+    if (lastEvent && lastEvent.type === event.type && now - lastEvent.timestamp < 100) {
+      return;
+    }
+    
+    lastAudioEventRef.current = { type: event.type, timestamp: now };
+    
+    switch (event.type) {
+      case 'hit':
+        if (event.intensity) {
+          fightAudio.onHit(event.intensity);
+        }
+        break;
+      case 'combo':
+        fightAudio.onComboStart();
+        break;
+      case 'special':
+        fightAudio.onSpecialMove();
+        break;
+      case 'round-start':
+        fightAudio.onRoundStart();
+        break;
+      case 'round-end':
+        fightAudio.onRoundEnd(event.winner);
+        break;
+      case 'ko':
+        fightAudio.onKnockdown();
+        break;
+    }
+  }, [fightAudio]);
 
   const createDynamicSoundEffect = useCallback((
     frequency: number,
@@ -42,26 +70,12 @@ export const useEnhancedAudioSystem = () => {
   }, []);
 
   const playRoundTransition = useCallback(() => {
-    // Enhanced round transition with dynamic audio
     processAudioEvent({ type: 'round-start' });
-    
-    // Add dramatic pause effect
-    setTimeout(() => {
-      createDynamicSoundEffect(523, 'square', 1.0, 0.4); // C note
-    }, 500);
-  }, [processAudioEvent, createDynamicSoundEffect]);
+  }, [processAudioEvent]);
 
   const playVictoryFanfare = useCallback((winner: string) => {
     processAudioEvent({ type: 'round-end', winner });
-    
-    // Victory fanfare sequence
-    const notes = [523, 659, 784, 1047]; // C, E, G, C octave
-    notes.forEach((note, index) => {
-      setTimeout(() => {
-        createDynamicSoundEffect(note, 'triangle', 0.5, 0.3);
-      }, index * 200);
-    });
-  }, [processAudioEvent, createDynamicSoundEffect]);
+  }, [processAudioEvent]);
 
   return {
     processAudioEvent,

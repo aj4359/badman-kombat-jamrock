@@ -448,8 +448,8 @@ export const useEnhancedGameEngine = () => {
         (newFighter.frameData as any).active = frameData.active;
         (newFighter.frameData as any).recovery = frameData.recovery;
         
-        // Audio disabled to prevent bell sounds
-        // fightAudio.onHit('medium');
+        // Play hit sound
+        fightAudio.onHit('medium');
         
         // Enhanced visual effects
         visualEffects.addScreenShake(4, 80);
@@ -474,8 +474,8 @@ export const useEnhancedGameEngine = () => {
         (newFighter.frameData as any).active = frameData.active;
         (newFighter.frameData as any).recovery = frameData.recovery;
         
-        // Audio disabled to prevent bell sounds
-        // fightAudio.onHit('heavy');
+        // Play hit sound
+        fightAudio.onHit('heavy');
         visualEffects.addScreenShake(8, 120);
         visualEffects.addHitSpark(newFighter.x + newFighter.width / 2, newFighter.y + 30, 'critical');
         

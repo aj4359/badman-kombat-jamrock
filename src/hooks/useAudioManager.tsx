@@ -169,16 +169,42 @@ export const useAudioManager = () => {
   }, [settings]);
 
   const playLayer = useCallback((layer: 'intro' | 'gameplay' | 'ambient', autoTransition: boolean = true) => {
-    // BELL ELIMINATION: All audio playback completely disabled
-    console.log('🔇 playLayer disabled to prevent bell sounds:', layer);
-    return;
-  }, []);
+    if (!isInitialized.current) {
+      console.log('Audio not initialized yet');
+      return;
+    }
+
+    const audioElement = audioRefs.current[layer];
+    if (!audioElement) {
+      console.warn(`Audio layer "${layer}" not found`);
+      return;
+    }
+
+    try {
+      audioElement.loop = true;
+      audioElement.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
+      audioElement.play().catch(err => {
+        console.warn('Audio play blocked:', err);
+      });
+      setIsPlaying(true);
+      setCurrentLayer(layer);
+    } catch (error) {
+      console.error('Error playing audio layer:', error);
+    }
+  }, [settings]);
 
   const playEffect = useCallback((effectType: string) => {
-    // BELL ELIMINATION: All audio effects completely disabled
-    console.log('playEffect disabled to prevent double bell ringing:', effectType);
-    return;
-  }, []);
+    if (!isInitialized.current) return;
+
+    const effects = audioRefs.current.effects;
+    const effect = effects.find(e => e.dataset.name === effectType);
+    
+    if (effect) {
+      effect.currentTime = 0;
+      effect.volume = settings.isMuted ? 0 : settings.effectsVolume * settings.masterVolume;
+      effect.play().catch(err => console.warn('Effect play blocked:', err));
+    }
+  }, [settings]);
 
   const updateSettings = useCallback((newSettings: Partial<AudioSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
