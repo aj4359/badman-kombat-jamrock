@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
-// Audio system removed to eliminate all audio/bell sounds
+import { useAudioManager } from '@/hooks/useAudioManager';
 import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { useFighterSprites } from '@/hooks/useFighterSprites';
 import { renderAuthenticFighter } from './ScaledAuthenticFighter';
@@ -70,7 +70,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     }
   }, []); // Empty dependency array - initialize only once on mount
   
-  // Audio system removed to eliminate all audio/bell sounds
+  const audioManager = useAudioManager();
   const { 
     addScreenShake, 
     addHitSpark, 
@@ -78,6 +78,19 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     getShakeOffset,
     updateEffects 
   } = useVisualEffects();
+  
+  // Auto-play Shaw Bros intro on mount, then Champion loop
+  useEffect(() => {
+    if (audioManager.isLoaded) {
+      audioManager.playLayer('intro');
+      
+      const introTimeout = setTimeout(() => {
+        audioManager.playLayer('gameplay');
+      }, 3000);
+
+      return () => clearTimeout(introTimeout);
+    }
+  }, [audioManager.isLoaded]);
   
   // Sprite loading system - NOW LOADS REAL PIXEL ART
   const { isLoaded: spritesLoaded, getSpriteData, getAnimationController } = useFighterSprites();

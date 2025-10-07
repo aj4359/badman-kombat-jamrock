@@ -327,14 +327,13 @@ export const useEnhancedGameEngine = () => {
            rect1.y + rect1.height > rect2.y;
   }, []);
 
-  const updateFighter = useCallback((fighter: Fighter, isPlayer1: boolean): Fighter => {
+  const updateFighter = useCallback((fighter: Fighter, keys: Record<string, boolean>): Fighter => {
     let newFighter = { ...fighter };
-    const keys = isPlayer1 ? player1Keys.current : player2Keys.current;
     const fighterData = ENHANCED_FIGHTER_DATA[fighter.id] || ENHANCED_FIGHTER_DATA.leroy;
     
     // 🐛 DEBUG: Log position changes every 60 frames
     if (frameCountRef.current % 60 === 0) {
-      console.log(`🎮 Fighter ${isPlayer1 ? 'P1' : 'P2'}: x=${newFighter.x.toFixed(0)}, state=${newFighter.state.current}, keys=`, keys);
+      console.log(`🎮 Fighter: x=${newFighter.x.toFixed(0)}, state=${newFighter.state.current}, keys=`, keys);
     }
     
     // Enhanced frame-perfect timing for 60fps gameplay
@@ -572,8 +571,8 @@ export const useEnhancedGameEngine = () => {
         
         // Update fighters
         if (newState.fighters.player1 && newState.fighters.player2) {
-          let newFighter1 = updateFighter(newState.fighters.player1, true);
-          let newFighter2 = updateFighter(newState.fighters.player2, false);
+      let newFighter1 = updateFighter(newState.fighters.player1, player1Keys.current);
+      let newFighter2 = updateFighter(newState.fighters.player2, player2Keys.current);
 
           // Enhanced collision detection with proper frame data
           const fighter1Hitbox = newFighter1.hitbox || { x: newFighter1.x, y: newFighter1.y, width: newFighter1.width, height: newFighter1.height };
@@ -617,7 +616,6 @@ export const useEnhancedGameEngine = () => {
                   fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
                 }
                 
-                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter2.x + newFighter2.width / 2, newFighter2.y + newFighter2.height / 2, 'impact');
                 visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
               }
@@ -660,7 +658,6 @@ export const useEnhancedGameEngine = () => {
                   fightAudio.onHit(attackType === 'heavy' ? 'heavy' : 'medium');
                 }
                 
-                // Audio disabled to prevent bell sounds
                 visualEffects.addHitSpark(newFighter1.x + newFighter1.width / 2, newFighter1.y + newFighter1.height / 2, 'impact');
                 visualEffects.addScreenShake(attackType === 'heavy' ? 8 : 6, 120);
               }
@@ -693,12 +690,10 @@ export const useEnhancedGameEngine = () => {
           newState.fighters.player1.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player2';
           fightAudio.onRoundEnd('player2');
-          // Audio disabled to prevent bell sounds
         } else if (newState.fighters.player2?.health === 0) {
           newState.fighters.player2.state = { current: 'ko', timer: 60, canCancel: false, frameAdvantage: 0 };
           newState.winner = 'player1';
           fightAudio.onRoundEnd('player1');
-          // Audio disabled to prevent bell sounds
         } else if (newState.timer <= 0) {
           // Time up
           if (newState.fighters.player1.health > newState.fighters.player2.health) {
@@ -711,7 +706,6 @@ export const useEnhancedGameEngine = () => {
             newState.winner = 'draw';
             fightAudio.onRoundEnd();
           }
-          // REMOVED: audioManager.playEffect('round-start'); - This was causing infinite bell sounds
         }
 
         return newState;

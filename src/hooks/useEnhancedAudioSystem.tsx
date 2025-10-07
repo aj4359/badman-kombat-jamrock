@@ -18,10 +18,8 @@ export const useEnhancedAudioSystem = () => {
   const lastAudioEventRef = useRef<{ type: string; timestamp: number } | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // PHASE 1: EMERGENCY AUDIO SILENCE - All AudioContext creation completely disabled
   useEffect(() => {
-    console.log('🔇 BELL ELIMINATION: AudioContext initialization completely disabled');
-    return;
+    console.log('✅ Enhanced audio system ready');
   }, []);
 
   const processAudioEvent = useCallback((event: AudioEvent) => {
@@ -64,8 +62,7 @@ export const useEnhancedAudioSystem = () => {
     duration: number = 0.2,
     volume: number = 0.3
   ) => {
-    // BELL ELIMINATION: Completely disabled oscillator creation
-    console.log('createDynamicSoundEffect disabled to prevent bell sounds');
+    // Disabled to prevent unwanted oscillator sounds
     return;
   }, []);
 
