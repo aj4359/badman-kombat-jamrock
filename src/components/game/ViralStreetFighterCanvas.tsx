@@ -6,7 +6,7 @@ import { useFighterSprites } from '@/hooks/useFighterSprites';
 import { renderAuthenticFighter } from './ScaledAuthenticFighter';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { renderProfessionalArena } from './ProfessionalArenaRenderer';
+import { KingstonStageBackground } from './KingstonStageBackground';
 import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
 import { ControlDisplay } from './ControlDisplay';
 import { FocusPrompt } from './FocusPrompt';
@@ -79,16 +79,10 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     updateEffects 
   } = useVisualEffects();
   
-  // Auto-play Shaw Bros intro on mount, then Champion loop
+  // Auto-play Shaw Bros intro, THEN Champion loop (no overlap)
   useEffect(() => {
-    if (audioManager.isLoaded) {
-      audioManager.playLayer('intro');
-      
-      const introTimeout = setTimeout(() => {
-        audioManager.playLayer('gameplay');
-      }, 3000);
-
-      return () => clearTimeout(introTimeout);
+    if (audioManager.isLoaded && audioManager.playIntroThenGameplay) {
+      audioManager.playIntroThenGameplay();
     }
   }, [audioManager.isLoaded]);
   
@@ -135,8 +129,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.save();
     ctx.translate(shake.x, shake.y);
     
-    // 1. DRAW ARENA BACKGROUND
-    renderProfessionalArena(ctx, 1024, 576);
+    // 1. CLEAR CANVAS (Kingston background is HTML overlay, not canvas)
+    ctx.clearRect(0, 0, 1024, 576);
     
     // 2. DRAW DEBUG RECTANGLES (temporary - to verify positioning)
     if (currentGameState.fighters.player1 && currentGameState.fighters.player2) {
@@ -349,12 +343,22 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     >
       {showPrompt && <FocusPrompt onDismiss={() => setShowPrompt(false)} />}
       
+      {/* Authentic Kingston ghetto background */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ width: '1024px', height: '576px' }}>
+        <KingstonStageBackground 
+          variant="alley" 
+          className="absolute inset-0"
+        />
+      </div>
+      
+      {/* Game canvas with transparent background */}
       <canvas
         ref={canvasRef}
-        className="border border-yellow-400 rounded-lg shadow-2xl"
+        className="relative z-10 border border-yellow-400 rounded-lg shadow-2xl"
         style={{ 
           width: '1024px',
-          height: '576px'
+          height: '576px',
+          background: 'transparent'
         }}
       />
       

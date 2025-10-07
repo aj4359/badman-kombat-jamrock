@@ -181,7 +181,10 @@ export const useAudioManager = () => {
     }
 
     try {
-      audioElement.loop = true;
+      // Don't override loop property for intro (keep it as one-shot)
+      if (layer !== 'intro') {
+        audioElement.loop = true;
+      }
       audioElement.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
       audioElement.play().catch(err => {
         console.warn('Audio play blocked:', err);
@@ -192,6 +195,31 @@ export const useAudioManager = () => {
       console.error('Error playing audio layer:', error);
     }
   }, [settings]);
+
+  const playIntroThenGameplay = useCallback(() => {
+    const intro = audioRefs.current.intro;
+    const gameplay = audioRefs.current.gameplay;
+    
+    // Stop any currently playing audio
+    stopAllAudio();
+    
+    // Play intro (one-shot)
+    intro.loop = false;
+    intro.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
+    intro.play().catch(err => console.warn('Intro play blocked:', err));
+    setIsPlaying(true);
+    setIntroPlaying(true);
+    
+    // Listen for intro to end, THEN start gameplay loop
+    const handleIntroEnd = () => {
+      setIntroPlaying(false);
+      gameplay.loop = true;
+      gameplay.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
+      gameplay.play().catch(err => console.warn('Gameplay play blocked:', err));
+    };
+    
+    intro.addEventListener('ended', handleIntroEnd, { once: true });
+  }, [stopAllAudio, settings]);
 
   const playEffect = useCallback((effectType: string) => {
     if (!isInitialized.current) return;
@@ -267,6 +295,7 @@ export const useAudioManager = () => {
     settings,
     audioRefs,
     playLayer,
+    playIntroThenGameplay,
     stopAll: stopAllAudio,
     stopAllAudio,
     playEffect,
