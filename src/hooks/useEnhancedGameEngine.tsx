@@ -105,6 +105,7 @@ export const useEnhancedGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const frameCountRef = useRef(0); // ✅ FIXED: Moved up for proper scope
+  const screenRef = useRef<'menu' | 'characterSelect' | 'vs' | 'fighting' | 'paused' | 'gameOver'>('fighting'); // PHASE 1: Track screen state
   // Audio manager removed to eliminate bell sounds
   const crowdAudio = useCrowdAudio();
   const fightAudio = useFightAudio();
@@ -136,6 +137,11 @@ export const useEnhancedGameEngine = () => {
   const [keys, setKeys] = useState<Record<string, boolean>>({});
   const player1Keys = useRef<Record<string, boolean>>({});
   const player2Keys = useRef<Record<string, boolean>>({});
+  
+  // PHASE 1: Update screenRef when gameState.screen changes
+  useEffect(() => {
+    screenRef.current = gameState.screen;
+  }, [gameState.screen]);
   
   // Enhanced input system for 60fps performance
   const inputSystemRef = useRef({
@@ -715,22 +721,25 @@ export const useEnhancedGameEngine = () => {
     updateParticles();
     streetFighterCombat.updateProjectiles();
     animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState.screen, updateFighter, updateParticles, checkCollision, visualEffects, streetFighterCombat]);
+  }, [updateFighter, updateParticles, checkCollision, visualEffects, streetFighterCombat]); // PHASE 1: Removed gameState.screen
 
   // Fighter initialization is handled by the canvas component only
 
-  // Start game loop
+  // Start game loop - PHASE 1: FIXED to prevent infinite loop
   useEffect(() => {
-    if (gameState.screen === 'fighting') {
+    if (gameState.screen === 'fighting' && !animationFrameRef.current) {
+      console.log('🎮 Starting game loop');
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     }
     
     return () => {
       if (animationFrameRef.current) {
+        console.log('🛑 Stopping game loop');
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
       }
     };
-  }, [gameLoop]);
+  }, [gameState.screen, gameLoop]);
 
   // Keyboard input handling
   useEffect(() => {

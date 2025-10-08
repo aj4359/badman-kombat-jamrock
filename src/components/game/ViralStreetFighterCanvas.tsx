@@ -198,39 +198,28 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // Update and render fighters with PIXEL ART SPRITES
-      const p1Controller = getAnimationController?.(p1.id);
-      const p2Controller = getAnimationController?.(p2.id);
+      // PHASE 2: SIMPLIFIED FIGHTER RENDERING - Simple colored rectangles
+      // P1 - Blue fighter
+      ctx.fillStyle = p1.health > 0 ? '#0066FF' : '#666666';
+      ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
       
-      // Update animation controllers based on fighter state
-      if (p1Controller) {
-        const animState = mapFighterStateToAnimation(p1.state.current);
-        p1Controller.setAnimation(animState);
-        p1Controller.update();
+      // P1 attack indicator (yellow glow when attacking)
+      if (p1.state.current === 'attacking') {
+        ctx.strokeStyle = '#FFFF00';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(p1.x, p1.y, p1.width, p1.height);
       }
       
-      if (p2Controller) {
-        const animState = mapFighterStateToAnimation(p2.state.current);
-        p2Controller.setAnimation(animState);
-        p2Controller.update();
+      // P2 - Red fighter  
+      ctx.fillStyle = p2.health > 0 ? '#FF3333' : '#666666';
+      ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
+      
+      // P2 attack indicator (yellow glow when attacking)
+      if (p2.state.current === 'attacking') {
+        ctx.strokeStyle = '#FFFF00';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(p2.x, p2.y, p2.width, p2.height);
       }
-
-      // Get current animation frames
-      const p1Frame = p1Controller?.getCurrentFrame();
-      const p2Frame = p2Controller?.getCurrentFrame();
-      
-      // Render fighters with sprite frames
-      renderAuthenticFighter({
-        ctx,
-        fighter: p1,
-        spriteImage: p1Frame?.image || getSpriteData?.(p1.id)
-      });
-      
-      renderAuthenticFighter({
-        ctx,
-        fighter: p2,
-        spriteImage: p2Frame?.image || getSpriteData?.(p2.id)
-      });
       
       // Add combo counter display above fighters
       if (p1.comboCount && p1.comboCount > 1) {
@@ -372,9 +361,17 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         />
       )}
       
-      {/* Debug Status */}
-      <div className="absolute top-4 right-4 bg-black/70 text-green-400 px-3 py-2 rounded text-sm font-mono">
-        Sprites: {spritesLoaded ? '✓' : '⏳'} | Fighters: {gameState.fighters.player1 && gameState.fighters.player2 ? '✓' : '✗'}
+      {/* PHASE 3: Real-Time Debug Panel */}
+      <div className="absolute top-4 right-4 bg-black/90 text-green-400 p-4 font-mono text-xs border border-yellow-400">
+        <div className="font-bold mb-2">🎮 DEBUG PANEL</div>
+        <div>Game Loop: {gameState.screen === 'fighting' ? '✓ RUNNING' : '✗ STOPPED'}</div>
+        <div>P1: x={gameState.fighters.player1?.x.toFixed(0)} y={gameState.fighters.player1?.y.toFixed(0)}</div>
+        <div>P1 State: {gameState.fighters.player1?.state.current}</div>
+        <div>P1 Health: {gameState.fighters.player1?.health}</div>
+        <div>P2: x={gameState.fighters.player2?.x.toFixed(0)} y={gameState.fighters.player2?.y.toFixed(0)}</div>
+        <div>P2 State: {gameState.fighters.player2?.state.current}</div>
+        <div>P2 Health: {gameState.fighters.player2?.health}</div>
+        <div>Audio: {audioManager.isLoaded ? '✓' : '✗'}</div>
       </div>
     </div>
   );
