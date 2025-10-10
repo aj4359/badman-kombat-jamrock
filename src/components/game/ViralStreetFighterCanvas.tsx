@@ -198,27 +198,74 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // PHASE 2: SIMPLIFIED FIGHTER RENDERING - Simple colored rectangles
-      // P1 - Blue fighter
-      ctx.fillStyle = p1.health > 0 ? '#0066FF' : '#666666';
-      ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
-      
-      // P1 attack indicator (yellow glow when attacking)
-      if (p1.state.current === 'attacking') {
-        ctx.strokeStyle = '#FFFF00';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(p1.x, p1.y, p1.width, p1.height);
+      // PHASE 2: RENDER STREET FIGHTER CHARACTERS WITH SPRITES
+      const p1Controller = getAnimationController(p1.id);
+      const p2Controller = getAnimationController(p2.id);
+
+      // Update and render P1
+      if (p1Controller) {
+        const p1AnimName = mapFighterStateToAnimation(p1.state.current);
+        p1Controller.setAnimation(p1AnimName);
+        p1Controller.update();
+        
+        const p1SpriteFrame = p1Controller.getCurrentFrame();
+        renderAuthenticFighter({
+          ctx,
+          fighter: p1,
+          spriteImage: p1SpriteFrame?.image || null,
+          effects: {
+            alpha: p1.state.current === 'stunned' ? 0.7 : 1,
+            glow: p1.state.current === 'special',
+            flash: p1.state.current === 'hurt',
+            special: p1.state.current === 'special'
+          }
+        });
+      } else {
+        // Fallback: Use geometric rendering
+        renderAuthenticFighter({
+          ctx,
+          fighter: p1,
+          spriteImage: null,
+          effects: {
+            alpha: p1.state.current === 'stunned' ? 0.7 : 1,
+            glow: p1.state.current === 'special',
+            flash: p1.state.current === 'hurt',
+            special: p1.state.current === 'special'
+          }
+        });
       }
-      
-      // P2 - Red fighter  
-      ctx.fillStyle = p2.health > 0 ? '#FF3333' : '#666666';
-      ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
-      
-      // P2 attack indicator (yellow glow when attacking)
-      if (p2.state.current === 'attacking') {
-        ctx.strokeStyle = '#FFFF00';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(p2.x, p2.y, p2.width, p2.height);
+
+      // Update and render P2
+      if (p2Controller) {
+        const p2AnimName = mapFighterStateToAnimation(p2.state.current);
+        p2Controller.setAnimation(p2AnimName);
+        p2Controller.update();
+        
+        const p2SpriteFrame = p2Controller.getCurrentFrame();
+        renderAuthenticFighter({
+          ctx,
+          fighter: p2,
+          spriteImage: p2SpriteFrame?.image || null,
+          effects: {
+            alpha: p2.state.current === 'stunned' ? 0.7 : 1,
+            glow: p2.state.current === 'special',
+            flash: p2.state.current === 'hurt',
+            special: p2.state.current === 'special'
+          }
+        });
+      } else {
+        // Fallback: Use geometric rendering
+        renderAuthenticFighter({
+          ctx,
+          fighter: p2,
+          spriteImage: null,
+          effects: {
+            alpha: p2.state.current === 'stunned' ? 0.7 : 1,
+            glow: p2.state.current === 'special',
+            flash: p2.state.current === 'hurt',
+            special: p2.state.current === 'special'
+          }
+        });
       }
       
       // Add combo counter display above fighters
