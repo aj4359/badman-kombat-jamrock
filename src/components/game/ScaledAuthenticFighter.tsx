@@ -146,8 +146,11 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
   }
   
-  const feetY = GROUND_LEVEL;
-  ctx.translate(fighter.x, feetY);
+  // Use absolute positioning like sprite rendering
+  const drawX = fighter.x;
+  const drawY = fighter.y; // Use fighter's Y directly instead of GROUND_LEVEL calculation
+  
+  ctx.translate(drawX, drawY);
   
   if (fighter.facing === 'left') {
     ctx.translate(fighter.width, 0);
