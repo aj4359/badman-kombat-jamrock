@@ -132,35 +132,6 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // 1. CLEAR CANVAS (Kingston background is HTML overlay, not canvas)
     ctx.clearRect(0, 0, 1024, 576);
     
-    // 2. DRAW DEBUG RECTANGLES (temporary - to verify positioning)
-    if (currentGameState.fighters.player1 && currentGameState.fighters.player2) {
-      // P1 debug rectangle (blue)
-      ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
-      ctx.fillRect(
-        currentGameState.fighters.player1.x,
-        currentGameState.fighters.player1.y,
-        currentGameState.fighters.player1.width,
-        currentGameState.fighters.player1.height
-      );
-      
-      // P2 debug rectangle (red)
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
-      ctx.fillRect(
-        currentGameState.fighters.player2.x,
-        currentGameState.fighters.player2.y,
-        currentGameState.fighters.player2.width,
-        currentGameState.fighters.player2.height
-      );
-      
-      // Ground line
-      ctx.strokeStyle = '#00FF00';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, 456);
-      ctx.lineTo(1024, 456);
-      ctx.stroke();
-    }
-    
     // 3. DRAW FIGHTERS WITH PROCEDURAL GEOMETRIC ANIMATION + VISUAL EFFECTS
     const p1 = currentGameState.fighters.player1;
     const p2 = currentGameState.fighters.player2;
