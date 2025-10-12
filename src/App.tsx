@@ -10,6 +10,7 @@ import Game from "./pages/Game";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import ArcadeMode from "./pages/ArcadeMode";
 import Teaser from "./pages/Teaser";
+import TrailerGenerator from "./pages/TrailerGenerator";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/game" element={<Game />} />
           <Route path="/arcade" element={<ArcadeMode />} />
           <Route path="/teaser" element={<Teaser />} />
+          <Route path="/trailer-generator" element={<TrailerGenerator />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
