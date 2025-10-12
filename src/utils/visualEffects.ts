@@ -215,25 +215,32 @@ export function renderComboCounter(
   ctx.translate(x, y);
   ctx.scale(scale, scale);
   
-  // Glow background
+  // Enhanced glow background with pulsing effect
+  const pulseScale = 1 + Math.sin(Date.now() / 100) * 0.1;
   ctx.shadowColor = '#FFD700';
-  ctx.shadowBlur = 20;
-  ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
-  ctx.fillRect(-60, -30, 120, 60);
+  ctx.shadowBlur = 30 * pulseScale; // Increased from 20
+  ctx.fillStyle = 'rgba(255, 215, 0, 0.5)'; // Increased opacity
+  ctx.fillRect(-80, -40, 160, 80); // Larger background
   
   ctx.shadowBlur = 0;
   
-  // Combo number
+  // Combo number - BIGGER and more impactful
   ctx.fillStyle = '#FFD700';
-  ctx.font = 'bold 40px Arial';
+  ctx.font = 'bold 72px Arial'; // Increased from 40px
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${comboCount}`, 0, -5);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 4;
+  ctx.strokeText(`${comboCount}`, 0, -10);
+  ctx.fillText(`${comboCount}`, 0, -10);
   
-  // "HIT" text
+  // "HIT COMBO" text - enhanced
   ctx.fillStyle = '#FFF';
-  ctx.font = 'bold 16px Arial';
-  ctx.fillText('HIT COMBO', 0, 20);
+  ctx.font = 'bold 20px Arial'; // Increased from 16px
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.strokeText('HIT COMBO', 0, 30);
+  ctx.fillText('HIT COMBO', 0, 30);
   
   ctx.restore();
 }

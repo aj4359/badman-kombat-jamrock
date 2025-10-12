@@ -112,9 +112,16 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
               <h2 className="text-2xl font-retro font-bold text-neon-cyan">
                 {fighterData.player1.name}
               </h2>
-              <p className="text-neon-cyan/80">
+              <p className="text-neon-cyan/80 text-sm">
                 {fighterData.player1.title}
               </p>
+              {fighterData.player1.enhancedData?.stats && (
+                <div className="flex gap-2 text-xs">
+                  <div className="text-foreground/60">PWR: {fighterData.player1.enhancedData.stats.power}</div>
+                  <div className="text-foreground/60">SPD: {fighterData.player1.enhancedData.stats.speed}</div>
+                  <div className="text-foreground/60">DEF: {fighterData.player1.enhancedData.stats.defense}</div>
+                </div>
+              )}
               <div className="text-sm text-foreground/60">
                 PLAYER 1
               </div>
@@ -161,9 +168,16 @@ export const EnhancedVSScreen: React.FC<VSScreenProps> = () => {
               <h2 className="text-2xl font-retro font-bold text-neon-pink">
                 {fighterData.player2.name}
               </h2>
-              <p className="text-neon-pink/80">
+              <p className="text-neon-pink/80 text-sm">
                 {fighterData.player2.title}
               </p>
+              {fighterData.player2.enhancedData?.stats && (
+                <div className="flex gap-2 text-xs">
+                  <div className="text-foreground/60">PWR: {fighterData.player2.enhancedData.stats.power}</div>
+                  <div className="text-foreground/60">SPD: {fighterData.player2.enhancedData.stats.speed}</div>
+                  <div className="text-foreground/60">DEF: {fighterData.player2.enhancedData.stats.defense}</div>
+                </div>
+              )}
               <div className="text-sm text-foreground/60">
                 PLAYER 2
               </div>

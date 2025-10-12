@@ -46,9 +46,15 @@ export const useFighterSprites = () => {
               }
               resolve();
             };
-            img.onerror = () => {
-              console.warn(`⚠️ Failed to load sprite sheet for ${fighterId}`);
-              reject();
+            img.onerror = (error) => {
+              console.error(`❌ SPRITE LOAD FAILED: ${fighterId}`, {
+                path,
+                error,
+                actualPath: img.src,
+                fileExists: 'Check if file exists in src/assets/'
+              });
+              console.warn(`🎨 Using geometric fallback for ${fighterId} - sprite failed to load`);
+              reject(new Error(`Failed to load ${fighterId} sprite from ${path}`));
             };
             img.src = path;
           })

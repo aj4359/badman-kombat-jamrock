@@ -27,7 +27,8 @@ export const useVisualEffects = () => {
   const sparkIdCounter = useRef(0);
 
   const addScreenShake = useCallback((intensity: number, duration: number) => {
-    setScreenShake({ intensity, duration, timer: 0 });
+    // Enhanced intensity for better feel (doubled)
+    setScreenShake({ intensity: intensity * 2, duration, timer: 0 });
   }, []);
 
   const addHitStop = useCallback((duration: number) => {
@@ -49,7 +50,7 @@ export const useVisualEffects = () => {
       id: `spark_${sparkIdCounter.current++}`,
       x,
       y,
-      size: type === 'critical' ? 20 : 15,
+      size: type === 'critical' ? 60 : 40, // Increased from 20/15 for more impact
       color: sparkColors[type],
       life: 0,
       maxLife: type === 'critical' ? 15 : 10,
@@ -118,9 +119,9 @@ export const useVisualEffects = () => {
       ctx.closePath();
       ctx.fill();
       
-      // Add glow effect
+      // Add enhanced glow effect
       ctx.shadowColor = spark.color;
-      ctx.shadowBlur = currentSize;
+      ctx.shadowBlur = currentSize * 2; // Doubled glow intensity
       ctx.fill();
       
       ctx.restore();

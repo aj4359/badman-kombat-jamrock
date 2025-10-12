@@ -110,8 +110,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
     }
     
+    // Sprite images have origin at top-left, so we need top position
     const drawX = fighter.x;
-    const drawY = GROUND_LEVEL - fighter.height;
+    const drawY = fighter.y; // fighter.y is already the top position
     
     if (fighter.facing === 'left') {
       ctx.save();
@@ -147,8 +148,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
   }
   
   // Position fighters with feet at ground level (matches sprite rendering logic)
+  // fighter.y represents TOP of hitbox, so feet = fighter.y + fighter.height
   const drawX = fighter.x;
-  const drawY = GROUND_LEVEL; // Geometric functions draw upward from ground
+  const drawY = fighter.y + fighter.height; // Use actual fighter position (feet)
   
   ctx.translate(drawX, drawY);
   

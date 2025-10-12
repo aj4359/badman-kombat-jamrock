@@ -10,6 +10,7 @@ import { KingstonStageBackground } from './KingstonStageBackground';
 import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
 import { ControlDisplay } from './ControlDisplay';
 import { FocusPrompt } from './FocusPrompt';
+import { VoiceLineDisplay } from '@/components/ui/VoiceLineDisplay';
 import { 
   renderMotionBlur, 
   renderSpeedLines, 
@@ -54,6 +55,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   const isMobile = useIsMobile();
   const initializationRef = useRef(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const [activeVoiceLine, setActiveVoiceLine] = useState<{ player: 1 | 2; text: string } | null>(null);
   
   const { 
     gameState, 
@@ -288,7 +290,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [render]);
 
-  // Combat event handlers
+  // Combat event handlers with voice line integration
   useEffect(() => {
     const handleCombatEvent = (event: any) => {
       switch (event.type) {
@@ -298,9 +300,17 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           break;
         case 'special':
           addScreenShake(8, 300);
+          // Trigger voice line for special move
+          if (event.player && event.voiceLine) {
+            setActiveVoiceLine({ player: event.player, text: event.voiceLine });
+          }
           break;
         case 'super':
           addScreenShake(12, 500);
+          // Trigger voice line for super move
+          if (event.player && event.voiceLine) {
+            setActiveVoiceLine({ player: event.player, text: event.voiceLine });
+          }
           break;
       }
     };
@@ -376,6 +386,15 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           onTouch={(action, pressed) => {
             handleMobileInput(1, action, pressed);
           }}
+        />
+      )}
+      
+      {/* Voice Line Display */}
+      {activeVoiceLine && (
+        <VoiceLineDisplay
+          text={activeVoiceLine.text}
+          player={activeVoiceLine.player}
+          onComplete={() => setActiveVoiceLine(null)}
         />
       )}
       

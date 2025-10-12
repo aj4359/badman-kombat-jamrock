@@ -332,7 +332,9 @@ const CharacterSelect = () => {
                   </div>
                 </div>
               )}
-              <div className={`p-4 rounded-lg border-2 bg-card/90 backdrop-blur ${
+              <div 
+                onClick={() => isUnlocked && handleFighterSelect(fighter.id, selectedP1 === fighter.id ? 2 : 1)}
+                className={`p-4 rounded-lg border-2 bg-card/90 backdrop-blur ${
                 selectedP1 === fighter.id || selectedP2 === fighter.id
                   ? 'border-neon-cyan shadow-neon-cyan'
                   : 'border-neon-cyan/30'
