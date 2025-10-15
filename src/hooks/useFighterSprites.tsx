@@ -28,8 +28,27 @@ export const useFighterSprites = () => {
       const loadPromises = Object.entries(SPRITE_SHEET_PATHS).map(
         ([fighterId, path]) =>
           new Promise<void>((resolve, reject) => {
+            console.log(`🎨 Loading ${fighterId}:`, { path, type: typeof path });
+            
+            if (!path || typeof path !== 'string') {
+              console.error(`❌ Invalid path for ${fighterId}:`, path);
+              resolve();
+              return;
+            }
+            
             const img = new Image();
             img.onload = async () => {
+              console.log(`✅ ${fighterId} loaded:`, {
+                width: img.naturalWidth,
+                height: img.naturalHeight
+              });
+              
+              if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                console.error(`❌ ${fighterId} has zero dimensions`);
+                resolve();
+                return;
+              }
+              
               spriteImages.current[fighterId] = img;
               
               // Extract frames from sprite sheet
@@ -42,19 +61,18 @@ export const useFighterSprites = () => {
                 const animations = createAnimationSequences(frames, fighterId);
                 animationControllers.current[fighterId] = new AnimationController(animations);
                 
-                console.log(`✅ Loaded ${fighterId} sprite: ${frames.length} frames`);
+                console.log(`✅ ${fighterId}: ${frames.length} frames`);
               }
               resolve();
             };
             img.onerror = (error) => {
-              console.error(`❌ SPRITE LOAD FAILED: ${fighterId}`, {
+              console.error(`❌ SPRITE FAILED: ${fighterId}`, {
                 path,
-                error,
-                actualPath: img.src,
-                fileExists: 'Check if file exists in src/assets/'
+                src: img.src,
+                error
               });
-              console.warn(`🎨 Using geometric fallback for ${fighterId} - sprite failed to load`);
-              reject(new Error(`Failed to load ${fighterId} sprite from ${path}`));
+              console.warn(`🎨 Geometric fallback: ${fighterId}`);
+              resolve();
             };
             img.src = path;
           })

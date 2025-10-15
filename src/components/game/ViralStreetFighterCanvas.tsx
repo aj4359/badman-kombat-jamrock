@@ -62,7 +62,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     handleMobileInput,
     streetFighterCombat,
     initializeFighters
-  } = useEnhancedGameEngine();
+  } = useEnhancedGameEngine(fighterData);
 
   // Single initialization to prevent loops - FIXED DEPENDENCIES
   useEffect(() => {
@@ -139,6 +139,12 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const p2 = currentGameState.fighters.player2;
     
     if (p1 && p2) {
+      if (frameCountRef.current % 60 === 0) {
+        console.log('🖼️ RENDER:', {
+          p1: { x: Math.round(p1.x), y: Math.round(p1.y), state: p1.state.current },
+          p2: { x: Math.round(p2.x), y: Math.round(p2.y), state: p2.state.current }
+        });
+      }
       // Add motion blur for fast-moving fighters
       const p1Speed = Math.sqrt((p1.velocityX || 0) ** 2 + (p1.velocityY || 0) ** 2);
       const p2Speed = Math.sqrt((p2.velocityX || 0) ** 2 + (p2.velocityY || 0) ** 2);

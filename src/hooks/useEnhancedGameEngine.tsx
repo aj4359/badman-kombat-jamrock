@@ -101,7 +101,7 @@ const WALK_SPEED = 3;
 const RUN_SPEED = 5;
 const MAX_COMBO_DECAY = 60;
 
-export const useEnhancedGameEngine = () => {
+export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const frameCountRef = useRef(0); // ✅ FIXED: Moved up for proper scope
@@ -285,19 +285,23 @@ export const useEnhancedGameEngine = () => {
   const initializationCompleteRef = useRef(false);
   
   const initializeFighters = useCallback(() => {
-    // PHASE 4: Prevent multiple initializations
     if (initializationCompleteRef.current) {
       console.log('⚠️ initializeFighters: Already initialized, skipping');
       return;
     }
     
-    console.log('🚀 initializeFighters: Starting SINGLE initialization...');
+    console.log('🚀 DIAGNOSTIC: initializeFighters called');
+    console.log('🔥 DIAGNOSTIC: Fighter data received:', fighterData);
     
     try {
-      const player1 = createFighter('leroy', 'Leroy', CANVAS_WIDTH / 2 - 150);
-      const player2 = createFighter('jordan', 'Jordan', CANVAS_WIDTH / 2 + 70);
+      const p1Data = fighterData?.player1 || { id: 'leroy', name: 'LEROY' };
+      const p2Data = fighterData?.player2 || { id: 'jordan', name: 'JORDAN' };
       
-      // PHASE 3: OPTIMIZE STATE UPDATES - Functional update to avoid stale closures
+      console.log('🔥 DIAGNOSTIC: Creating fighters:', { p1: p1Data.id, p2: p2Data.id });
+      
+      const player1 = createFighter(p1Data.id, p1Data.name, CANVAS_WIDTH / 2 - 150);
+      const player2 = createFighter(p2Data.id, p2Data.name, CANVAS_WIDTH / 2 + 70);
+      
       setGameState(prev => {
         const newState = {
           ...prev,
@@ -306,25 +310,21 @@ export const useEnhancedGameEngine = () => {
           round: 1,
           timer: 99
         };
-        console.log('✅ Setting fighters in game state:', {
+        console.log('✅ Fighters set in game state:', {
           p1: player1.name,
-          p2: player2.name,
-          p1Pos: { x: player1.x, y: player1.y },
-          p2Pos: { x: player2.x, y: player2.y }
+          p2: player2.name
         });
         return newState;
       });
       
-      // PHASE 4: Mark as complete
       initializationCompleteRef.current = true;
-      console.log('🎉 Fighter initialization COMPLETE and LOCKED!');
+      console.log('🎉 Fighter initialization COMPLETE!');
       
     } catch (error) {
-      console.error('💥 initializeFighters: FAILED:', error);
-      // Reset flag on error to allow retry
+      console.error('💥 initializeFighters FAILED:', error);
       initializationCompleteRef.current = false;
     }
-  }, [createFighter]); // Stable dependency
+  }, [createFighter, fighterData]);
 
   const checkCollision = useCallback((rect1: any, rect2: any): boolean => {
     return rect1.x < rect2.x + rect2.width &&
@@ -563,7 +563,15 @@ export const useEnhancedGameEngine = () => {
   const gameLoop = useCallback(() => {
     if (gameState.screen !== 'fighting') return;
     
-    frameCountRef.current++; // ✅ FIXED: Increment frame counter
+    if (frameCountRef.current === 0) {
+      console.log('🔄 GAME LOOP STARTED');
+    }
+    
+    if (frameCountRef.current % 60 === 0) {
+      console.log('🔄 TICK:', frameCountRef.current, 'Screen:', gameState.screen);
+    }
+    
+    frameCountRef.current++;
     
     // Update visual effects
     visualEffects.updateEffects(16);
@@ -727,6 +735,8 @@ export const useEnhancedGameEngine = () => {
 
   // Start game loop - PHASE 1: FIXED to prevent infinite loop
   useEffect(() => {
+    console.log('🚀 Game Loop Effect: Screen is', gameState.screen);
+    
     if (gameState.screen === 'fighting' && !animationFrameRef.current) {
       console.log('🎮 Starting game loop');
       animationFrameRef.current = requestAnimationFrame(gameLoop);
@@ -746,18 +756,21 @@ export const useEnhancedGameEngine = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
       
+      console.log('🎮 KEY DOWN:', e.key);
+      
       // Player 1 controls
       if (['w', 'a', 's', 'd', 'j', 'k', 'l'].includes(key)) {
         const mapping: Record<string, string> = {
           'w': 'up',
-          'a': 'left', 
+          'a': 'left',
           's': 'down',
           'd': 'right',
           'j': 'punch',
           'k': 'block',
-          'l': 'kick' // ✅ FIXED: Added kick
+          'l': 'kick'
         };
         player1Keys.current[mapping[key]] = true;
+        console.log('⬆️ P1:', mapping[key]);
       }
 
       // Player 2 controls
@@ -769,9 +782,10 @@ export const useEnhancedGameEngine = () => {
           'arrowright': 'right',
           '1': 'punch',
           '2': 'block',
-          '3': 'kick' // ✅ FIXED: Added kick
+          '3': 'kick'
         };
         player2Keys.current[mapping[key]] = true;
+        console.log('⬆️ P2:', mapping[key]);
       }
     };
 
