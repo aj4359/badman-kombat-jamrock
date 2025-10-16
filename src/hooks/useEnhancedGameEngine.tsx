@@ -733,10 +733,8 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
 
   // Fighter initialization is handled by the canvas component only
 
-  // Start game loop - PHASE 1: FIXED to prevent infinite loop
+  // Start game loop - FIXED: gameLoop is stable, only depends on screen state
   useEffect(() => {
-    console.log('🚀 Game Loop Effect: Screen is', gameState.screen);
-    
     if (gameState.screen === 'fighting' && !animationFrameRef.current) {
       console.log('🎮 Starting game loop');
       animationFrameRef.current = requestAnimationFrame(gameLoop);
@@ -749,7 +747,7 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
         animationFrameRef.current = undefined;
       }
     };
-  }, [gameState.screen, gameLoop]);
+  }, [gameState.screen]); // Only restart when screen changes, NOT gameLoop
 
   // Keyboard input handling
   useEffect(() => {
