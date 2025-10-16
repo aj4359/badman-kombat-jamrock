@@ -96,8 +96,8 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     moveType
   );
   
-  // If we have a sprite image, use it instead of geometric rendering
-  if (spriteImage && spriteImage.complete) {
+  // ✅ USE SPRITE IMAGE - This is the Street Fighter-style pixel art!
+  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
     if (effects.alpha !== undefined) {
       ctx.globalAlpha = effects.alpha;
     }
@@ -110,28 +110,49 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
     }
     
-    // Sprite images have origin at top-left, so we need top position
-    const drawX = fighter.x;
-    const drawY = fighter.y; // fighter.y is already the top position
+    // Apply glow for special moves
+    if (effects.glow || effects.special) {
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur = 20;
+    }
     
-    if (fighter.facing === 'left') {
+    // Apply flash when hit
+    if (effects.flash) {
+      ctx.globalCompositeOperation = 'lighter';
+    }
+    
+    // Scale sprite to be 2.5x larger for better visibility
+    const scale = 2.5;
+    const spriteWidth = spriteImage.naturalWidth || spriteImage.width;
+    const spriteHeight = spriteImage.naturalHeight || spriteImage.height;
+    const finalWidth = spriteWidth * scale;
+    const finalHeight = spriteHeight * scale;
+    
+    // Center sprite on fighter position
+    const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
+    const drawY = fighter.y + fighter.height - finalHeight;
+    
+    // Flip based on facing direction
+    const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
+                       (typeof fighter.facing === 'number' && fighter.facing === -1);
+    if (facingLeft) {
       ctx.save();
-      ctx.translate(drawX + fighter.width / 2, drawY + fighter.height / 2);
+      ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
       ctx.scale(-1, 1);
       ctx.drawImage(
         spriteImage,
-        -fighter.width / 2,
-        -fighter.height / 2,
-        fighter.width,
-        fighter.height
+        -finalWidth / 2,
+        -finalHeight / 2,
+        finalWidth,
+        finalHeight
       );
       ctx.restore();
     } else {
-      ctx.drawImage(spriteImage, drawX, drawY, fighter.width, fighter.height);
+      ctx.drawImage(spriteImage, drawX, drawY, finalWidth, finalHeight);
     }
     
     ctx.restore();
-    return;
+    return; // ✅ EXIT - Don't draw geometric shapes!
   }
   
   // Geometric rendering fallback
