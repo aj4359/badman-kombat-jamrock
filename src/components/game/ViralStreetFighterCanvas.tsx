@@ -177,58 +177,100 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // PHASE 2: RENDER FIGHTERS WITH PIXEL ART SPRITES
+      // PHASE 2: ROBUST HYBRID FIGHTER RENDERING (Sprite + Fallback)
       const p1Controller = getAnimationController(p1.id);
       const p2Controller = getAnimationController(p2.id);
 
-      // Update and render P1 with actual sprite
+      // Render P1 with sprite OR geometric fallback
+      let p1Rendered = false;
       if (p1Controller && spritesLoaded) {
-        const p1AnimName = mapFighterStateToAnimation(p1.state.current);
-        p1Controller.setAnimation(p1AnimName);
-        p1Controller.update();
-        
-        const p1SpriteFrame = p1Controller.getCurrentFrame();
-        
-        if (p1SpriteFrame && p1SpriteFrame.image) {
-          // Draw the actual sprite frame
-          ctx.save();
+        try {
+          const p1AnimName = mapFighterStateToAnimation(p1.state.current);
+          p1Controller.setAnimation(p1AnimName);
+          p1Controller.update();
           
-          // Flip sprite if facing left
-          if (p1.facing === 'left') {
-            ctx.translate(p1.x + p1.width, p1.y);
-            ctx.scale(-1, 1);
-            ctx.drawImage(p1SpriteFrame.image, 0, 0, p1.width, p1.height);
-          } else {
-            ctx.drawImage(p1SpriteFrame.image, p1.x, p1.y, p1.width, p1.height);
+          const p1SpriteFrame = p1Controller.getCurrentFrame();
+          
+          // Only use sprite if image is fully loaded
+          if (p1SpriteFrame?.image?.complete && p1SpriteFrame.image.naturalWidth > 0) {
+            ctx.save();
+            
+            // Flip sprite if facing left
+            if (p1.facing === 'left') {
+              ctx.translate(p1.x + p1.width, p1.y);
+              ctx.scale(-1, 1);
+              ctx.drawImage(p1SpriteFrame.image, 0, 0, p1.width, p1.height);
+            } else {
+              ctx.drawImage(p1SpriteFrame.image, p1.x, p1.y, p1.width, p1.height);
+            }
+            
+            ctx.restore();
+            p1Rendered = true;
           }
-          
-          ctx.restore();
+        } catch (error) {
+          console.error('P1 sprite rendering failed:', error);
         }
       }
-
-      // Update and render P2 with actual sprite
-      if (p2Controller && spritesLoaded) {
-        const p2AnimName = mapFighterStateToAnimation(p2.state.current);
-        p2Controller.setAnimation(p2AnimName);
-        p2Controller.update();
-        
-        const p2SpriteFrame = p2Controller.getCurrentFrame();
-        
-        if (p2SpriteFrame && p2SpriteFrame.image) {
-          // Draw the actual sprite frame
-          ctx.save();
-          
-          // Flip sprite if facing left
-          if (p2.facing === 'left') {
-            ctx.translate(p2.x + p2.width, p2.y);
-            ctx.scale(-1, 1);
-            ctx.drawImage(p2SpriteFrame.image, 0, 0, p2.width, p2.height);
-          } else {
-            ctx.drawImage(p2SpriteFrame.image, p2.x, p2.y, p2.width, p2.height);
+      
+      // Fallback to geometric rendering if sprite failed
+      if (!p1Rendered) {
+        renderAuthenticFighter({
+          ctx,
+          fighter: p1,
+          spriteImage: null,
+          effects: {
+            alpha: p1.state.current === 'stunned' ? 0.7 : 1,
+            glow: p1.state.current === 'special',
+            flash: p1.state.current === 'hurt',
+            special: p1.state.current === 'special'
           }
+        });
+      }
+
+      // Render P2 with sprite OR geometric fallback
+      let p2Rendered = false;
+      if (p2Controller && spritesLoaded) {
+        try {
+          const p2AnimName = mapFighterStateToAnimation(p2.state.current);
+          p2Controller.setAnimation(p2AnimName);
+          p2Controller.update();
           
-          ctx.restore();
+          const p2SpriteFrame = p2Controller.getCurrentFrame();
+          
+          // Only use sprite if image is fully loaded
+          if (p2SpriteFrame?.image?.complete && p2SpriteFrame.image.naturalWidth > 0) {
+            ctx.save();
+            
+            // Flip sprite if facing left
+            if (p2.facing === 'left') {
+              ctx.translate(p2.x + p2.width, p2.y);
+              ctx.scale(-1, 1);
+              ctx.drawImage(p2SpriteFrame.image, 0, 0, p2.width, p2.height);
+            } else {
+              ctx.drawImage(p2SpriteFrame.image, p2.x, p2.y, p2.width, p2.height);
+            }
+            
+            ctx.restore();
+            p2Rendered = true;
+          }
+        } catch (error) {
+          console.error('P2 sprite rendering failed:', error);
         }
+      }
+      
+      // Fallback to geometric rendering if sprite failed
+      if (!p2Rendered) {
+        renderAuthenticFighter({
+          ctx,
+          fighter: p2,
+          spriteImage: null,
+          effects: {
+            alpha: p2.state.current === 'stunned' ? 0.7 : 1,
+            glow: p2.state.current === 'special',
+            flash: p2.state.current === 'hurt',
+            special: p2.state.current === 'special'
+          }
+        });
       }
       
       // Add combo counter display above fighters
