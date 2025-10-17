@@ -177,74 +177,58 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // PHASE 2: RENDER STREET FIGHTER CHARACTERS WITH SPRITES
+      // PHASE 2: RENDER FIGHTERS WITH PIXEL ART SPRITES
       const p1Controller = getAnimationController(p1.id);
       const p2Controller = getAnimationController(p2.id);
 
-      // Update and render P1
-      if (p1Controller) {
+      // Update and render P1 with actual sprite
+      if (p1Controller && spritesLoaded) {
         const p1AnimName = mapFighterStateToAnimation(p1.state.current);
         p1Controller.setAnimation(p1AnimName);
         p1Controller.update();
         
         const p1SpriteFrame = p1Controller.getCurrentFrame();
-        renderAuthenticFighter({
-          ctx,
-          fighter: p1,
-          spriteImage: p1SpriteFrame?.image || null,
-          effects: {
-            alpha: p1.state.current === 'stunned' ? 0.7 : 1,
-            glow: p1.state.current === 'special',
-            flash: p1.state.current === 'hurt',
-            special: p1.state.current === 'special'
+        
+        if (p1SpriteFrame && p1SpriteFrame.image) {
+          // Draw the actual sprite frame
+          ctx.save();
+          
+          // Flip sprite if facing left
+          if (p1.facing === 'left') {
+            ctx.translate(p1.x + p1.width, p1.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(p1SpriteFrame.image, 0, 0, p1.width, p1.height);
+          } else {
+            ctx.drawImage(p1SpriteFrame.image, p1.x, p1.y, p1.width, p1.height);
           }
-        });
-      } else {
-        // Fallback: Use geometric rendering
-        renderAuthenticFighter({
-          ctx,
-          fighter: p1,
-          spriteImage: null,
-          effects: {
-            alpha: p1.state.current === 'stunned' ? 0.7 : 1,
-            glow: p1.state.current === 'special',
-            flash: p1.state.current === 'hurt',
-            special: p1.state.current === 'special'
-          }
-        });
+          
+          ctx.restore();
+        }
       }
 
-      // Update and render P2
-      if (p2Controller) {
+      // Update and render P2 with actual sprite
+      if (p2Controller && spritesLoaded) {
         const p2AnimName = mapFighterStateToAnimation(p2.state.current);
         p2Controller.setAnimation(p2AnimName);
         p2Controller.update();
         
         const p2SpriteFrame = p2Controller.getCurrentFrame();
-        renderAuthenticFighter({
-          ctx,
-          fighter: p2,
-          spriteImage: p2SpriteFrame?.image || null,
-          effects: {
-            alpha: p2.state.current === 'stunned' ? 0.7 : 1,
-            glow: p2.state.current === 'special',
-            flash: p2.state.current === 'hurt',
-            special: p2.state.current === 'special'
+        
+        if (p2SpriteFrame && p2SpriteFrame.image) {
+          // Draw the actual sprite frame
+          ctx.save();
+          
+          // Flip sprite if facing left
+          if (p2.facing === 'left') {
+            ctx.translate(p2.x + p2.width, p2.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(p2SpriteFrame.image, 0, 0, p2.width, p2.height);
+          } else {
+            ctx.drawImage(p2SpriteFrame.image, p2.x, p2.y, p2.width, p2.height);
           }
-        });
-      } else {
-        // Fallback: Use geometric rendering
-        renderAuthenticFighter({
-          ctx,
-          fighter: p2,
-          spriteImage: null,
-          effects: {
-            alpha: p2.state.current === 'stunned' ? 0.7 : 1,
-            glow: p2.state.current === 'special',
-            flash: p2.state.current === 'hurt',
-            special: p2.state.current === 'special'
-          }
-        });
+          
+          ctx.restore();
+        }
       }
       
       // Add combo counter display above fighters
