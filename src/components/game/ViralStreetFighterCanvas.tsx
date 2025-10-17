@@ -54,7 +54,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const initializationRef = useRef(false);
-  const [showPrompt, setShowPrompt] = useState(true);
+  const [showPrompt, setShowPrompt] = useState(false); // Auto-start - no prompt needed
   const [activeVoiceLine, setActiveVoiceLine] = useState<{ player: 1 | 2; text: string } | null>(null);
   
   const { 
@@ -328,7 +328,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [addScreenShake, addHitSpark]);
 
-  // Setup canvas with DPI scaling and focus
+  // Setup canvas with DPI scaling and auto-focus for keyboard
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -352,11 +352,11 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     canvas.style.width = '1024px';
     canvas.style.height = '576px';
     
-    // Auto-focus container for keyboard input
-    if (container && !showPrompt) {
-      container.focus();
+    // IMMEDIATELY focus for keyboard input - no delay
+    if (container) {
+      setTimeout(() => container.focus(), 100);
     }
-  }, [showPrompt]);
+  }, []);
 
   return (
     <div 
