@@ -90,6 +90,11 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   
   // Sprite loading system - NOW LOADS REAL PIXEL ART
   const { isLoaded: spritesLoaded, getSpriteData, getAnimationController } = useFighterSprites();
+  
+  // Debug sprite loading
+  useEffect(() => {
+    console.log('🎨 Sprite System Status:', { spritesLoaded });
+  }, [spritesLoaded]);
 
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(Date.now());
@@ -180,16 +185,37 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       // PHASE 2: ROBUST HYBRID FIGHTER RENDERING (Sprite + Fallback)
       const p1Controller = getAnimationController(p1.id);
       const p2Controller = getAnimationController(p2.id);
+      
+      // Debug sprite loading status every 300 frames
+      if (frameCountRef.current % 300 === 0) {
+        console.log('🎨 SPRITE STATUS:', {
+          spritesLoaded,
+          p1Controller: !!p1Controller,
+          p2Controller: !!p2Controller,
+          p1_id: p1.id,
+          p2_id: p2.id
+        });
+      }
 
       // Render P1 with sprite OR geometric fallback
       let p1Rendered = false;
-      if (p1Controller && spritesLoaded) {
+      if (spritesLoaded && p1Controller) {
         try {
           const p1AnimName = mapFighterStateToAnimation(p1.state.current);
           p1Controller.setAnimation(p1AnimName);
           p1Controller.update();
           
           const p1SpriteFrame = p1Controller.getCurrentFrame();
+          
+          // Log sprite frame status occasionally
+          if (frameCountRef.current % 300 === 0) {
+            console.log('🎨 P1 Frame:', {
+              hasFrame: !!p1SpriteFrame,
+              hasImage: !!p1SpriteFrame?.image,
+              imageComplete: p1SpriteFrame?.image?.complete,
+              imageWidth: p1SpriteFrame?.image?.naturalWidth
+            });
+          }
           
           // Only use sprite if image is fully loaded
           if (p1SpriteFrame?.image?.complete && p1SpriteFrame.image.naturalWidth > 0) {
@@ -208,7 +234,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
             p1Rendered = true;
           }
         } catch (error) {
-          console.error('P1 sprite rendering failed:', error);
+          if (frameCountRef.current % 300 === 0) {
+            console.error('❌ P1 sprite rendering failed:', error);
+          }
         }
       }
       
@@ -229,7 +257,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
       // Render P2 with sprite OR geometric fallback
       let p2Rendered = false;
-      if (p2Controller && spritesLoaded) {
+      if (spritesLoaded && p2Controller) {
         try {
           const p2AnimName = mapFighterStateToAnimation(p2.state.current);
           p2Controller.setAnimation(p2AnimName);
@@ -254,7 +282,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
             p2Rendered = true;
           }
         } catch (error) {
-          console.error('P2 sprite rendering failed:', error);
+          if (frameCountRef.current % 300 === 0) {
+            console.error('❌ P2 sprite rendering failed:', error);
+          }
         }
       }
       
