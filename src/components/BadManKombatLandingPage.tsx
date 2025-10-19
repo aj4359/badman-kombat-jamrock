@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Users, Trophy, Swords, Volume2, VolumeX } from 'lucide-react';
+import { Zap, Users, Trophy, Swords, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAudioManager } from '@/hooks/useAudioManager';
+import ParticleSystem from '@/components/ui/ParticleSystem';
+import VideoBackground from '@/components/ui/VideoBackground';
+import CharacterCard3D from '@/components/ui/CharacterCard3D';
+import leroySprite from '@/assets/leroy-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite.png';
+import razorSprite from '@/assets/razor-sprite.png';
+import sifuSprite from '@/assets/sifu-sprite.png';
+import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import ashaSprite from '@/assets/asha-sprite.png';
 
 const BadManKombatLandingPage = () => {
   const navigate = useNavigate();
@@ -11,12 +20,48 @@ const BadManKombatLandingPage = () => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
 
   const fighters = [
-    { name: "Leroy", icon: "🌿", color: "from-cyan-500 to-cyan-700" },
-    { name: "Jordan", icon: "🎧", color: "from-purple-500 to-purple-700" },
-    { name: "Sifu", icon: "🔮", color: "from-yellow-500 to-yellow-700" },
-    { name: "Razor", icon: "⚔️", color: "from-green-500 to-green-700" },
-    { name: "Asha", icon: "⚡", color: "from-red-500 to-red-700" },
-    { name: "Rootsman", icon: "🌿", color: "from-green-600 to-green-800" }
+    { 
+      name: "LEROY", 
+      title: "DIGITAL DREAD",
+      image: leroySprite, 
+      accentColor: "#00d4ff",
+      stats: { power: 85, speed: 90, defense: 75 }
+    },
+    { 
+      name: "JORDAN", 
+      title: "BASSLINE WARRIOR",
+      image: jordanSprite, 
+      accentColor: "#8b00ff",
+      stats: { power: 75, speed: 95, defense: 75 }
+    },
+    { 
+      name: "RAZOR", 
+      title: "CYBER SAMURAI",
+      image: razorSprite, 
+      accentColor: "#00ff7f",
+      stats: { power: 95, speed: 80, defense: 70 }
+    },
+    { 
+      name: "SIFU", 
+      title: "ANCIENT WISDOM",
+      image: sifuSprite, 
+      accentColor: "#ffd700",
+      stats: { power: 90, speed: 85, defense: 95 }
+    },
+    { 
+      name: "ASHA", 
+      title: "LIGHTNING FURY",
+      image: ashaSprite, 
+      accentColor: "#ff1493",
+      stats: { power: 88, speed: 92, defense: 70 }
+    },
+    { 
+      name: "ROOTSMAN", 
+      title: "NATURE'S VOICE",
+      image: rootsmanSprite, 
+      accentColor: "#32cd32",
+      stats: { power: 85, speed: 90, defense: 80 }
+    }
   ];
 
   useEffect(() => {
@@ -37,166 +82,250 @@ const BadManKombatLandingPage = () => {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-gradient-to-b from-black via-purple-950 to-black overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 via-green-500/20 to-red-500/20 animate-pulse" />
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
-      </div>
+    <div className="relative w-full min-h-screen bg-black overflow-hidden">
+      {/* Particle System */}
+      <ParticleSystem />
 
       {/* Top Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-2">
-          <Swords className="w-8 h-8 text-yellow-400" />
-          <span className="text-2xl font-bold text-white">BADMAN KOMBAT</span>
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-black/40 backdrop-blur-md border-b border-cyan-500/20">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded flex items-center justify-center">
+            <Swords className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className="text-xs text-cyan-400 font-bold tracking-wider">BADMAN</div>
+            <div className="text-sm text-white font-black tracking-tight">KOMBAT</div>
+          </div>
         </div>
-        <div className="flex items-center gap-6">
-          <button onClick={toggleAudio} className="text-white hover:text-yellow-400 transition-colors">
-            {isAudioEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+        <div className="flex items-center gap-4">
+          <button onClick={toggleAudio} className="text-white/60 hover:text-cyan-400 transition-colors p-2">
+            {isAudioEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
           </button>
           <Button 
             onClick={() => navigate('/3d-ultimate')}
-            className="bg-yellow-400 text-black font-bold px-8 py-3 text-lg hover:bg-yellow-500 hover:scale-105 transition-all"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold px-6 py-2 text-sm hover:shadow-lg hover:shadow-cyan-500/50 transition-all"
           >
-            DOWNLOAD
+            PLAY FREE
           </Button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
-        {/* Logo */}
-        <div className="mb-8 animate-fade-in">
-          <div className="text-red-600 font-bold text-xl mb-2 tracking-widest">BADMAN</div>
-          <div className="relative">
-            <h1 className="text-[120px] md:text-[180px] lg:text-[220px] font-black text-white leading-none tracking-tighter transform -skew-y-2 drop-shadow-2xl">
-              KOMBAT
-            </h1>
-            <div className="absolute inset-0 text-[120px] md:text-[180px] lg:text-[220px] font-black leading-none tracking-tighter transform -skew-y-2 bg-gradient-to-r from-yellow-400 via-green-400 to-red-500 bg-clip-text text-transparent blur-sm opacity-50" />
-          </div>
-        </div>
-
-        {/* Subtitle */}
-        <h2 className="text-2xl md:text-4xl text-white font-bold mb-4 tracking-wide">
-          THE CYBER-RASTA TEAM-BASED FIGHTING GAME
-        </h2>
+      <div className="relative min-h-screen flex items-center justify-center">
+        <VideoBackground type="hero" overlay="dark" />
         
-        <p className="text-3xl md:text-5xl font-black text-yellow-400 mb-12 animate-pulse tracking-wider">
-          ALL FIGHTERS ARE FREE TO PLAY!
-        </p>
-
-        {/* CTA Button */}
-        <Button
-          onClick={() => navigate('/3d-ultimate')}
-          className="bg-yellow-400 text-black font-black text-2xl px-16 py-8 mb-12 hover:bg-yellow-500 hover:scale-110 transition-all shadow-2xl"
-        >
-          PLAY NOW
-        </Button>
-
-        {/* Platform Icons */}
-        <div className="flex items-center gap-8 text-white/80 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center">🖥️</div>
-            <span>WEB</span>
+        <div className="relative z-10 flex flex-col items-center justify-center px-4 text-center pt-20">
+          {/* Small centered logo */}
+          <div className="mb-12 animate-fade-in">
+            <div className="inline-block px-6 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full mb-4">
+              <span className="text-xs font-bold tracking-widest text-cyan-400">BADMAN KOMBAT</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center">📱</div>
-            <span>MOBILE</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center">🎮</div>
-            <span>CONSOLE</span>
-          </div>
-        </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/50 text-sm flex flex-col items-center gap-2 animate-bounce">
-          <span className="tracking-widest">SWIPE TO BROWSE</span>
-          <div className="text-2xl">↓</div>
+          {/* Large rotating fighter */}
+          <div className="relative w-full max-w-2xl h-96 mb-12">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src={fighters[currentSlide].image} 
+                alt={fighters[currentSlide].name}
+                className="h-full w-auto object-contain animate-fade-in filter drop-shadow-2xl"
+                style={{
+                  filter: `drop-shadow(0 0 60px ${fighters[currentSlide].accentColor})`,
+                }}
+              />
+            </div>
+            {/* Character glow */}
+            <div 
+              className="absolute inset-0 blur-3xl opacity-30"
+              style={{
+                background: `radial-gradient(circle at center, ${fighters[currentSlide].accentColor} 0%, transparent 70%)`,
+              }}
+            />
+          </div>
+
+          {/* Character name */}
+          <div className="mb-8">
+            <div className="text-sm font-bold tracking-widest mb-2" style={{ color: fighters[currentSlide].accentColor }}>
+              {fighters[currentSlide].title}
+            </div>
+            <h1 className="text-6xl md:text-7xl font-black text-white">
+              {fighters[currentSlide].name}
+            </h1>
+          </div>
+
+          {/* CTA Button with glow */}
+          <Button
+            onClick={() => navigate('/3d-ultimate')}
+            className="relative bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-black text-xl px-12 py-6 mb-8 hover:scale-105 transition-all group"
+          >
+            <Sparkles className="mr-2 inline animate-pulse" />
+            PLAY NOW
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur-lg opacity-30 group-hover:opacity-60 transition-opacity -z-10" />
+          </Button>
+
+          <p className="text-cyan-400 text-sm mb-12">FREE TO PLAY • ALL PLATFORMS • 6 UNIQUE FIGHTERS</p>
+
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+            <div className="text-xs text-white/40 tracking-widest">SCROLL</div>
+            <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
+              <div className="w-1 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Fighter Showcase Section */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20">
-        <h2 className="text-6xl font-black text-white mb-16 text-center">
-          CHOOSE YOUR <span className="text-yellow-400">FIGHTER</span>
-        </h2>
-
-        {/* Fighter Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-7xl mb-12">
-          {fighters.map((fighter, idx) => (
-            <div
-              key={fighter.name}
-              className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-110 ${
-                idx === currentSlide ? 'scale-110 ring-4 ring-yellow-400' : ''
-              }`}
-              onClick={() => setCurrentSlide(idx)}
-            >
-              <div className={`bg-gradient-to-br ${fighter.color} p-8 rounded-2xl border-2 border-white/20 hover:border-yellow-400 transition-all`}>
-                <div className="text-7xl mb-4 transform group-hover:scale-125 transition-transform">
-                  {fighter.icon}
-                </div>
-                <div className="text-white font-bold text-lg">{fighter.name}</div>
-              </div>
-              {idx === currentSlide && (
-                <div className="absolute -inset-2 bg-yellow-400/20 rounded-2xl blur-xl -z-10 animate-pulse" />
-              )}
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+        
+        <div className="relative z-10 w-full max-w-7xl">
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full mb-4">
+              <span className="text-xs font-bold tracking-widest text-cyan-400">CHOOSE YOUR CHAMPION</span>
             </div>
-          ))}
-        </div>
+            <h2 className="text-5xl md:text-6xl font-black text-white">
+              THE <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">ROSTER</span>
+            </h2>
+          </div>
 
-        <Button
-          onClick={() => navigate('/character-select')}
-          className="bg-gradient-to-r from-yellow-400 to-red-500 text-black font-black text-xl px-12 py-6 hover:scale-105 transition-all"
-        >
-          VIEW ALL FIGHTERS
-        </Button>
+          {/* Character Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {fighters.map((fighter) => (
+              <CharacterCard3D
+                key={fighter.name}
+                name={fighter.name}
+                title={fighter.title}
+                image={fighter.image}
+                accentColor={fighter.accentColor}
+                stats={fighter.stats}
+                onClick={() => navigate('/character-select')}
+              />
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button
+              onClick={() => navigate('/character-select')}
+              className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-black text-lg px-10 py-5 hover:scale-105 transition-all hover:shadow-lg hover:shadow-cyan-500/50"
+            >
+              SELECT FIGHTER
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Features Section */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20 bg-gradient-to-b from-transparent via-black/50 to-transparent">
-        <h2 className="text-6xl font-black text-white mb-16 text-center">
-          GAME <span className="text-green-400">FEATURES</span>
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl">
-          <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-700/20 backdrop-blur-sm p-8 rounded-2xl border-2 border-cyan-400/50 hover:border-cyan-400 transition-all group">
-            <Zap className="w-16 h-16 text-cyan-400 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-2xl font-bold text-white mb-4">SPECIAL MOVES</h3>
-            <p className="text-white/80">Execute devastating combos with Street Fighter-style motion inputs and unleash ultimate attacks!</p>
+      {/* Features Section - Split Screen */}
+      <div className="relative">
+        {/* Feature 1 */}
+        <div className="relative min-h-screen flex items-center">
+          <VideoBackground type="section" overlay="darker" />
+          <div className="relative z-10 max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1">
+              <div className="inline-block px-4 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full mb-6">
+                <span className="text-xs font-bold tracking-widest text-cyan-400">COMBAT SYSTEM</span>
+              </div>
+              <h3 className="text-4xl md:text-5xl font-black text-white mb-6">
+                SPECIAL <span className="text-cyan-400">MOVES</span>
+              </h3>
+              <p className="text-lg text-white/70 mb-6">
+                Execute devastating combos with Street Fighter-style motion inputs. Master unique special moves, projectiles, and super attacks for each fighter.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <div className="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                  <span className="text-sm text-cyan-400">MOTION INPUTS</span>
+                </div>
+                <div className="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                  <span className="text-sm text-cyan-400">COMBO SYSTEM</span>
+                </div>
+                <div className="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                  <span className="text-sm text-cyan-400">SUPER MOVES</span>
+                </div>
+              </div>
+            </div>
+            <div className="order-1 md:order-2 flex justify-center">
+              <div className="relative">
+                <img src={fighters[0].image} alt="Combat" className="h-96 w-auto filter drop-shadow-2xl" />
+                <div className="absolute inset-0 blur-3xl opacity-40 bg-cyan-500/50" />
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div className="bg-gradient-to-br from-purple-500/20 to-purple-700/20 backdrop-blur-sm p-8 rounded-2xl border-2 border-purple-400/50 hover:border-purple-400 transition-all group">
-            <Users className="w-16 h-16 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-2xl font-bold text-white mb-4">TEAM BATTLES</h3>
-            <p className="text-white/80">Fight solo or team up in epic 3v3 showdowns across cinematic Jamaican battlefields!</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-700/20 backdrop-blur-sm p-8 rounded-2xl border-2 border-yellow-400/50 hover:border-yellow-400 transition-all group">
-            <Trophy className="w-16 h-16 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-2xl font-bold text-white mb-4">TOURNAMENTS</h3>
-            <p className="text-white/80">Compete in ranked matches and tournaments to become the ultimate BadMan Kombat champion!</p>
+        {/* Feature 2 */}
+        <div className="relative min-h-screen flex items-center">
+          <VideoBackground type="section" overlay="darker" />
+          <div className="relative z-10 max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="flex justify-center">
+              <div className="relative">
+                <img src={fighters[1].image} alt="Team Battles" className="h-96 w-auto filter drop-shadow-2xl" />
+                <div className="absolute inset-0 blur-3xl opacity-40 bg-purple-500/50" />
+              </div>
+            </div>
+            <div>
+              <div className="inline-block px-4 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full mb-6">
+                <span className="text-xs font-bold tracking-widest text-purple-400">MULTIPLAYER</span>
+              </div>
+              <h3 className="text-4xl md:text-5xl font-black text-white mb-6">
+                TEAM <span className="text-purple-400">BATTLES</span>
+              </h3>
+              <p className="text-lg text-white/70 mb-6">
+                Fight solo or team up in epic 3v3 showdowns. Battle across cinematic Jamaican locations with dynamic stages and interactive environments.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                  <span className="text-sm text-purple-400">1V1 MODE</span>
+                </div>
+                <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                  <span className="text-sm text-purple-400">3V3 BATTLES</span>
+                </div>
+                <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                  <span className="text-sm text-purple-400">TAG SYSTEM</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Story Section */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="text-red-500 font-bold text-xl mb-4 tracking-widest">THE STORY</div>
-          <h2 className="text-6xl font-black text-white mb-8">
-            PROJECT <span className="text-yellow-400">CYBER YARD</span>
+      <div className="relative min-h-screen flex items-center justify-center">
+        <VideoBackground type="section" overlay="dark" />
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+          <div className="inline-block px-4 py-1 bg-red-500/10 border border-red-500/30 rounded-full mb-6">
+            <span className="text-xs font-bold tracking-widest text-red-400">THE STORY</span>
+          </div>
+          
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-8">
+            PROJECT <span className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 bg-clip-text text-transparent">CYBER YARD</span>
           </h2>
-          <p className="text-xl text-white/80 mb-8 leading-relaxed">
+          
+          <p className="text-lg md:text-xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
             In a dystopian future Jamaica, the government's Project CYBER YARD creates super-soldiers to control the streets. 
-            But when test subject Leroy "Tek-9" King escapes, he rallies a team of cyber-enhanced fighters to take down the corrupt system.
+            But when test subject Leroy "Digital Dread" King escapes, he rallies a team of cyber-enhanced fighters to take down the corrupt system.
           </p>
-          <p className="text-2xl text-green-400 font-bold mb-12">
-            "WI NAH GO DOWN WITHOUT A FIGHT!" - Leroy King
-          </p>
+          
+          {/* Character quote with glitch effect */}
+          <div className="relative mb-12">
+            <div className="absolute inset-0 blur-2xl opacity-40 bg-cyan-500/50" />
+            <div className="relative">
+              <img 
+                src={fighters[0].image} 
+                alt="Leroy" 
+                className="h-64 w-auto mx-auto mb-6 filter drop-shadow-2xl"
+                style={{ filter: `drop-shadow(0 0 40px ${fighters[0].accentColor})` }}
+              />
+              <blockquote className="text-2xl md:text-3xl font-black text-cyan-400 mb-2">
+                "WI NAH GO DOWN WITHOUT A FIGHT!"
+              </blockquote>
+              <cite className="text-sm text-white/60 not-italic">— Leroy "Digital Dread" King</cite>
+            </div>
+          </div>
+          
           <Button
             onClick={() => navigate('/game')}
-            className="bg-gradient-to-r from-green-400 to-cyan-400 text-black font-black text-xl px-12 py-6 hover:scale-105 transition-all"
+            className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 text-black font-black text-lg px-10 py-5 hover:scale-105 transition-all hover:shadow-lg hover:shadow-yellow-500/50"
           >
             EXPERIENCE THE STORY
           </Button>
@@ -204,31 +333,43 @@ const BadManKombatLandingPage = () => {
       </div>
 
       {/* Final CTA */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20 bg-gradient-to-t from-black via-transparent to-transparent">
-        <h2 className="text-7xl md:text-9xl font-black text-white mb-8 text-center leading-none">
-          READY TO
-          <br />
-          <span className="bg-gradient-to-r from-yellow-400 via-green-400 to-red-500 bg-clip-text text-transparent">
-            FIGHT?
-          </span>
-        </h2>
-        <Button
-          onClick={() => navigate('/3d-ultimate')}
-          className="bg-yellow-400 text-black font-black text-3xl px-20 py-10 mb-8 hover:bg-yellow-500 hover:scale-110 transition-all shadow-2xl animate-pulse"
-        >
-          PLAY NOW
-        </Button>
-        <p className="text-white/60 text-sm">Free to Play • No Download Required • All Platforms</p>
+      <div className="relative min-h-screen flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
+        <VideoBackground type="hero" overlay="darker" />
+        
+        <div className="relative z-10 text-center px-4">
+          {/* Massive text */}
+          <h2 className="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-12 leading-none">
+            READY TO<br />
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+              FIGHT?
+            </span>
+          </h2>
+          
+          {/* Pulsing button with massive glow */}
+          <div className="relative inline-block mb-8">
+            <Button
+              onClick={() => navigate('/3d-ultimate')}
+              className="relative bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-black text-2xl md:text-4xl px-16 py-8 hover:scale-110 transition-all z-10"
+            >
+              <Sparkles className="mr-3 inline animate-pulse" />
+              PLAY NOW
+            </Button>
+            <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur-2xl opacity-50 animate-pulse" />
+          </div>
+          
+          <p className="text-white/40 text-sm">Free to Play • All Platforms • 6 Unique Fighters</p>
+        </div>
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-8 px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white/60 text-sm">
+      <footer className="relative z-10 border-t border-cyan-500/10 py-8 px-8 bg-black/60 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white/40 text-sm">
           <div>© 2025 BadMan Kombat. All rights reserved.</div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-yellow-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">Contact</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">Contact</a>
           </div>
         </div>
       </footer>
