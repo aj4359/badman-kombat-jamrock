@@ -11,6 +11,7 @@ import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import ArcadeMode from "./pages/ArcadeMode";
 import Teaser from "./pages/Teaser";
 import TrailerGenerator from "./pages/TrailerGenerator";
+import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/arcade" element={<ArcadeMode />} />
           <Route path="/teaser" element={<Teaser />} />
           <Route path="/trailer-generator" element={<TrailerGenerator />} />
+          <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

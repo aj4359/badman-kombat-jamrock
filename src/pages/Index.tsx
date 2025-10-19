@@ -6,12 +6,24 @@ import GameplayTrailer from '@/components/GameplayTrailer';
 import KombatArena from '@/components/KombatArena';
 import Footer from '@/components/Footer';
 import { RastaChatbot } from '@/components/RastaChatbot';
+import { Button } from '@/components/ui/button';
+import { Zap } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      {/* 3D Ultimate Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <Button 
+          onClick={() => navigate('/3d-ultimate')}
+          className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 text-white font-bold text-lg px-6 py-6 animate-pulse hover:scale-110 transition-transform"
+        >
+          <Zap className="mr-2" /> PLAY 3D ULTIMATE
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <Hero />
       
