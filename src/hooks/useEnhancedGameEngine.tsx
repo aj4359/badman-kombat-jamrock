@@ -749,82 +749,93 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     };
   }, [gameState.screen]); // Only restart when screen changes, NOT gameLoop
 
-  // Keyboard input handling
+  // Keyboard input handling - FIXED: Use e.code for reliable key detection
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
+      e.preventDefault(); // Prevent default browser actions
       
-      console.log('🎮 KEY DOWN:', e.key);
+      console.log('🎮 KEY DOWN:', e.code);
       
-      // Player 1 controls
-      if (['w', 'a', 's', 'd', 'j', 'k', 'l'].includes(key)) {
-        const mapping: Record<string, string> = {
-          'w': 'up',
-          'a': 'left',
-          's': 'down',
-          'd': 'right',
-          'j': 'punch',
-          'k': 'block',
-          'l': 'kick'
-        };
-        player1Keys.current[mapping[key]] = true;
-        console.log('⬆️ P1:', mapping[key]);
+      // Player 1 controls (WASD + JKL)
+      const p1Mapping: Record<string, string> = {
+        'KeyW': 'up',
+        'KeyA': 'left',
+        'KeyS': 'down',
+        'KeyD': 'right',
+        'KeyJ': 'punch',
+        'KeyK': 'block',
+        'KeyL': 'kick'
+      };
+      
+      if (p1Mapping[e.code]) {
+        player1Keys.current[p1Mapping[e.code]] = true;
+        console.log('⬆️ P1:', p1Mapping[e.code], player1Keys.current);
       }
 
-      // Player 2 controls
-      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2', '3'].includes(key)) {
-        const mapping: Record<string, string> = {
-          'arrowup': 'up',
-          'arrowleft': 'left',
-          'arrowdown': 'down', 
-          'arrowright': 'right',
-          '1': 'punch',
-          '2': 'block',
-          '3': 'kick'
-        };
-        player2Keys.current[mapping[key]] = true;
-        console.log('⬆️ P2:', mapping[key]);
+      // Player 2 controls (Arrows + 1,2,3)
+      const p2Mapping: Record<string, string> = {
+        'ArrowUp': 'up',
+        'ArrowLeft': 'left',
+        'ArrowDown': 'down',
+        'ArrowRight': 'right',
+        'Digit1': 'punch',
+        'Numpad1': 'punch',
+        'Digit2': 'block',
+        'Numpad2': 'block',
+        'Digit3': 'kick',
+        'Numpad3': 'kick'
+      };
+      
+      if (p2Mapping[e.code]) {
+        player2Keys.current[p2Mapping[e.code]] = true;
+        console.log('⬆️ P2:', p2Mapping[e.code], player2Keys.current);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
+      e.preventDefault(); // Prevent default browser actions
       
       // Player 1 controls
-      if (['w', 'a', 's', 'd', 'j', 'k', 'l'].includes(key)) {
-        const mapping: Record<string, string> = {
-          'w': 'up',
-          'a': 'left',
-          's': 'down',
-          'd': 'right',
-          'j': 'punch',
-          'k': 'block',
-          'l': 'kick' // ✅ FIXED: Added kick
-        };
-        player1Keys.current[mapping[key]] = false;
+      const p1Mapping: Record<string, string> = {
+        'KeyW': 'up',
+        'KeyA': 'left',
+        'KeyS': 'down',
+        'KeyD': 'right',
+        'KeyJ': 'punch',
+        'KeyK': 'block',
+        'KeyL': 'kick'
+      };
+      
+      if (p1Mapping[e.code]) {
+        player1Keys.current[p1Mapping[e.code]] = false;
       }
 
       // Player 2 controls
-      if (['arrowup', 'arrowleft', 'arrowdown', 'arrowright', '1', '2', '3'].includes(key)) {
-        const mapping: Record<string, string> = {
-          'arrowup': 'up',
-          'arrowleft': 'left',
-          'arrowdown': 'down',
-          'arrowright': 'right', 
-          '1': 'punch',
-          '2': 'block',
-          '3': 'kick' // ✅ FIXED: Added kick
-        };
-        player2Keys.current[mapping[key]] = false;
+      const p2Mapping: Record<string, string> = {
+        'ArrowUp': 'up',
+        'ArrowLeft': 'left',
+        'ArrowDown': 'down',
+        'ArrowRight': 'right',
+        'Digit1': 'punch',
+        'Numpad1': 'punch',
+        'Digit2': 'block',
+        'Numpad2': 'block',
+        'Digit3': 'kick',
+        'Numpad3': 'kick'
+      };
+      
+      if (p2Mapping[e.code]) {
+        player2Keys.current[p2Mapping[e.code]] = false;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    // Attach to document for reliable capture
+    document.addEventListener('keydown', handleKeyDown, { passive: false });
+    document.addEventListener('keyup', handleKeyUp, { passive: false });
     
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
