@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import BadManKombatLandingPage from "./components/BadManKombatLandingPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CharacterSelect from "./pages/CharacterSelect";
@@ -22,7 +23,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<BadManKombatLandingPage />} />
+          <Route path="/original-home" element={<Index />} />
           <Route path="/character-select" element={<CharacterSelect />} />
           <Route path="/vs-screen" element={<EnhancedVSScreen />} />
           <Route path="/game" element={<Game />} />
