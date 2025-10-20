@@ -95,7 +95,14 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     if (audioManager.isLoaded && audioManager.playIntroThenGameplay) {
       audioManager.playIntroThenGameplay();
     }
-  }, [audioManager.isLoaded]);
+    
+    // ✅ CLEANUP: Stop audio when component unmounts
+    return () => {
+      if (audioManager.stopAllAudio) {
+        audioManager.stopAllAudio();
+      }
+    };
+  }, [audioManager.isLoaded, audioManager.playIntroThenGameplay, audioManager.stopAllAudio]);
   
   // Sprite loading system - NOW LOADS REAL PIXEL ART
   const { isLoaded: spritesLoaded, getSpriteData, getAnimationFrame } = useFighterSprites();

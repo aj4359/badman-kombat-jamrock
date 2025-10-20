@@ -187,9 +187,11 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     return;
   }
   
-  // Geometric rendering fallback
+  // Geometric rendering fallback with transparency for stage visibility
   if (effects.alpha !== undefined) {
     ctx.globalAlpha = effects.alpha;
+  } else {
+    ctx.globalAlpha = 0.85; // ✅ TRANSPARENCY: Make geometric fallback semi-transparent so stage shows through
   }
   
   if (effects.shake) {

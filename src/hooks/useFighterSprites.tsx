@@ -104,6 +104,13 @@ export const useFighterSprites = () => {
     animationName: string,
     frameIndex: number
   ): { x: number; y: number; width: number; height: number } | null => {
+    // ✅ VALIDATION: Check if sprite exists before returning coordinates
+    const spriteImage = spriteImages.current[fighterId];
+    if (!spriteImage || !spriteImage.complete || spriteImage.naturalWidth === 0) {
+      console.warn(`⚠️ Sprite not loaded for ${fighterId}, using geometric fallback`);
+      return null;
+    }
+    
     const FRAME_WIDTH = 64;
     const FRAME_HEIGHT = 64;
     
@@ -125,6 +132,17 @@ export const useFighterSprites = () => {
     
     const anim = animationRows[animationName] || animationRows.idle;
     const safeFrameIndex = frameIndex % anim.frames;
+    
+    console.log(`🎨 Returning frame coords for ${fighterId}:`, {
+      animation: animationName,
+      frame: safeFrameIndex,
+      coords: {
+        x: safeFrameIndex * FRAME_WIDTH,
+        y: anim.row * FRAME_HEIGHT,
+        width: FRAME_WIDTH,
+        height: FRAME_HEIGHT
+      }
+    });
     
     return {
       x: safeFrameIndex * FRAME_WIDTH,
