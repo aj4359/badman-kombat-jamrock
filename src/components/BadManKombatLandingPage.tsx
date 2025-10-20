@@ -120,203 +120,241 @@ const BadManKombatLandingPage = () => {
         </div>
       </nav>
 
-      {/* HERO: Marvel Rivals Style */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        {/* Animated Background */}
+      {/* HERO: Epic Marvel Rivals Style */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Cinematic Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black" />
+          <div className="absolute inset-0 bg-gradient-radial from-purple-900/20 via-black to-black z-10" />
           <img 
             src={kingstonStreet} 
             alt="Kingston" 
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-40 scale-110 animate-[zoom_30s_ease-in-out_infinite]"
           />
-          {/* Animated grid overlay */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)',
-            backgroundSize: '100px 100px',
-            animation: 'grid-flow 20s linear infinite'
-          }} />
+          {/* Dynamic light rays */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent animate-pulse" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-          {/* Logo Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8 backdrop-blur-sm">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-            <span className="text-xs font-bold tracking-[0.3em] text-cyan-400">SEASON 1 • NOW LIVE</span>
+        {/* Epic Content */}
+        <div className="relative z-20 max-w-[1400px] mx-auto px-6 text-center pt-24">
+          {/* Season Badge */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-purple-600/20 border-2 border-cyan-400/30 rounded-full mb-8 backdrop-blur-md shadow-[0_0_50px_rgba(0,212,255,0.3)]">
+            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_20px_rgba(0,212,255,0.8)]" />
+            <span className="text-sm font-bold tracking-[0.4em] text-cyan-300 font-['Orbitron']">SEASON 1 • KINGSTON NIGHTS</span>
+            <Sparkles className="w-4 h-4 text-cyan-400" />
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-7xl md:text-9xl font-black mb-6 leading-none">
-            <span className="block text-white mb-2">BADMAN</span>
-            <span className="block bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              KOMBAT
-            </span>
+          {/* Epic Title with 3D effect */}
+          <h1 className="mb-8 leading-none">
+            <div className="text-[120px] md:text-[180px] font-black mb-4 font-['Bebas_Neue'] tracking-tight">
+              <span className="block text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.3)]">BADMAN</span>
+            </div>
+            <div className="text-[100px] md:text-[160px] font-black font-['Bebas_Neue'] tracking-wider">
+              <span className="inline-block bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_60px_rgba(0,212,255,0.6)] animate-[shimmer_3s_ease-in-out_infinite]">
+                KOMBAT
+              </span>
+            </div>
           </h1>
 
-          <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Jamaica's most dangerous fighters clash in electrifying street combat. 
-            Master devastating combos, special moves, and super powers across iconic locations.
+          <p className="text-2xl md:text-3xl text-white/80 max-w-4xl mx-auto mb-16 leading-relaxed font-['Inter'] font-medium tracking-wide">
+            <span className="text-cyan-400 font-bold">Jamaica's Finest</span> clash in explosive street combat.<br/>
+            Master <span className="text-purple-400">devastating combos</span> and <span className="text-pink-400">super powers</span> across iconic locations.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          {/* Epic CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
             <Button
               onClick={() => navigate('/bmk-ultimate3d')}
-              className="relative group bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-black text-xl px-12 py-7 overflow-hidden"
+              className="group relative bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 text-white font-black text-2xl px-16 py-8 rounded-full overflow-hidden shadow-[0_0_60px_rgba(0,212,255,0.5)] hover:shadow-[0_0_100px_rgba(0,212,255,0.8)] transition-all duration-300 border-2 border-white/20"
             >
-              <Play className="mr-2 inline w-6 h-6" />
-              <span className="relative z-10">PLAY FREE NOW</span>
-              <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
-              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 blur-xl opacity-50 group-hover:opacity-75 transition -z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+              <Play className="mr-3 inline w-8 h-8 drop-shadow-lg" />
+              <span className="relative z-10 font-['Orbitron']">PLAY FREE NOW</span>
             </Button>
             <Button
               onClick={() => document.getElementById('trailer')?.scrollIntoView({ behavior: 'smooth' })}
-              variant="outline"
-              className="border-2 border-white/20 hover:border-cyan-400 text-white hover:text-cyan-400 font-bold text-xl px-12 py-7 bg-white/5 backdrop-blur-sm"
+              className="border-3 border-cyan-400/50 hover:border-cyan-400 text-white hover:text-cyan-400 font-bold text-2xl px-16 py-8 bg-black/40 backdrop-blur-lg hover:bg-black/60 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(0,212,255,0.2)] hover:shadow-[0_0_60px_rgba(0,212,255,0.4)]"
             >
-              WATCH TRAILER
+              <span className="font-['Orbitron']">WATCH TRAILER</span>
             </Button>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mb-12">
-            <div className="text-center">
-              <div className="text-4xl font-black text-cyan-400 mb-2">6</div>
-              <div className="text-sm text-white/50 uppercase tracking-wider">Fighters</div>
+          {/* Epic Stats Grid */}
+          <div className="grid grid-cols-3 gap-12 max-w-4xl mx-auto mb-16">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/20 to-transparent blur-xl group-hover:blur-2xl transition-all" />
+              <div className="relative text-center p-6 border border-cyan-500/30 rounded-lg backdrop-blur-sm bg-black/30">
+                <div className="text-6xl font-black text-cyan-400 mb-3 font-['Orbitron'] drop-shadow-[0_0_20px_rgba(0,212,255,0.6)]">6</div>
+                <div className="text-sm text-white/70 uppercase tracking-[0.3em] font-bold">LEGENDS</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-black text-purple-400 mb-2">5</div>
-              <div className="text-sm text-white/50 uppercase tracking-wider">Locations</div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-b from-purple-500/20 to-transparent blur-xl group-hover:blur-2xl transition-all" />
+              <div className="relative text-center p-6 border border-purple-500/30 rounded-lg backdrop-blur-sm bg-black/30">
+                <div className="text-6xl font-black text-purple-400 mb-3 font-['Orbitron'] drop-shadow-[0_0_20px_rgba(168,85,247,0.6)]">5</div>
+                <div className="text-sm text-white/70 uppercase tracking-[0.3em] font-bold">ARENAS</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-black text-pink-400 mb-2">∞</div>
-              <div className="text-sm text-white/50 uppercase tracking-wider">Combos</div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-b from-pink-500/20 to-transparent blur-xl group-hover:blur-2xl transition-all" />
+              <div className="relative text-center p-6 border border-pink-500/30 rounded-lg backdrop-blur-sm bg-black/30">
+                <div className="text-6xl font-black text-pink-400 mb-3 font-['Orbitron'] drop-shadow-[0_0_20px_rgba(236,72,153,0.6)]">∞</div>
+                <div className="text-sm text-white/70 uppercase tracking-[0.3em] font-bold">COMBOS</div>
+              </div>
             </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="animate-bounce">
-            <ChevronDown className="w-8 h-8 text-cyan-400 mx-auto" />
           </div>
         </div>
 
-        {/* Floating Fighter Images */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-4 pointer-events-none opacity-20">
-          {fighters.slice(0, 3).map((fighter, i) => (
-            <img
-              key={i}
-              src={fighter.image}
-              alt={fighter.name}
-              className="h-96 object-contain"
-              style={{
-                animation: `float ${3 + i}s ease-in-out infinite`,
-                animationDelay: `${i * 0.3}s`
-              }}
-            />
-          ))}
+        {/* Massive Fighter Showcase - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-[600px] flex items-end justify-center pointer-events-none z-10">
+          <div className="flex items-end justify-center gap-12 pb-0">
+            {fighters.slice(0, 3).map((fighter, i) => (
+              <div key={i} className="relative" style={{ animation: `float ${4 + i * 0.5}s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}>
+                <div className="absolute inset-0 blur-3xl opacity-60" style={{ background: `radial-gradient(circle, ${fighter.accentColor}, transparent)` }} />
+                <img
+                  src={fighter.image}
+                  alt={fighter.name}
+                  className="relative h-[500px] object-contain drop-shadow-[0_0_60px_rgba(0,0,0,0.8)]"
+                  style={{ filter: `drop-shadow(0 0 40px ${fighter.accentColor}80)` }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* FIGHTER ROSTER - Marvel Rivals Grid */}
-      <section className="relative py-32 bg-gradient-to-b from-black via-purple-950/10 to-black">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full mb-6">
-              <Trophy className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-bold tracking-[0.3em] text-purple-400">THE ROSTER</span>
+      {/* FIGHTER ROSTER - Marvel Rivals Premium Grid */}
+      <section className="relative py-40 bg-gradient-to-b from-black via-purple-950/20 to-black overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+        
+        <div className="relative max-w-[1600px] mx-auto px-6">
+          {/* Epic Section Header */}
+          <div className="text-center mb-24">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400/30 rounded-full mb-8 backdrop-blur-md">
+              <Trophy className="w-5 h-5 text-purple-400" />
+              <span className="text-sm font-bold tracking-[0.4em] text-purple-300 font-['Orbitron']">THE LEGENDS</span>
             </div>
-            <h2 className="text-6xl md:text-7xl font-black text-white mb-6">
-              CHOOSE YOUR <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">WARRIOR</span>
+            <h2 className="text-7xl md:text-8xl font-black mb-8 font-['Bebas_Neue'] tracking-tight">
+              <span className="text-white">ASSEMBLE YOUR </span>
+              <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(168,85,247,0.4)]">
+                TEAM
+              </span>
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Each fighter brings unique abilities, devastating combos, and their own fighting style to dominate the streets.
+            <p className="text-2xl text-white/70 max-w-3xl mx-auto font-['Inter'] leading-relaxed">
+              Master unique abilities, devastating special moves, and game-changing super powers
             </p>
           </div>
 
-          {/* Fighter Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Premium Fighter Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {fighters.map((fighter, index) => (
               <div
                 key={fighter.name}
-                className="group relative bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-lg overflow-hidden cursor-pointer hover:border-cyan-400/50 transition-all duration-300"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="group relative bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-transparent border-2 border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-cyan-400/60 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_80px_rgba(0,212,255,0.3)]"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  backdropFilter: 'blur(20px)'
+                }}
               >
+                {/* Glow Effect */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl -z-10"
+                  style={{ background: `radial-gradient(circle at 50% 50%, ${fighter.accentColor}40, transparent)` }}
+                />
+
                 {/* Fighter Image */}
-                <div className="relative h-96 overflow-hidden bg-gradient-to-b from-transparent to-black/80">
+                <div className="relative h-[480px] overflow-hidden bg-gradient-to-b from-transparent via-black/20 to-black/90">
                   <img
                     src={fighter.image}
                     alt={fighter.name}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_0_50px_rgba(0,0,0,0.9)]"
                     style={{
-                      filter: `drop-shadow(0 0 30px ${fighter.accentColor}40)`
+                      filter: `drop-shadow(0 0 40px ${fighter.accentColor}60)`
                     }}
                   />
+                  
+                  {/* Animated accent glow */}
                   <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-3xl"
-                    style={{ background: `radial-gradient(circle at center, ${fighter.accentColor}, transparent)` }}
+                    className="absolute inset-0 opacity-0 group-hover:opacity-40 transition-opacity duration-700 blur-3xl"
+                    style={{ background: `radial-gradient(ellipse at bottom, ${fighter.accentColor}, transparent 70%)` }}
                   />
+                  
+                  {/* Top gradient overlay */}
+                  <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
                 </div>
 
                 {/* Fighter Info */}
-                <div className="p-6">
-                  <div className="text-xs font-bold tracking-[0.3em] mb-2" style={{ color: fighter.accentColor }}>
+                <div className="relative p-8 bg-gradient-to-b from-black/80 to-black/95">
+                  {/* Title Badge */}
+                  <div 
+                    className="inline-block text-xs font-bold tracking-[0.3em] mb-3 px-3 py-1 rounded-full border font-['Orbitron']" 
+                    style={{ 
+                      color: fighter.accentColor,
+                      borderColor: `${fighter.accentColor}40`,
+                      backgroundColor: `${fighter.accentColor}10`
+                    }}
+                  >
                     {fighter.title}
                   </div>
-                  <h3 className="text-3xl font-black text-white mb-4">{fighter.name}</h3>
                   
-                  {/* Stats */}
-                  <div className="space-y-2">
+                  <h3 className="text-4xl font-black text-white mb-6 font-['Bebas_Neue'] tracking-wide drop-shadow-lg">
+                    {fighter.name}
+                  </h3>
+                  
+                  {/* Epic Stats with glow */}
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">POWER</span>
-                      <div className="flex-1 mx-3 h-1 bg-white/10 rounded-full overflow-hidden">
+                      <span className="text-white/60 font-['Inter'] font-semibold">POWER</span>
+                      <div className="flex-1 mx-4 h-2 bg-white/10 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="h-full rounded-full transition-all duration-1000"
+                          className="h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_currentColor]"
                           style={{ 
                             width: `${fighter.stats.power}%`,
                             backgroundColor: fighter.accentColor
                           }}
                         />
                       </div>
-                      <span className="text-white font-bold w-8 text-right">{fighter.stats.power}</span>
+                      <span className="text-white font-bold w-10 text-right font-['Orbitron']">{fighter.stats.power}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">SPEED</span>
-                      <div className="flex-1 mx-3 h-1 bg-white/10 rounded-full overflow-hidden">
+                      <span className="text-white/60 font-['Inter'] font-semibold">SPEED</span>
+                      <div className="flex-1 mx-4 h-2 bg-white/10 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="h-full rounded-full transition-all duration-1000"
+                          className="h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_currentColor]"
                           style={{ 
                             width: `${fighter.stats.speed}%`,
                             backgroundColor: fighter.accentColor
                           }}
                         />
                       </div>
-                      <span className="text-white font-bold w-8 text-right">{fighter.stats.speed}</span>
+                      <span className="text-white font-bold w-10 text-right font-['Orbitron']">{fighter.stats.speed}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/50">DEFENSE</span>
-                      <div className="flex-1 mx-3 h-1 bg-white/10 rounded-full overflow-hidden">
+                      <span className="text-white/60 font-['Inter'] font-semibold">DEFENSE</span>
+                      <div className="flex-1 mx-4 h-2 bg-white/10 rounded-full overflow-hidden border border-white/5">
                         <div 
-                          className="h-full rounded-full transition-all duration-1000"
+                          className="h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_currentColor]"
                           style={{ 
                             width: `${fighter.stats.defense}%`,
                             backgroundColor: fighter.accentColor
                           }}
                         />
                       </div>
-                      <span className="text-white font-bold w-8 text-right">{fighter.stats.defense}</span>
+                      <span className="text-white font-bold w-10 text-right font-['Orbitron']">{fighter.stats.defense}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                {/* Premium Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-12">
                   <Button
                     onClick={() => navigate('/bmk-ultimate3d')}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white font-bold"
+                    className="relative overflow-hidden bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold px-10 py-4 rounded-full text-lg shadow-[0_0_30px_rgba(0,212,255,0.5)] border-2 border-white/20 font-['Orbitron']"
                   >
-                    SELECT FIGHTER
+                    <span className="relative z-10">SELECT FIGHTER</span>
                   </Button>
                 </div>
               </div>
