@@ -188,11 +188,12 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
       }
       
-      // RENDER FIGHTERS - Always use geometric rendering for now (sprites will be re-enabled once fixed)
+      // RENDER FIGHTERS WITH PIXEL ART SPRITES
+      const p1SpriteImage = getSpriteData(fighterData?.player1?.id || '');
       renderAuthenticFighter({
         ctx,
         fighter: p1,
-        spriteImage: null,
+        spriteImage: p1SpriteImage,
         effects: {
           alpha: p1.state.current === 'stunned' ? 0.7 : 1,
           glow: p1.state.current === 'special',
@@ -201,10 +202,11 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         }
       });
       
+      const p2SpriteImage = getSpriteData(fighterData?.player2?.id || '');
       renderAuthenticFighter({
         ctx,
         fighter: p2,
-        spriteImage: null,
+        spriteImage: p2SpriteImage,
         effects: {
           alpha: p2.state.current === 'stunned' ? 0.7 : 1,
           glow: p2.state.current === 'special',
