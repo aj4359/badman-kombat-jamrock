@@ -89,6 +89,9 @@ export interface GameState {
     parallax2: number;
     parallax3: number;
   };
+  hitFreeze: number; // Street Fighter hit freeze effect
+  cameraZoom: number; // Cinematic camera zoom
+  cameraZoomTimer: number;
 }
 
 const CANVAS_WIDTH = 1024;
@@ -100,6 +103,30 @@ const MOVE_SPEED = 4;
 const WALK_SPEED = 3;
 const RUN_SPEED = 5;
 const MAX_COMBO_DECAY = 60;
+
+// Street Fighter-style movement constants
+const ACCELERATION = 0.5;
+const FRICTION = 0.85;
+const MAX_WALK_SPEED = 4;
+const HIT_FREEZE_DURATION = 8; // Frames to pause on impact
+
+// Animation state mapper for Street Fighter-style animations
+const getAnimationState = (fighter: Fighter): string => {
+  // Priority order (like Street Fighter)
+  if (fighter.state.current === 'hurt') return 'hit';
+  if (fighter.state.current === 'stunned') return 'hit';
+  if (fighter.state.current === 'blocking') return 'blocking';
+  if (fighter.state.current === 'special') return 'special';
+  if (fighter.state.current === 'attacking') {
+    const moveName = fighter.animation?.currentMove?.toLowerCase() || '';
+    if (moveName.includes('kick')) return 'attacking';
+    if (moveName.includes('punch')) return 'attacking';
+    return 'attacking';
+  }
+  if (fighter.velocityY !== 0) return 'jumping';
+  if (Math.abs(fighter.velocityX || 0) > 0.5) return 'walking';
+  return 'idle';
+};
 
 export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -131,7 +158,10 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     stage: 'kingston-street',
     particles: [],
     projectiles: [],
-    backgroundLayers: { parallax1: 0, parallax2: 0, parallax3: 0 }
+    backgroundLayers: { parallax1: 0, parallax2: 0, parallax3: 0 },
+    hitFreeze: 0,
+    cameraZoom: 1.0,
+    cameraZoomTimer: 0
   });
 
   const [keys, setKeys] = useState<Record<string, boolean>>({});
@@ -384,30 +414,37 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     
     // Only allow new actions if fighter can act (using combat system)
     if (CombatSystem.canAct(newFighter as any)) {
-      // Enhanced Movement with frame-perfect responsiveness
-      const moveSpeed = fighterData.stats.walkSpeed * (deltaTime / 16.67); // Normalize to 60fps
+      // STREET FIGHTER-STYLE MOVEMENT with acceleration and momentum
       if (keys.left && newFighter.x > 50) {
-        const oldX = newFighter.x;
-        newFighter.x -= moveSpeed;
+        newFighter.velocityX = newFighter.velocityX || 0;
+        newFighter.velocityX -= ACCELERATION;
+        newFighter.velocityX = Math.max(newFighter.velocityX, -MAX_WALK_SPEED);
         newFighter.facing = 'left';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
         }
-        // 🐛 DEBUG: Log movement
-        if (Math.random() < 0.01) console.log(`⬅️ Moving LEFT: ${oldX.toFixed(0)} → ${newFighter.x.toFixed(0)}`);
       } else if (keys.right && newFighter.x < CANVAS_WIDTH - 50 - newFighter.width) {
-        const oldX = newFighter.x;
-        newFighter.x += moveSpeed;
+        newFighter.velocityX = newFighter.velocityX || 0;
+        newFighter.velocityX += ACCELERATION;
+        newFighter.velocityX = Math.min(newFighter.velocityX, MAX_WALK_SPEED);
         newFighter.facing = 'right';
         if (newFighter.state.current === 'idle' || newFighter.state.current === 'walking') {
           newFighter.state.current = 'walking';
         }
-        // 🐛 DEBUG: Log movement
-        if (Math.random() < 0.01) console.log(`➡️ Moving RIGHT: ${oldX.toFixed(0)} → ${newFighter.x.toFixed(0)}`);
-      } else if (newFighter.state.current === 'walking') {
-        newFighter.state.current = 'idle';
-        newFighter.animationTimer = 0;
+      } else {
+        // Apply friction when no input
+        newFighter.velocityX = (newFighter.velocityX || 0) * FRICTION;
+        if (Math.abs(newFighter.velocityX || 0) < 0.1) {
+          newFighter.velocityX = 0;
+          if (newFighter.state.current === 'walking') {
+            newFighter.state.current = 'idle';
+            newFighter.animationTimer = 0;
+          }
+        }
       }
+      
+      // Apply velocity to position
+      newFighter.x += (newFighter.velocityX || 0);
 
       // Increment animation timer slowly for smooth pose transitions
       if (newFighter.animationTimer !== undefined) {

@@ -134,6 +134,16 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // ✅ FIXED: Use ref to get latest state without recreating render callback
     const currentGameState = gameStateRef.current;
     
+    // Marvel Rivals-style dynamic lighting during special moves
+    const renderDynamicLighting = () => {
+      const p1 = currentGameState.fighters.player1;
+      const p2 = currentGameState.fighters.player2;
+      if (p1?.state.current === 'special' || p2?.state.current === 'special') {
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    };
+    
     // Update visual effects
     updateEffects(deltaTime);
     
@@ -145,7 +155,10 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // 1. CLEAR CANVAS (Kingston background is HTML overlay, not canvas)
     ctx.clearRect(0, 0, 1024, 576);
     
-    // 3. DRAW FIGHTERS WITH PROCEDURAL GEOMETRIC ANIMATION + VISUAL EFFECTS
+    // DYNAMIC LIGHTING LAYER
+    renderDynamicLighting();
+    
+    // 3. DRAW FIGHTERS WITH PIXEL ART SPRITES + STREET FIGHTER EFFECTS
     const p1 = currentGameState.fighters.player1;
     const p2 = currentGameState.fighters.player2;
     
@@ -156,10 +169,12 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           p2: { x: Math.round(p2.x), y: Math.round(p2.y), state: p2.state.current }
         });
       }
-      // Add motion blur for fast-moving fighters
+      
+      // Calculate speeds for effects
       const p1Speed = Math.sqrt((p1.velocityX || 0) ** 2 + (p1.velocityY || 0) ** 2);
       const p2Speed = Math.sqrt((p2.velocityX || 0) ** 2 + (p2.velocityY || 0) ** 2);
       
+      // Motion blur trails for fast movement
       if (p1Speed > 3) {
         renderMotionBlur(ctx, {
           x: p1.x,
@@ -180,12 +195,35 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         });
       }
       
-      // Add speed lines during attacks
-      if (p1.state.current === 'attacking') {
-        renderSpeedLines(ctx, p1.x + p1.width/2, p1.y + p1.height/2, p1.facing, 1.2);
+      // Speed lines during attacks (Marvel Rivals style)
+      if (p1.state.current === 'attacking' && p1.state.timer && p1.state.timer < 10) {
+        renderSpeedLines(ctx, p1.x + p1.width/2, p1.y + p1.height/2, p1.facing, 1.5);
+        
+        // Ghost trail for heavy attacks
+        for (let i = 1; i <= 3; i++) {
+          const p1SpriteGhost = getSpriteData(fighterData?.player1?.id || '');
+          renderAuthenticFighter({
+            ctx,
+            fighter: { ...p1, x: p1.x - (p1.facing === 'right' ? i*15 : -i*15) },
+            spriteImage: p1SpriteGhost,
+            effects: { alpha: 0.3 - (i * 0.08) }
+          });
+        }
       }
-      if (p2.state.current === 'attacking') {
-        renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.2);
+      
+      if (p2.state.current === 'attacking' && p2.state.timer && p2.state.timer < 10) {
+        renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.5);
+        
+        // Ghost trail for heavy attacks
+        for (let i = 1; i <= 3; i++) {
+          const p2SpriteGhost = getSpriteData(fighterData?.player2?.id || '');
+          renderAuthenticFighter({
+            ctx,
+            fighter: { ...p2, x: p2.x - (p2.facing === 'right' ? i*15 : -i*15) },
+            spriteImage: p2SpriteGhost,
+            effects: { alpha: 0.3 - (i * 0.08) }
+          });
+        }
       }
       
       // RENDER FIGHTERS WITH PIXEL ART SPRITES
