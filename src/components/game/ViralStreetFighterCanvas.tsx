@@ -7,6 +7,7 @@ import { renderAuthenticFighter } from './ScaledAuthenticFighter';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { KingstonStageBackground } from './KingstonStageBackground';
+import { renderLate70sKingstonStage } from './Late70sKingstonStage';
 import { renderProfessionalHealthBars, renderFighterNames } from './ProfessionalUIRenderer';
 import { ControlDisplay } from './ControlDisplay';
 import { FocusPrompt } from './FocusPrompt';
@@ -154,8 +155,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     ctx.save();
     ctx.translate(shake.x, shake.y);
     
-    // 1. CLEAR CANVAS (Kingston background is HTML overlay, not canvas)
-    ctx.clearRect(0, 0, 1024, 576);
+    // 1. RENDER AUTHENTIC 1970s KINGSTON STAGE BACKGROUND
+    renderLate70sKingstonStage(ctx, frameCountRef.current, shake);
     
     // DYNAMIC LIGHTING LAYER
     renderDynamicLighting();

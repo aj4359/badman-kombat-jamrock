@@ -84,7 +84,7 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
-  const GROUND_LEVEL = 456; // 576 (canvas height) - 120 (ground offset) = 456
+  const GROUND_LEVEL = 456;
   
   const attackType = fighter.state?.current === 'attacking' ? 'medium' : undefined;
   const moveType = fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'kick' : 'punch';
@@ -96,63 +96,113 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     moveType
   );
   
-  // ✅ USE SPRITE IMAGE - This is the Street Fighter-style pixel art!
+  // Map fighter state to animation name
+  const getAnimationName = (state: string): string => {
+    const stateMap: Record<string, string> = {
+      idle: 'idle',
+      walking: 'walking',
+      attacking: fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'heavyKick' : 'mediumPunch',
+      blocking: 'blocking',
+      hurt: 'hurt',
+      knockdown: 'knockdown',
+      special: 'special',
+      victory: 'victory'
+    };
+    return stateMap[state] || 'idle';
+  };
+  
+  // ✅ USE SPRITE IMAGE WITH ANIMATION FRAMES
   if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
-    if (effects.alpha !== undefined) {
-      ctx.globalAlpha = effects.alpha;
+    // Get animation frame hook
+    const { useFighterSprites } = require('@/hooks/useFighterSprites');
+    const { getAnimationFrame } = useFighterSprites();
+    
+    if (getAnimationFrame) {
+      // Calculate current frame
+      const animationName = getAnimationName(fighter.state?.current || 'idle');
+      const frameIndex = Math.floor((fighter.animation?.frameTimer || 0) / 5); // Change frame every 5 game ticks
+      const frameCoords = getAnimationFrame(fighter.id, animationName, frameIndex);
+      
+      if (frameCoords) {
+        // Apply effects
+        if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
+        if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
+        if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
+        if (effects.glow || effects.special) {
+          ctx.shadowColor = '#FFD700';
+          ctx.shadowBlur = 20;
+        }
+        if (effects.flash) ctx.globalCompositeOperation = 'lighter';
+        
+        // Scale sprite
+        const scale = 2.5;
+        const finalWidth = frameCoords.width * scale;
+        const finalHeight = frameCoords.height * scale;
+        
+        // Position sprite
+        const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
+        const drawY = fighter.y + fighter.height - finalHeight;
+        
+        // Flip based on facing
+        const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
+                           (typeof fighter.facing === 'number' && fighter.facing === -1);
+        
+        if (facingLeft) {
+          ctx.save();
+          ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
+          ctx.scale(-1, 1);
+          ctx.drawImage(
+            spriteImage,
+            frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect (specific frame)
+            -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight // Dest rect
+          );
+          ctx.restore();
+        } else {
+          ctx.drawImage(
+            spriteImage,
+            frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect
+            drawX, drawY, finalWidth, finalHeight // Dest rect
+          );
+        }
+        
+        ctx.restore();
+        return; // ✅ EXIT - Animated sprite rendered!
+      }
     }
     
-    if (effects.shake) {
-      ctx.translate(effects.shake.x, effects.shake.y);
-    }
-    
-    if (effects.hueRotation) {
-      ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
-    }
-    
-    // Apply glow for special moves
+    // Fallback to full sprite sheet if getAnimationFrame not available
+    if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
+    if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
+    if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
     if (effects.glow || effects.special) {
       ctx.shadowColor = '#FFD700';
       ctx.shadowBlur = 20;
     }
+    if (effects.flash) ctx.globalCompositeOperation = 'lighter';
     
-    // Apply flash when hit
-    if (effects.flash) {
-      ctx.globalCompositeOperation = 'lighter';
-    }
-    
-    // Scale sprite to be 2.5x larger for better visibility
     const scale = 2.5;
     const spriteWidth = spriteImage.naturalWidth || spriteImage.width;
     const spriteHeight = spriteImage.naturalHeight || spriteImage.height;
     const finalWidth = spriteWidth * scale;
     const finalHeight = spriteHeight * scale;
     
-    // Center sprite on fighter position
     const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
     const drawY = fighter.y + fighter.height - finalHeight;
     
-    // Flip based on facing direction
     const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
                        (typeof fighter.facing === 'number' && fighter.facing === -1);
     if (facingLeft) {
       ctx.save();
       ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
       ctx.scale(-1, 1);
-      ctx.drawImage(
-        spriteImage,
-        -finalWidth / 2,
-        -finalHeight / 2,
-        finalWidth,
-        finalHeight
-      );
+      ctx.drawImage(spriteImage, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
       ctx.restore();
     } else {
       ctx.drawImage(spriteImage, drawX, drawY, finalWidth, finalHeight);
     }
     
     ctx.restore();
-    return; // ✅ EXIT - Don't draw geometric shapes!
+    return;
   }
   
   // Geometric rendering fallback

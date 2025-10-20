@@ -74,6 +74,25 @@ export const useAudioManager = () => {
     handleAudioLoad(gameplay, 'gameplay');
     handleAudioLoad(ambient, 'ambient');
     
+    // Fallback audio system - ensure at least one track plays
+    const ensureFallbackAudio = () => {
+      intro.addEventListener('error', () => {
+        console.warn('⚠️ Intro failed, using gameplay music');
+        gameplay.volume = settings.musicVolume * settings.masterVolume;
+        gameplay.loop = true;
+        gameplay.play().catch(err => console.warn('Gameplay fallback blocked:', err));
+      }, { once: true });
+      
+      gameplay.addEventListener('error', () => {
+        console.warn('⚠️ Gameplay failed, using ambient music');
+        ambient.volume = settings.musicVolume * settings.masterVolume * 0.6;
+        ambient.loop = true;
+        ambient.play().catch(err => console.warn('Ambient fallback blocked:', err));
+      }, { once: true });
+    };
+    
+    ensureFallbackAudio();
+    
     // Configure intro audio (one-shot)
     intro.loop = false;
     intro.preload = 'auto';

@@ -99,10 +99,46 @@ export const useFighterSprites = () => {
     return animationControllers.current[fighterId] || null;
   }, []);
 
+  const getAnimationFrame = useCallback((
+    fighterId: string,
+    animationName: string,
+    frameIndex: number
+  ): { x: number; y: number; width: number; height: number } | null => {
+    const FRAME_WIDTH = 64;
+    const FRAME_HEIGHT = 64;
+    
+    // Map animation names to sprite sheet rows
+    const animationRows: Record<string, { row: number; frames: number }> = {
+      idle: { row: 0, frames: 4 },
+      walking: { row: 1, frames: 8 },
+      lightPunch: { row: 2, frames: 6 },
+      mediumPunch: { row: 3, frames: 7 },
+      heavyPunch: { row: 4, frames: 8 },
+      lightKick: { row: 5, frames: 6 },
+      heavyKick: { row: 6, frames: 8 },
+      blocking: { row: 7, frames: 2 },
+      hurt: { row: 8, frames: 4 },
+      knockdown: { row: 9, frames: 6 },
+      special: { row: 10, frames: 12 },
+      victory: { row: 11, frames: 8 }
+    };
+    
+    const anim = animationRows[animationName] || animationRows.idle;
+    const safeFrameIndex = frameIndex % anim.frames;
+    
+    return {
+      x: safeFrameIndex * FRAME_WIDTH,
+      y: anim.row * FRAME_HEIGHT,
+      width: FRAME_WIDTH,
+      height: FRAME_HEIGHT
+    };
+  }, []);
+
   return {
     isLoaded,
     getSpriteData,
     getAnimationController,
+    getAnimationFrame,
     spriteData: spriteImages.current,
     spriteFrames: spriteFrames.current,
   };
