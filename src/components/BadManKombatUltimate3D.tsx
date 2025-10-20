@@ -1,321 +1,111 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Target, Users, Trophy, Volume2, VolumeX, Zap, MapPin, Swords } from 'lucide-react';
-import * as THREE from 'three';
+import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-interface Fighter {
-  id: string;
-  name: string;
-  role: string;
-  color: string;
-  lore: string;
-}
+import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
+import { ViralStreetFighterCanvas } from './game/ViralStreetFighterCanvas';
 
 interface Arena {
   id: string;
   name: string;
   description: string;
-  color: string;
+  background: string;
+  music: string;
 }
 
-const FIGHTERS: Fighter[] = [
-  {
-    id: 'leroy',
-    name: 'Leroy "Tek-9" King',
-    role: 'Tank',
-    color: '#00ff00',
-    lore: 'Project CYBER YARD survivor with cybernetic enhancements'
-  },
-  {
-    id: 'jordan',
-    name: 'Jordan Sound Master',
-    role: 'DPS',
-    color: '#ffaa00',
-    lore: 'Dancehall specialist who weaponizes sound waves'
-  },
-  {
-    id: 'sifu',
-    name: 'Sifu Drone 09',
-    role: 'Support',
-    color: '#ff0000',
-    lore: 'Corrupted cyber-monk seeking redemption'
-  },
-  {
-    id: 'razor',
-    name: 'Razor Cyber Samurai',
-    role: 'DPS',
-    color: '#00ffff',
-    lore: 'Blade master from the digital underworld'
-  },
-  {
-    id: 'asha',
-    name: 'Asha Spear Maiden',
-    role: 'DPS',
-    color: '#ff00ff',
-    lore: 'Lightning warrior channeling ancient power'
-  },
-  {
-    id: 'rootsman',
-    name: 'Rootsman Nature Voice',
-    role: 'Flanker',
-    color: '#00ff88',
-    lore: 'Guardian of nature in a corrupted world'
-  }
-];
+// Get fighter list from enhanced data
+const FIGHTERS = Object.values(ENHANCED_FIGHTER_DATA);
 
 const ARENAS: Arena[] = [
   {
-    id: 'kingston',
-    name: 'Downtown Kingston Dockyard',
+    id: 'kingston-street',
+    name: 'Kingston Downtown Streets',
     description: 'Rain-soaked streets with VHS aesthetic',
-    color: '#1a1a2e'
+    background: '/assets/kingston-street-scene-1.jpg',
+    music: '/assets/audio/dancehall-riddim-1.mp3'
   },
   {
-    id: 'mountains',
-    name: 'Blue Mountains Shrine',
-    description: 'Mystical temple with glowing glyphs',
-    color: '#0f3460'
+    id: 'kingston-alley',
+    name: 'Kingston Back Alley',
+    description: 'Dark alley showdown',
+    background: '/assets/kingston-alley-scene.jpg',
+    music: '/assets/audio/dancehall-riddim-2.mp3'
   },
   {
-    id: 'negril',
-    name: 'Negril Sunset Battlefield',
-    description: 'Tropical combat zone at golden hour',
-    color: '#533483'
+    id: 'kingston-courtyard',
+    name: 'Kingston Courtyard',
+    description: 'Community gathering spot turned battleground',
+    background: '/assets/kingston-courtyard-scene.jpg',
+    music: '/assets/audio/reggae-drum-bass.mp3'
+  },
+  {
+    id: 'negril-beach',
+    name: 'Negril Beach Arena',
+    description: 'Sunset combat at the beach',
+    background: '/assets/negril-beach-arena.jpg',
+    music: '/assets/audio/jamaican-dub-riddim.mp3'
+  },
+  {
+    id: 'blue-mountains',
+    name: 'Blue Mountains Temple',
+    description: 'Ancient temple with mystical energy',
+    background: '/assets/blue-mountains-temple.jpg',
+    music: '/assets/audio/bmk-champion-loop.mp3'
   }
 ];
 
-const VOICE_LINES = [
-  'RASSCLAART!',
-  'BOMBOCLAART!',
-  'YUH DUN KNOW!',
-  'WICKED!',
-  'BIG UP!',
-  'FORWARD!'
-];
 
 const BadManKombatUltimate3D = () => {
   const [gameState, setGameState] = useState<'menu' | 'select' | 'arena' | 'fight'>('menu');
-  const [selectedHero, setSelectedHero] = useState<Fighter | null>(null);
+  const [selectedPlayer1, setSelectedPlayer1] = useState<any>(null);
+  const [selectedPlayer2, setSelectedPlayer2] = useState<any>(null);
   const [selectedArena, setSelectedArena] = useState<Arena | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const mountRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const playerRef = useRef<THREE.Mesh | null>(null);
-  const enemyRef = useRef<THREE.Mesh | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const keyStates = useRef(new Set<string>());
-  const inputBuffer = useRef<{ key: string; time: number }[]>([]);
-  
-  const [playerHealth, setPlayerHealth] = useState(100);
-  const [enemyHealth, setEnemyHealth] = useState(100);
-  const [playerSuper, setPlayerSuper] = useState(0);
-  const [comboText, setComboText] = useState('');
-  const [comboCount, setComboCount] = useState(0);
-  const [showShout, setShowShout] = useState(false);
-  const [currentShout, setCurrentShout] = useState('');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Initialize Three.js scene
-  const initScene = useCallback(() => {
-    if (!mountRef.current) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Arena-specific lighting and background
-    const arenaColor = selectedArena?.color || '#1a1a2e';
-    scene.background = new THREE.Color(arenaColor);
-    scene.fog = new THREE.Fog(arenaColor, 10, 50);
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 5);
-    scene.add(directionalLight);
-
-    // Ground
-    const groundGeometry = new THREE.PlaneGeometry(50, 50);
-    const groundMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x333333,
-      roughness: 0.8
-    });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = 0;
-    scene.add(ground);
-
-    // Player (superhero-style character)
-    const playerGeometry = new THREE.BoxGeometry(1, 2, 0.5);
-    const playerMaterial = new THREE.MeshStandardMaterial({
-      color: selectedHero?.color || '#00ff00',
-      emissive: selectedHero?.color || '#00ff00',
-      emissiveIntensity: 0.3
-    });
-    const player = new THREE.Mesh(playerGeometry, playerMaterial);
-    player.position.set(-5, 1, 0);
-    scene.add(player);
-
-    // Enemy
-    const enemyGeometry = new THREE.BoxGeometry(1, 2, 0.5);
-    const enemyMaterial = new THREE.MeshStandardMaterial({
-      color: '#ff0000',
-      emissive: '#ff0000',
-      emissiveIntensity: 0.3
-    });
-    const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
-    enemy.position.set(5, 1, 0);
-    scene.add(enemy);
-
-    // Camera position
-    camera.position.set(0, 5, 15);
-    camera.lookAt(0, 1, 0);
-
-    sceneRef.current = scene;
-    cameraRef.current = camera;
-    rendererRef.current = renderer;
-    playerRef.current = player;
-    enemyRef.current = enemy;
-  }, [selectedHero, selectedArena]);
-
-  // Animation loop
-  const animate = useCallback(() => {
-    if (!sceneRef.current || !cameraRef.current || !rendererRef.current || !playerRef.current) {
-      return;
-    }
-
-    // Handle movement
-    const moveSpeed = 0.1;
-    if (keyStates.current.has('w')) playerRef.current.position.z -= moveSpeed;
-    if (keyStates.current.has('s')) playerRef.current.position.z += moveSpeed;
-    if (keyStates.current.has('a')) playerRef.current.position.x -= moveSpeed;
-    if (keyStates.current.has('d')) playerRef.current.position.x += moveSpeed;
-
-    // Keep player in bounds
-    playerRef.current.position.x = Math.max(-10, Math.min(10, playerRef.current.position.x));
-    playerRef.current.position.z = Math.max(-10, Math.min(10, playerRef.current.position.z));
-
-    rendererRef.current.render(sceneRef.current, cameraRef.current);
-    animationFrameRef.current = requestAnimationFrame(animate);
-  }, []);
-
-  // Input handling
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    const key = e.key.toLowerCase();
-    keyStates.current.add(key);
-    
-    // Add to input buffer for combo detection
-    inputBuffer.current.push({ key, time: Date.now() });
-    if (inputBuffer.current.length > 10) {
-      inputBuffer.current.shift();
-    }
-
-    // Attack buttons
-    if (key === 'j') {
-      // Punch/Special
-      const damage = 10;
-      setEnemyHealth(prev => Math.max(0, prev - damage));
-      setPlayerSuper(prev => Math.min(100, prev + 5));
-      setComboCount(prev => prev + 1);
-      setComboText('HIT!');
-      
-      // Random voice line
-      if (audioEnabled) {
-        const shout = VOICE_LINES[Math.floor(Math.random() * VOICE_LINES.length)];
-        setCurrentShout(shout);
-        setShowShout(true);
-        setTimeout(() => setShowShout(false), 1000);
-      }
-    }
-
-    if (key === 'k' && playerSuper >= 100) {
-      // Super move
-      const damage = 30;
-      setEnemyHealth(prev => Math.max(0, prev - damage));
-      setPlayerSuper(0);
-      setComboCount(prev => prev + 3);
-      setComboText('SUPER MOVE!');
-      
-      if (audioEnabled) {
-        setCurrentShout('BOMBOCLAART!');
-        setShowShout(true);
-        setTimeout(() => setShowShout(false), 2000);
-      }
-    }
-  }, [audioEnabled, playerSuper]);
-
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    keyStates.current.delete(e.key.toLowerCase());
-  }, []);
-
-  // Start fight
-  const startFight = useCallback(() => {
-    setGameState('fight');
-    setPlayerHealth(100);
-    setEnemyHealth(100);
-    setPlayerSuper(0);
-    setComboCount(0);
-    initScene();
-    animate();
-  }, [initScene, animate]);
-
-  // Cleanup
+  // Play arena music
   useEffect(() => {
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+    if (gameState === 'fight' && selectedArena && audioEnabled) {
+      if (audioRef.current) {
+        audioRef.current.pause();
       }
-      if (rendererRef.current && mountRef.current) {
-        mountRef.current.removeChild(rendererRef.current.domElement);
+      audioRef.current = new Audio(selectedArena.music);
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.4;
+      audioRef.current.play().catch(console.error);
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
-  }, []);
-
-  // Event listeners
-  useEffect(() => {
-    if (gameState === 'fight') {
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('keyup', handleKeyUp);
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-      };
-    }
-  }, [gameState, handleKeyDown, handleKeyUp]);
-
-  // Reset combo text
-  useEffect(() => {
-    if (comboText) {
-      const timer = setTimeout(() => setComboText(''), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [comboText]);
+  }, [gameState, selectedArena, audioEnabled]);
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white overflow-hidden relative">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-black text-white overflow-x-hidden">
       {/* Menu */}
       {gameState === 'menu' && (
-        <div className="flex flex-col items-center justify-center h-full space-y-8 p-8">
-          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 animate-pulse">
-            BADMAN KOMBAT ULTIMATE 3D
-          </h1>
-          <p className="text-xl text-center max-w-2xl">
-            1980s Kingston Underground Tournament • Project CYBER YARD
-          </p>
-          <div className="flex gap-4">
-            <Button onClick={() => setGameState('select')} className="text-2xl p-8">
-              <Swords className="mr-2" /> START FIGHT
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-12 p-8 relative">
+          <div className="absolute inset-0 bg-[url('/assets/kingston-street-scene-1.jpg')] bg-cover bg-center opacity-20" />
+          <div className="relative z-10 space-y-8 text-center">
+            <h1 className="text-7xl md:text-9xl font-black tracking-tighter">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 animate-pulse drop-shadow-[0_0_30px_rgba(234,179,8,0.5)]">
+                BADMAN KOMBAT
+              </span>
+              <span className="block text-6xl md:text-7xl mt-4 text-cyan-400 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+                ULTIMATE
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl max-w-3xl mx-auto text-gray-300 font-semibold tracking-wide">
+              1980s Kingston Street Fights • Dancehall Meets Martial Arts<br />
+              <span className="text-yellow-400">Project CYBER YARD</span>
+            </p>
+            <Button 
+              onClick={() => setGameState('select')} 
+              className="text-3xl px-12 py-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 border-4 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] transition-all duration-300 transform hover:scale-110"
+            >
+              ENTER THE RING
             </Button>
           </div>
         </div>
@@ -323,133 +113,150 @@ const BadManKombatUltimate3D = () => {
 
       {/* Fighter Selection */}
       {gameState === 'select' && (
-        <div className="flex flex-col items-center justify-center h-full p-8 space-y-8">
-          <h2 className="text-4xl font-bold">SELECT YOUR FIGHTER</h2>
-          <div className="grid grid-cols-3 gap-6 max-w-6xl">
-            {FIGHTERS.map(fighter => (
-              <button
-                key={fighter.id}
-                onClick={() => {
-                  setSelectedHero(fighter);
-                  setGameState('arena');
-                }}
-                className="p-6 bg-gray-800 rounded-lg border-2 border-gray-700 hover:border-yellow-400 transition-all transform hover:scale-105"
-                style={{ borderColor: selectedHero?.id === fighter.id ? fighter.color : undefined }}
-              >
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full flex items-center justify-center text-6xl"
-                     style={{ backgroundColor: fighter.color }}>
-                  👊
-                </div>
-                <h3 className="text-xl font-bold mb-2">{fighter.name}</h3>
-                <p className="text-sm text-gray-400 mb-2">{fighter.role}</p>
-                <p className="text-xs text-gray-500">{fighter.lore}</p>
-              </button>
-            ))}
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 space-y-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/50 to-black" />
+          <div className="relative z-10 w-full max-w-7xl">
+            <h2 className="text-5xl md:text-6xl font-black text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+              {!selectedPlayer1 ? 'PLAYER 1: SELECT FIGHTER' : 'PLAYER 2: SELECT FIGHTER'}
+            </h2>
+            <p className="text-center text-gray-400 mb-12">Choose your warrior from the streets of Kingston</p>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {FIGHTERS.map(fighter => {
+                const spriteMap: Record<string, string> = {
+                  'leroy': '/src/assets/leroy-sprite.png',
+                  'jordan': '/src/assets/jordan-sprite.png',
+                  'sifu': '/src/assets/sifu-sprite.png',
+                  'razor': '/src/assets/razor-sprite.png',
+                  'rootsman': '/src/assets/rootsman-sprite.png',
+                  'asha': '/src/assets/asha-warrior-sprite.png'
+                };
+                
+                return (
+                  <button
+                    key={fighter.id}
+                    onClick={() => {
+                      if (!selectedPlayer1) {
+                        setSelectedPlayer1(fighter);
+                      } else if (!selectedPlayer2 || selectedPlayer2.id === fighter.id) {
+                        if (fighter.id !== selectedPlayer1.id) {
+                          setSelectedPlayer2(fighter);
+                          setGameState('arena');
+                        }
+                      }
+                    }}
+                    disabled={selectedPlayer1?.id === fighter.id}
+                    className="group relative p-6 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border-4 hover:border-yellow-400 transition-all transform hover:scale-105 hover:shadow-[0_0_40px_rgba(234,179,8,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ 
+                      borderColor: selectedPlayer1?.id === fighter.id || selectedPlayer2?.id === fighter.id 
+                        ? fighter.colors.primary 
+                        : '#374151' 
+                    }}
+                  >
+                    <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-lg bg-black/30">
+                      <img 
+                        src={spriteMap[fighter.id] || '/src/assets/leroy-sprite.png'} 
+                        alt={fighter.name}
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                        style={{ imageRendering: 'pixelated' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2 text-center" style={{ color: fighter.colors.primary }}>
+                      {fighter.name}
+                    </h3>
+                    <div className="flex justify-between text-xs text-gray-400 mb-2">
+                      <span>PWR: {fighter.stats.power}</span>
+                      <span>SPD: {fighter.stats.speed}</span>
+                      <span>DEF: {fighter.stats.defense}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center line-clamp-2">
+                      {fighter.voiceLines[0]?.text || 'Ready to fight!'}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
 
       {/* Arena Selection */}
       {gameState === 'arena' && (
-        <div className="flex flex-col items-center justify-center h-full p-8 space-y-8">
-          <h2 className="text-4xl font-bold">SELECT ARENA</h2>
-          <div className="grid grid-cols-3 gap-6 max-w-6xl">
-            {ARENAS.map(arena => (
-              <button
-                key={arena.id}
-                onClick={() => {
-                  setSelectedArena(arena);
-                  startFight();
-                }}
-                className="p-6 bg-gray-800 rounded-lg border-2 border-gray-700 hover:border-yellow-400 transition-all transform hover:scale-105"
-                style={{ backgroundColor: arena.color }}
-              >
-                <MapPin className="w-16 h-16 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">{arena.name}</h3>
-                <p className="text-sm text-gray-400">{arena.description}</p>
-              </button>
-            ))}
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 space-y-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-red-950/30 to-black" />
+          <div className="relative z-10 w-full max-w-7xl">
+            <h2 className="text-5xl md:text-6xl font-black text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
+              SELECT BATTLEGROUND
+            </h2>
+            <p className="text-center text-gray-400 mb-12">Fight across iconic Jamaican locations</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {ARENAS.map(arena => (
+                <button
+                  key={arena.id}
+                  onClick={() => {
+                    setSelectedArena(arena);
+                    setGameState('fight');
+                  }}
+                  className="group relative overflow-hidden rounded-xl border-4 border-gray-700 hover:border-yellow-400 transition-all transform hover:scale-105 hover:shadow-[0_0_50px_rgba(234,179,8,0.6)]"
+                >
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={arena.background} 
+                      alt={arena.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-2xl font-bold mb-2 text-yellow-400 drop-shadow-lg">
+                      {arena.name}
+                    </h3>
+                    <p className="text-sm text-gray-200 drop-shadow-md">{arena.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Fight Screen */}
-      {gameState === 'fight' && (
-        <>
-          <div ref={mountRef} className="absolute inset-0" />
-          
-          {/* HUD */}
-          <div className="absolute top-0 left-0 right-0 p-4 z-10">
-            {/* Health Bars */}
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex-1 mr-4">
-                <div className="text-sm mb-1">{selectedHero?.name}</div>
-                <div className="h-8 bg-gray-800 rounded-full overflow-hidden border-2 border-green-500">
-                  <div 
-                    className="h-full bg-green-500 transition-all duration-300"
-                    style={{ width: `${playerHealth}%` }}
-                  />
-                </div>
-              </div>
-              <div className="flex-1 ml-4">
-                <div className="text-sm mb-1 text-right">Enemy</div>
-                <div className="h-8 bg-gray-800 rounded-full overflow-hidden border-2 border-red-500">
-                  <div 
-                    className="h-full bg-red-500 transition-all duration-300 ml-auto"
-                    style={{ width: `${enemyHealth}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Super Meter */}
-            <div className="max-w-md mx-auto">
-              <div className="text-xs mb-1 text-center">SUPER METER</div>
-              <div className="h-4 bg-gray-800 rounded-full overflow-hidden border border-yellow-500">
-                <div 
-                  className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-300"
-                  style={{ width: `${playerSuper}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Combo Counter */}
-          {comboCount > 0 && (
-            <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 text-6xl font-bold text-yellow-400 animate-bounce">
-              {comboCount} HIT COMBO!
-            </div>
-          )}
-
-          {/* Combo Text */}
-          {comboText && (
-            <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-4xl font-bold text-red-500 animate-pulse">
-              {comboText}
-            </div>
-          )}
-
-          {/* Voice Shout */}
-          {showShout && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold text-yellow-400 animate-ping">
-              {currentShout}
-            </div>
-          )}
-
-          {/* Controls */}
-          <div className="absolute bottom-4 left-4 bg-black/50 p-4 rounded-lg text-sm">
-            <div>WASD - Move</div>
-            <div>J - Punch/Special</div>
-            <div>K - Super (100%)</div>
-          </div>
+      {gameState === 'fight' && selectedPlayer1 && selectedPlayer2 && selectedArena && (
+        <div className="relative w-full h-screen overflow-hidden">
+          {/* Back Button */}
+          <Button
+            onClick={() => {
+              setGameState('menu');
+              setSelectedPlayer1(null);
+              setSelectedPlayer2(null);
+              setSelectedArena(null);
+            }}
+            variant="outline"
+            size="lg"
+            className="fixed top-4 left-4 z-50 bg-black/80 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition-all"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            EXIT
+          </Button>
 
           {/* Audio Toggle */}
           <button
             onClick={() => setAudioEnabled(!audioEnabled)}
-            className="absolute bottom-4 right-4 p-4 bg-black/50 rounded-lg hover:bg-black/70"
+            className="fixed top-4 right-4 z-50 p-4 bg-black/80 border-2 border-yellow-400 rounded-lg hover:bg-yellow-400 hover:text-black transition-all"
           >
-            {audioEnabled ? <Volume2 /> : <VolumeX />}
+            {audioEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
           </button>
-        </>
+
+          {/* Game Canvas */}
+          <ViralStreetFighterCanvas 
+            fighterData={{
+              player1: selectedPlayer1,
+              player2: selectedPlayer2
+            }}
+          />
+        </div>
       )}
     </div>
   );
