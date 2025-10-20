@@ -98,7 +98,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   }, [audioManager.isLoaded]);
   
   // Sprite loading system - NOW LOADS REAL PIXEL ART
-  const { isLoaded: spritesLoaded, getSpriteData, getAnimationController } = useFighterSprites();
+  const { isLoaded: spritesLoaded, getSpriteData, getAnimationFrame } = useFighterSprites();
   
   // Debug sprite loading
   useEffect(() => {
@@ -234,12 +234,36 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         }
       }
       
+      // Get animation state mapping
+      const getAnimationName = (state: string, fighter: any): string => {
+        const stateMap: Record<string, string> = {
+          idle: 'idle',
+          walking: 'walking',
+          attacking: fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'heavyKick' : 'mediumPunch',
+          blocking: 'blocking',
+          hurt: 'hurt',
+          knockdown: 'knockdown',
+          special: 'special',
+          victory: 'victory'
+        };
+        return stateMap[state] || 'idle';
+      };
+      
+      // Calculate frame coordinates for both fighters
+      const p1AnimName = getAnimationName(p1.state?.current || 'idle', p1);
+      const p2AnimName = getAnimationName(p2.state?.current || 'idle', p2);
+      const p1FrameIndex = Math.floor((p1.animation?.frameTimer || 0) / 5);
+      const p2FrameIndex = Math.floor((p2.animation?.frameTimer || 0) / 5);
+      const p1FrameCoords = getAnimationFrame(fighterData?.player1?.id || '', p1AnimName, p1FrameIndex);
+      const p2FrameCoords = getAnimationFrame(fighterData?.player2?.id || '', p2AnimName, p2FrameIndex);
+      
       // RENDER FIGHTERS WITH PIXEL ART SPRITES
       const p1SpriteImage = getSpriteData(fighterData?.player1?.id || '');
       renderAuthenticFighter({
         ctx,
         fighter: p1,
         spriteImage: p1SpriteImage,
+        frameCoords: p1FrameCoords,
         effects: {
           alpha: p1.state.current === 'stunned' ? 0.7 : 1,
           glow: p1.state.current === 'special',
@@ -253,6 +277,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         ctx,
         fighter: p2,
         spriteImage: p2SpriteImage,
+        frameCoords: p2FrameCoords,
         effects: {
           alpha: p2.state.current === 'stunned' ? 0.7 : 1,
           glow: p2.state.current === 'special',
@@ -298,7 +323,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
     ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-  }, [getSpriteData, getAnimationController, getShakeOffset, updateEffects, drawHitSparks]);
+  }, [getSpriteData, getAnimationFrame, getShakeOffset, updateEffects, drawHitSparks, fighterData]);
 
   // Animation loop
   useEffect(() => {

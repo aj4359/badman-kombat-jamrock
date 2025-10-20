@@ -1,6 +1,13 @@
 import { Fighter } from '@/types/gameTypes';
 import { getCurrentPose, type Pose } from '@/utils/fighterPoses';
 
+export interface SpriteFrameCoords {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface AuthenticFighterRendererProps {
   ctx: CanvasRenderingContext2D;
   fighter: Fighter;
@@ -13,6 +20,7 @@ export interface AuthenticFighterRendererProps {
     special?: boolean;
   };
   spriteImage?: HTMLImageElement | null;
+  frameCoords?: SpriteFrameCoords | null;
 }
 
 // Scale factor: Match 200px fighter height (200 / 135 ≈ 1.48, rounded to 1.5)
@@ -81,7 +89,7 @@ const AUTHENTIC_FIGHTER_PROFILES = {
   }
 };
 
-export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null }: AuthenticFighterRendererProps) {
+export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null, frameCoords = null }: AuthenticFighterRendererProps) {
   ctx.save();
   
   const GROUND_LEVEL = 456;
@@ -96,81 +104,55 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     moveType
   );
   
-  // Map fighter state to animation name
-  const getAnimationName = (state: string): string => {
-    const stateMap: Record<string, string> = {
-      idle: 'idle',
-      walking: 'walking',
-      attacking: fighter.animation?.currentMove?.toLowerCase().includes('kick') ? 'heavyKick' : 'mediumPunch',
-      blocking: 'blocking',
-      hurt: 'hurt',
-      knockdown: 'knockdown',
-      special: 'special',
-      victory: 'victory'
-    };
-    return stateMap[state] || 'idle';
-  };
-  
   // ✅ USE SPRITE IMAGE WITH ANIMATION FRAMES
-  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
-    // Get animation frame hook
-    const { useFighterSprites } = require('@/hooks/useFighterSprites');
-    const { getAnimationFrame } = useFighterSprites();
+  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0 && frameCoords) {
+    // Apply effects
+    if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
+    if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
+    if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
+    if (effects.glow || effects.special) {
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur = 20;
+    }
+    if (effects.flash) ctx.globalCompositeOperation = 'lighter';
     
-    if (getAnimationFrame) {
-      // Calculate current frame
-      const animationName = getAnimationName(fighter.state?.current || 'idle');
-      const frameIndex = Math.floor((fighter.animation?.frameTimer || 0) / 5); // Change frame every 5 game ticks
-      const frameCoords = getAnimationFrame(fighter.id, animationName, frameIndex);
-      
-      if (frameCoords) {
-        // Apply effects
-        if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
-        if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
-        if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
-        if (effects.glow || effects.special) {
-          ctx.shadowColor = '#FFD700';
-          ctx.shadowBlur = 20;
-        }
-        if (effects.flash) ctx.globalCompositeOperation = 'lighter';
-        
-        // Scale sprite
-        const scale = 2.5;
-        const finalWidth = frameCoords.width * scale;
-        const finalHeight = frameCoords.height * scale;
-        
-        // Position sprite
-        const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
-        const drawY = fighter.y + fighter.height - finalHeight;
-        
-        // Flip based on facing
-        const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
-                           (typeof fighter.facing === 'number' && fighter.facing === -1);
-        
-        if (facingLeft) {
-          ctx.save();
-          ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
-          ctx.scale(-1, 1);
-          ctx.drawImage(
-            spriteImage,
-            frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect (specific frame)
-            -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight // Dest rect
-          );
-          ctx.restore();
-        } else {
-          ctx.drawImage(
-            spriteImage,
-            frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect
-            drawX, drawY, finalWidth, finalHeight // Dest rect
-          );
-        }
-        
-        ctx.restore();
-        return; // ✅ EXIT - Animated sprite rendered!
-      }
+    // Scale sprite
+    const scale = 2.5;
+    const finalWidth = frameCoords.width * scale;
+    const finalHeight = frameCoords.height * scale;
+    
+    // Position sprite
+    const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
+    const drawY = fighter.y + fighter.height - finalHeight;
+    
+    // Flip based on facing
+    const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
+                       (typeof fighter.facing === 'number' && fighter.facing === -1);
+    
+    if (facingLeft) {
+      ctx.save();
+      ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        spriteImage,
+        frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect (specific frame)
+        -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight // Dest rect
+      );
+      ctx.restore();
+    } else {
+      ctx.drawImage(
+        spriteImage,
+        frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect
+        drawX, drawY, finalWidth, finalHeight // Dest rect
+      );
     }
     
-    // Fallback to full sprite sheet if getAnimationFrame not available
+    ctx.restore();
+    return; // ✅ EXIT - Animated sprite rendered!
+  }
+  
+  // Fallback to full sprite sheet if frameCoords not available
+  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
     if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
     if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
     if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
