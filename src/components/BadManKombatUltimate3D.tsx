@@ -255,6 +255,7 @@ const BadManKombatUltimate3D = () => {
               player1: selectedPlayer1,
               player2: selectedPlayer2
             }}
+            stage={selectedArena}
           />
         </div>
       )}

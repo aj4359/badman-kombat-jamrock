@@ -23,6 +23,11 @@ interface ViralStreetFighterCanvasProps {
     player1: any;
     player2: any;
   };
+  stage?: {
+    name: string;
+    background: string;
+    music: string;
+  };
 }
 
 // Map fighter state to sprite animation name
@@ -48,7 +53,8 @@ const mapFighterStateToAnimation = (state: string): string => {
 };
 
 export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> = ({ 
-  fighterData 
+  fighterData,
+  stage 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -326,12 +332,22 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     >
       {showPrompt && <FocusPrompt onDismiss={() => setShowPrompt(false)} />}
       
-      {/* Authentic Kingston ghetto background */}
+      {/* Dynamic arena background */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ width: '1024px', height: '576px' }}>
-        <KingstonStageBackground 
-          variant="alley" 
-          className="absolute inset-0"
-        />
+        {stage?.background ? (
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url(${stage.background})`,
+              filter: 'brightness(0.7) contrast(1.2)'
+            }}
+          />
+        ) : (
+          <KingstonStageBackground 
+            variant="alley" 
+            className="absolute inset-0"
+          />
+        )}
       </div>
       
       {/* Game canvas with transparent background */}
