@@ -79,13 +79,15 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
   }, []); // Empty dependency array - initialize only once on mount
   
   const audioManager = useAudioManager();
+  const visualEffectsHook = useVisualEffects();
   const { 
     addScreenShake, 
     addHitSpark, 
     drawHitSparks,
     getShakeOffset,
-    updateEffects 
-  } = useVisualEffects();
+    updateEffects,
+    drawProjectileTrail
+  } = visualEffectsHook;
   
   // Auto-play Shaw Bros intro, THEN Champion loop (no overlap)
   useEffect(() => {
@@ -157,6 +159,11 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     
     // DYNAMIC LIGHTING LAYER
     renderDynamicLighting();
+    
+    // PHASE 7: Draw projectile trails
+    currentGameState.projectiles.forEach((projectile: any) => {
+      drawProjectileTrail(ctx, projectile);
+    });
     
     // 3. DRAW FIGHTERS WITH PIXEL ART SPRITES + STREET FIGHTER EFFECTS
     const p1 = currentGameState.fighters.player1;
@@ -269,6 +276,16 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       renderProfessionalHealthBars(ctx, 1024, currentGameState.fighters);
       renderFighterNames(ctx, 1024, currentGameState.fighters);
     }
+    
+    // PHASE 7: Draw projectiles with enhanced rendering
+    currentGameState.projectiles.forEach((projectile: any) => {
+      const { renderStreetFighterProjectile } = require('@/components/game/StreetFighterProjectiles');
+      renderStreetFighterProjectile({
+        ctx,
+        projectile,
+        effects: { glow: true, trail: true }
+      });
+    });
     
     // 5. DRAW VISUAL EFFECTS
     drawHitSparks(ctx);

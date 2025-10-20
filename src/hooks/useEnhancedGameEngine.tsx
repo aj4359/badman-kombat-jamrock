@@ -375,6 +375,13 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     // Enhanced frame-perfect timing for 60fps gameplay
     const deltaTime = 16.67; // Target 60fps frame time
     
+    // PHASE 4: Update animation controller
+    const animState = getAnimationState(newFighter);
+    if (newFighter.animation) {
+      newFighter.animation.sequence = animState;
+      newFighter.animation.frameTimer++;
+    }
+    
     // Update combat state using the integrated system
     newFighter.combatState = CombatSystem.updateCombatState(newFighter.combatState);
     

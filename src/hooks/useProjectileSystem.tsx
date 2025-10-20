@@ -67,18 +67,26 @@ export const useProjectileSystem = () => {
   const updateProjectiles = useCallback(() => {
     setProjectiles(prev => {
       return prev
-        .map(projectile => ({
-          ...projectile,
-          x: projectile.x + projectile.velocityX,
-          y: projectile.y + projectile.velocityY,
-          life: projectile.life - 1,
-          hitbox: {
+        .map(projectile => {
+          // PHASE 7: Add rotation and scaling animation
+          const lifeFactor = projectile.life / projectile.maxLife;
+          const scaleFactor = 0.9 + (0.1 * lifeFactor); // Grow as they travel
+          
+          return {
+            ...projectile,
             x: projectile.x + projectile.velocityX,
             y: projectile.y + projectile.velocityY,
-            width: projectile.width,
-            height: projectile.height
-          }
-        }))
+            life: projectile.life - 1,
+            width: projectile.width * scaleFactor,
+            height: projectile.height * scaleFactor,
+            hitbox: {
+              x: projectile.x + projectile.velocityX,
+              y: projectile.y + projectile.velocityY,
+              width: projectile.width * scaleFactor,
+              height: projectile.height * scaleFactor
+            }
+          };
+        })
         .filter(projectile => 
           projectile.life > 0 && 
           projectile.x > -100 && 

@@ -129,24 +129,34 @@ export const useVisualEffects = () => {
   }, [hitSparks]);
 
   const drawProjectileTrail = useCallback((ctx: CanvasRenderingContext2D, projectile: Projectile) => {
+    // PHASE 7: Enhanced projectile trails with glow
     const trail = {
-      fireball: '#ff4400',
-      soundwave: '#00ffff',
-      energy: '#ffff00'
+      fireball: 'hsl(20, 100%, 50%)',
+      soundwave: 'hsl(180, 100%, 50%)',
+      energy: 'hsl(60, 100%, 50%)',
+      hadoken: 'hsl(220, 100%, 60%)',
+      sonic: 'hsl(270, 100%, 60%)',
+      plasma: 'hsl(180, 100%, 60%)'
     };
 
     ctx.save();
-    ctx.globalAlpha = 0.6;
-    ctx.fillStyle = trail[projectile.type] || '#ffffff';
+    const trailColor = trail[projectile.type] || 'hsl(0, 0%, 100%)';
     
-    // Draw trailing particles
-    for (let i = 0; i < 5; i++) {
-      const trailX = projectile.x - (projectile.velocityX * i * 2);
-      const trailY = projectile.y - (projectile.velocityY * i * 2);
-      const trailSize = projectile.width * (1 - i * 0.15);
+    // Draw glowing trail with enhanced particles
+    for (let i = 0; i < 8; i++) {
+      const trailX = projectile.x - (projectile.velocityX * i * 1.5);
+      const trailY = projectile.y - (projectile.velocityY * i * 1.5);
+      const trailSize = projectile.width * (1 - i * 0.1);
+      const alpha = 0.7 * (1 - i * 0.12);
       
-      ctx.globalAlpha = 0.6 * (1 - i * 0.2);
-      ctx.fillRect(trailX, trailY, trailSize, trailSize);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = trailColor;
+      ctx.shadowColor = trailColor;
+      ctx.shadowBlur = 20;
+      
+      ctx.beginPath();
+      ctx.arc(trailX + trailSize/2, trailY + trailSize/2, trailSize/2, 0, Math.PI * 2);
+      ctx.fill();
     }
     
     ctx.restore();
