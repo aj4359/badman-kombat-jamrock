@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
+import MarvelRivalsLanding from "./components/MarvelRivalsLanding";
 import BadManKombatLandingPage from "./components/BadManKombatLandingPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -18,28 +20,31 @@ import TeaserCreator from "./pages/TeaserCreator";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/landing" element={<BadManKombatLandingPage />} />
-          <Route path="/character-select" element={<CharacterSelect />} />
-          <Route path="/vs-screen" element={<EnhancedVSScreen />} />
-          <Route path="/game" element={<Game />} />
-          <Route path="/arcade" element={<ArcadeMode />} />
-          <Route path="/teaser" element={<Teaser />} />
-          <Route path="/trailer-generator" element={<TrailerGenerator />} />
-          <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
-          <Route path="/teaser-creator" element={<TeaserCreator />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<MarvelRivalsLanding />} />
+            <Route path="/cyberpunk" element={<Index />} />
+            <Route path="/landing" element={<BadManKombatLandingPage />} />
+            <Route path="/character-select" element={<CharacterSelect />} />
+            <Route path="/vs-screen" element={<EnhancedVSScreen />} />
+            <Route path="/game" element={<Game />} />
+            <Route path="/arcade" element={<ArcadeMode />} />
+            <Route path="/teaser" element={<Teaser />} />
+            <Route path="/trailer-generator" element={<TrailerGenerator />} />
+            <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
+            <Route path="/teaser-creator" element={<TeaserCreator />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

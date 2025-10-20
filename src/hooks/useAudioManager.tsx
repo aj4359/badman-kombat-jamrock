@@ -74,24 +74,21 @@ export const useAudioManager = () => {
     handleAudioLoad(gameplay, 'gameplay');
     handleAudioLoad(ambient, 'ambient');
     
-    // Fallback audio system - ensure at least one track plays
-    const ensureFallbackAudio = () => {
-      intro.addEventListener('error', () => {
-        console.warn('⚠️ Intro failed, using gameplay music');
-        gameplay.volume = settings.musicVolume * settings.masterVolume;
-        gameplay.loop = true;
-        gameplay.play().catch(err => console.warn('Gameplay fallback blocked:', err));
-      }, { once: true });
-      
-      gameplay.addEventListener('error', () => {
-        console.warn('⚠️ Gameplay failed, using ambient music');
-        ambient.volume = settings.musicVolume * settings.masterVolume * 0.6;
-        ambient.loop = true;
-        ambient.play().catch(err => console.warn('Ambient fallback blocked:', err));
-      }, { once: true });
-    };
+    // Fallback audio system - DON'T auto-play, just set up error handlers
+    intro.addEventListener('error', () => {
+      console.warn('⚠️ Intro failed to load');
+      errors.push('intro');
+    }, { once: true });
     
-    ensureFallbackAudio();
+    gameplay.addEventListener('error', () => {
+      console.warn('⚠️ Gameplay failed to load');
+      errors.push('gameplay');
+    }, { once: true });
+    
+    ambient.addEventListener('error', () => {
+      console.warn('⚠️ Ambient failed to load');
+      errors.push('ambient');
+    }, { once: true });
     
     // Configure intro audio (one-shot)
     intro.loop = false;
@@ -205,11 +202,19 @@ export const useAudioManager = () => {
         audioElement.loop = true;
       }
       audioElement.volume = settings.isMuted ? 0 : settings.musicVolume * settings.masterVolume;
-      audioElement.play().catch(err => {
-        console.warn('Audio play blocked:', err);
-      });
-      setIsPlaying(true);
-      setCurrentLayer(layer);
+      
+      // Try to play with better error handling
+      const playPromise = audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+            setCurrentLayer(layer);
+          })
+          .catch(err => {
+            console.warn('Audio play blocked (user interaction required):', err);
+          });
+      }
     } catch (error) {
       console.error('Error playing audio layer:', error);
     }

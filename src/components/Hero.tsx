@@ -17,13 +17,21 @@ const Hero = () => {
   }, [currentLayer]);
 
   const enableAudio = () => {
-    playLayer('ambient');
-    setIsPlaying(true);
+    try {
+      playLayer('ambient');
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Failed to enable audio:', error);
+    }
   };
 
   const disableAudio = () => {
-    emergencyAudioKillSwitch();
-    setIsPlaying(false);
+    try {
+      emergencyAudioKillSwitch();
+      setIsPlaying(false);
+    } catch (error) {
+      console.error('Failed to disable audio:', error);
+    }
   };
 
   const handleStartKombat = () => {

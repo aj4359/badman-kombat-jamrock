@@ -99,6 +99,17 @@
       radial-gradient(circle at 80% 20%, hsl(var(--neon-pink) / 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 80%, hsl(var(--neon-green) / 0.1) 0%, transparent 50%);
   }
+  
+  /* Marvel Rivals Glow Effect */
+  .marvel-glow {
+    text-shadow: 
+      0 0 10px rgba(0, 212, 255, 0.8),
+      0 0 20px rgba(0, 212, 255, 0.6),
+      0 0 30px rgba(0, 212, 255, 0.4),
+      0 0 40px rgba(168, 85, 247, 0.6),
+      0 0 70px rgba(168, 85, 247, 0.4),
+      0 0 100px rgba(236, 72, 153, 0.3);
+  }
 }
 
 @layer components {
