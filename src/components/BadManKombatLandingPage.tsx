@@ -86,8 +86,9 @@ const BadManKombatLandingPage = () => {
     <div className="relative w-full bg-black overflow-x-hidden">
       {/* Rasta Chatbot Navigator */}
       <RastaChatbot 
-        onNavigateToGame={() => navigate('/bmk-ultimate3d')}
+        onNavigateToGame={() => navigate('/3d-ultimate')}
         onNavigateToCharacterSelect={() => navigate('/character-select')}
+        onNavigateToHome={() => navigate('/')}
       />
 
       {/* Fixed Navigation */}

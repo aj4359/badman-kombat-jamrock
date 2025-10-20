@@ -13,6 +13,7 @@ import ArcadeMode from "./pages/ArcadeMode";
 import Teaser from "./pages/Teaser";
 import TrailerGenerator from "./pages/TrailerGenerator";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
+import TeaserCreator from "./pages/TeaserCreator";
 
 const queryClient = new QueryClient();
 
@@ -23,8 +24,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<BadManKombatLandingPage />} />
-          <Route path="/original-home" element={<Index />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/landing" element={<BadManKombatLandingPage />} />
           <Route path="/character-select" element={<CharacterSelect />} />
           <Route path="/vs-screen" element={<EnhancedVSScreen />} />
           <Route path="/game" element={<Game />} />
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/teaser" element={<Teaser />} />
           <Route path="/trailer-generator" element={<TrailerGenerator />} />
           <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
+          <Route path="/teaser-creator" element={<TeaserCreator />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
