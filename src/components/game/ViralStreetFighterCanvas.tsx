@@ -144,6 +144,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     // ✅ FIXED: Use ref to get latest state without recreating render callback
     const currentGameState = gameStateRef.current;
     
+    // PHASE 3: Clear canvas and reset state between frames
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+    ctx.filter = 'none';
+    
     // Marvel Rivals-style dynamic lighting during special moves
     const renderDynamicLighting = () => {
       const p1 = currentGameState.fighters.player1;

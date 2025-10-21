@@ -90,7 +90,11 @@ const AUTHENTIC_FIGHTER_PROFILES = {
 };
 
 export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage = null, frameCoords = null }: AuthenticFighterRendererProps) {
-  ctx.save();
+  // PHASE 1: Reset canvas state to prevent corruption
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1.0;
+  ctx.filter = 'none';
   
   const GROUND_LEVEL = 456;
   
@@ -106,6 +110,22 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
   
   // ✅ USE SPRITE IMAGE WITH ANIMATION FRAMES
   if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0 && frameCoords) {
+    // PHASE 2: Validate image and frame coords before rendering
+    if (!spriteImage.complete || spriteImage.naturalWidth === 0) {
+      console.error('❌ Sprite not ready for rendering:', fighter.id);
+      return;
+    }
+    
+    if (frameCoords.x < 0 || frameCoords.y < 0 || 
+        frameCoords.x + frameCoords.width > spriteImage.naturalWidth ||
+        frameCoords.y + frameCoords.height > spriteImage.naturalHeight) {
+      console.error('❌ Frame coords out of bounds:', { fighter: fighter.id, frameCoords, imageSize: `${spriteImage.naturalWidth}x${spriteImage.naturalHeight}` });
+      return;
+    }
+    
+    // PHASE 1: Save canvas state INSIDE sprite block
+    ctx.save();
+    
     // Apply effects
     if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
     if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
@@ -124,6 +144,16 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     // Position sprite
     const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
     const drawY = fighter.y + fighter.height - finalHeight;
+    
+    // PHASE 2: Log render parameters for debugging
+    if (frameCoords.x === 0 && frameCoords.y === 0) {
+      console.log('🎨 RENDERING:', { 
+        fighter: fighter.id,
+        spriteSize: `${spriteImage.naturalWidth}x${spriteImage.naturalHeight}`,
+        frameCoords,
+        drawPos: { drawX: Math.round(drawX), drawY: Math.round(drawY), finalWidth: Math.round(finalWidth), finalHeight: Math.round(finalHeight) }
+      });
+    }
     
     // Flip based on facing
     const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
@@ -147,6 +177,7 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       );
     }
     
+    // PHASE 1: Restore canvas state (matches save at line 121)
     ctx.restore();
     return; // ✅ EXIT - Animated sprite rendered!
   }
@@ -187,7 +218,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     return;
   }
   
-  // Geometric rendering fallback with transparency for stage visibility
+  // PHASE 4: Geometric rendering fallback with colored shapes (not white)
+  ctx.save();
+  
   if (effects.alpha !== undefined) {
     ctx.globalAlpha = effects.alpha;
   } else {
