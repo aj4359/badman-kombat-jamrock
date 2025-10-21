@@ -333,7 +333,6 @@ const CharacterSelect = () => {
                 </div>
               )}
               <div 
-                onClick={() => isUnlocked && handleFighterSelect(fighter.id, selectedP1 === fighter.id ? 2 : 1)}
                 className={`p-4 rounded-lg border-2 bg-card/90 backdrop-blur ${
                 selectedP1 === fighter.id || selectedP2 === fighter.id
                   ? 'border-neon-cyan shadow-neon-cyan'
@@ -399,7 +398,10 @@ const CharacterSelect = () => {
                         ? 'bg-pink-600 text-white border-pink-400 shadow-lg shadow-pink-500/50 scale-105' 
                         : 'hover:bg-pink-500/10 border-pink-500/50 text-pink-400'
                     }`}
-                    onClick={() => handleFighterSelect(fighter.id, 1)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFighterSelect(fighter.id, 1);
+                    }}
                     disabled={selectedP2 === fighter.id || !isUnlocked}
                   >
                     {selectedP1 === fighter.id ? '✓ P1' : 'P1'}
@@ -412,7 +414,10 @@ const CharacterSelect = () => {
                         ? 'bg-green-600 text-white border-green-400 shadow-lg shadow-green-500/50 scale-105' 
                         : 'hover:bg-green-500/10 border-green-500/50 text-green-400'
                     }`}
-                    onClick={() => handleFighterSelect(fighter.id, 2)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFighterSelect(fighter.id, 2);
+                    }}
                     disabled={selectedP1 === fighter.id || !isUnlocked}
                   >
                     {selectedP2 === fighter.id ? '✓ P2' : 'P2'}
@@ -492,21 +497,9 @@ const CharacterSelect = () => {
         <Button 
           disabled={!canProceed}
           onClick={() => {
-            console.log('🎮 Starting combat with:', { selectedP1, selectedP2 });
-            console.log('🥊 Fighter Data:', { 
-              player1: selectedP1Fighter?.name, 
-              player2: selectedP2Fighter?.name 
-            });
-            navigate('/game', { 
-              state: { 
-                selectedP1, 
-                selectedP2,
-                fighterData: {
-                  player1: selectedP1Fighter,
-                  player2: selectedP2Fighter
-                }
-              } 
-            });
+            if (canProceed) {
+              handleStartFight(selectedP1, selectedP2, selectedP1Fighter, selectedP2Fighter, navigate);
+            }
           }}
           className={`text-lg px-8 font-bold transform transition-all shadow-lg ${
             canProceed 

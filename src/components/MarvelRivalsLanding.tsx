@@ -5,6 +5,12 @@ import { Play, Swords, Sparkles } from 'lucide-react';
 import ParticleSystem from '@/components/ui/ParticleSystem';
 import leroyPoster from '@/assets/leroy-poster.png';
 import fighterLineup from '@/assets/fighter-lineup.png';
+import leroySprite from '@/assets/leroy-sprite.png';
+import razorSprite from '@/assets/razor-sprite.png';
+import voltageSprite from '@/assets/voltage-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite.png';
+import sifuSprite from '@/assets/sifu-sprite.png';
+import rootsmanSprite from '@/assets/rootsman-sprite.png';
 
 const MarvelRivalsLanding = () => {
   const navigate = useNavigate();
@@ -15,19 +21,17 @@ const MarvelRivalsLanding = () => {
     // Delay heavy content loading to ensure page renders first
     const timer = setTimeout(() => {
       setShouldLoadHeavyContent(true);
-    }, 300);
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
   const fighters = [
-    { id: 'leroy', name: 'LEROY', img: '/src/assets/leroy-sprite.png' },
-    { id: 'jordan', name: 'JORDAN', img: '/src/assets/jordan-sprite.png' },
-    { id: 'razor', name: 'RAZOR', img: '/src/assets/razor-sprite.png' },
-    { id: 'rootsman', name: 'ROOTSMAN', img: '/src/assets/rootsman-sprite.png' },
-    { id: 'sifu', name: 'SIFU', img: '/src/assets/sifu-sprite.png' },
-    { id: 'blaze', name: 'BLAZE', img: '/src/assets/blaze-sprite.png' },
-    { id: 'marcus', name: 'MARCUS', img: '/src/assets/marcus-sprite.png' },
-    { id: 'asha', name: 'ASHA', img: '/src/assets/asha-sprite.png' },
+    { id: 'leroy', name: 'LEROY', img: leroySprite, title: 'Cyber Storm' },
+    { id: 'jordan', name: 'JORDAN', img: jordanSprite, title: 'Sound Master' },
+    { id: 'razor', name: 'RAZOR', img: razorSprite, title: 'Neon Blade' },
+    { id: 'rootsman', name: 'ROOTSMAN', img: rootsmanSprite, title: 'Tech-Nature' },
+    { id: 'sifu', name: 'SIFU', img: sifuSprite, title: 'Steel Wire' },
+    { id: 'voltage', name: 'VOLTAGE', img: voltageSprite, title: 'Electric Queen' }
   ];
 
   return (
@@ -59,95 +63,94 @@ const MarvelRivalsLanding = () => {
       {/* Main Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-4 py-20">
-          <div className="max-w-7xl mx-auto text-center">
-            {/* Main Title */}
-            <div className="mb-12 animate-fade-in">
-              <h1 className="font-retro text-7xl md:text-9xl font-black mb-6 marvel-glow text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500">
-                BADMAN KOMBAT
+        <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20 animate-pulse" />
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            {/* Left Content */}
+            <div className="text-center lg:text-left space-y-8">
+              <h1 className="text-7xl md:text-9xl font-bold leading-tight animate-fade-in">
+                <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+                  BADMAN
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]">
+                  KOMBAT
+                </span>
               </h1>
-              <p className="text-2xl md:text-4xl font-bold text-cyan-400 tracking-wider mb-4">
-                KINGSTON'S FINEST WARRIORS
+              
+              <p className="text-2xl md:text-3xl text-gray-200 max-w-xl font-bold drop-shadow-lg">
+                Kingston Rises. The Streets Remember. Choose Your Fighter.
               </p>
-              <p className="text-lg md:text-xl text-purple-300 max-w-2xl mx-auto">
-                8 legendary fighters. Infinite kombat. One champion.
-              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/character-select')}
+                  className="text-2xl px-12 py-8 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold shadow-2xl shadow-purple-500/50 hover:scale-110 transition-all duration-300 hover:shadow-purple-500/80 border-2 border-purple-400"
+                >
+                  <Play className="mr-3 h-8 w-8" />
+                  PLAY NOW
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => navigate('/character-select')}
+                  className="text-2xl px-12 py-8 border-4 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-bold transition-all hover:scale-110 duration-300 shadow-2xl shadow-cyan-500/50 hover:shadow-cyan-500/80"
+                >
+                  <Swords className="mr-3 h-8 w-8" />
+                  SELECT FIGHTER
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => navigate('/john-wick-trailer')}
+                  className="text-2xl px-12 py-8 border-4 border-pink-400 text-pink-400 hover:bg-pink-400 hover:text-black font-bold transition-all hover:scale-110 duration-300 shadow-2xl shadow-pink-500/50 hover:shadow-pink-500/80"
+                >
+                  <Sparkles className="mr-3 h-8 w-8" />
+                  WATCH TRAILER
+                </Button>
+              </div>
             </div>
 
-            {/* Hero Character */}
-            <div className="mb-12 relative inline-block group">
-              <div className="absolute -inset-8 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full opacity-30 blur-3xl group-hover:opacity-50 transition-opacity duration-500" />
-              <img
-                src={leroyPoster}
-                alt="Leroy - Champion Fighter"
-                className="relative w-80 h-80 md:w-96 md:h-96 object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-300"
+            {/* Right Content */}
+            <div className="flex justify-center lg:justify-end">
+              <img 
+                src={leroyPoster} 
+                alt="Leroy - The Trench Town Technomancer"
+                className="w-full max-w-md lg:max-w-lg rounded-lg shadow-2xl shadow-purple-500/50 hover:scale-105 transition-transform duration-500 animate-float"
               />
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button
-                size="lg"
-                onClick={() => navigate('/game')}
-                className="text-xl px-12 py-8 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-2xl transform hover:scale-110 transition-all duration-300 border-2 border-cyan-300"
-              >
-                <Play className="mr-3 h-6 w-6" />
-                PLAY NOW
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => navigate('/character-select')}
-                className="text-xl px-12 py-8 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-2xl transform hover:scale-110 transition-all duration-300 border-2 border-purple-300"
-              >
-                <Swords className="mr-3 h-6 w-6" />
-                SELECT FIGHTER
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => navigate('/john-wick-trailer')}
-                className="text-xl px-12 py-8 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-2xl transform hover:scale-110 transition-all duration-300 border-2 border-red-300"
-              >
-                🎬 JOHN WICK TRAILER
-              </Button>
             </div>
           </div>
         </section>
 
         {/* Fighter Roster */}
-        <section className="py-20 px-4">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-5xl md:text-7xl font-black text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+        <section className="py-20 px-4 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 via-pink-900/10 to-cyan-900/10" />
+          <div className="max-w-7xl mx-auto relative z-10">
+            <h2 className="text-6xl font-bold text-center mb-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.5)] animate-fade-in">
               CHOOSE YOUR WARRIOR
             </h2>
-            <p className="text-xl text-center text-purple-300 mb-16">
-              Master unique fighting styles from Kingston's streets
-            </p>
-
-            {/* Fighter Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
               {fighters.map((fighter, index) => (
                 <div
                   key={fighter.id}
-                  className="group relative cursor-pointer"
-                  style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => navigate('/character-select')}
+                  className="relative group cursor-pointer transform transition-all duration-500 hover:scale-125 hover:z-10"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  {/* Glow Effect */}
-                  <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg opacity-0 group-hover:opacity-75 blur-xl transition-all duration-500" />
-                  
-                  {/* Card */}
-                  <div className="relative bg-gradient-to-b from-gray-900 to-black border-2 border-purple-500/50 rounded-lg p-4 transform group-hover:scale-110 group-hover:border-cyan-400 transition-all duration-300 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative">
-                      <div className="w-full h-40 bg-gray-800 rounded mb-3 flex items-center justify-center overflow-hidden">
-                        <span className="text-6xl font-bold text-purple-500/20">
-                          {fighter.name[0]}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-center text-cyan-400 group-hover:text-white transition-colors">
-                        {fighter.name}
-                      </h3>
-                    </div>
+                  <div className="aspect-square rounded-xl bg-gradient-to-br from-purple-900/80 to-cyan-900/80 border-4 border-purple-500/50 group-hover:border-cyan-400 transition-all overflow-hidden backdrop-blur-md shadow-2xl group-hover:shadow-cyan-500/50 relative">
+                    <img 
+                      src={fighter.img} 
+                      alt={fighter.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-cyan-500/0 group-hover:from-purple-500/20 group-hover:to-cyan-500/20 transition-all duration-500" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl flex flex-col items-center justify-end pb-6 px-2">
+                    <span className="text-white font-bold text-xl mb-1 drop-shadow-lg">{fighter.name}</span>
+                    <span className="text-cyan-400 text-sm font-semibold">{fighter.title}</span>
                   </div>
                 </div>
               ))}
@@ -156,28 +159,31 @@ const MarvelRivalsLanding = () => {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 px-4 bg-gradient-to-b from-black via-purple-900/20 to-black">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center p-8 bg-gray-900/50 rounded-xl border border-cyan-500/30 hover:border-cyan-400 transition-colors">
-                <Sparkles className="w-16 h-16 mx-auto mb-4 text-cyan-400" />
-                <h3 className="text-2xl font-bold mb-3 text-cyan-400">8 UNIQUE FIGHTERS</h3>
-                <p className="text-gray-300">
-                  Each warrior brings their own devastating combat style
+        <section className="py-20 px-4 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/20 to-transparent" />
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid md:grid-cols-3 gap-12">
+              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-purple-900/50 to-transparent border-2 border-purple-500/50 hover:border-purple-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-purple-500/50 backdrop-blur-md">
+                <div className="text-7xl animate-bounce">⚡</div>
+                <h3 className="text-3xl font-bold text-cyan-400 drop-shadow-lg">UNIQUE FIGHTERS</h3>
+                <p className="text-gray-200 text-lg">
+                  9 authentic Jamaican warriors with distinct fighting styles and backstories rooted in 1980s Kingston culture
                 </p>
               </div>
-              <div className="text-center p-8 bg-gray-900/50 rounded-xl border border-purple-500/30 hover:border-purple-400 transition-colors">
-                <Swords className="w-16 h-16 mx-auto mb-4 text-purple-400" />
-                <h3 className="text-2xl font-bold mb-3 text-purple-400">EPIC STAGES</h3>
-                <p className="text-gray-300">
-                  Fight across iconic Kingston locations
+              
+              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-cyan-900/50 to-transparent border-2 border-cyan-500/50 hover:border-cyan-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-cyan-500/50 backdrop-blur-md">
+                <div className="text-7xl animate-bounce" style={{ animationDelay: '0.2s' }}>🏙️</div>
+                <h3 className="text-3xl font-bold text-purple-400 drop-shadow-lg">EPIC STAGES</h3>
+                <p className="text-gray-200 text-lg">
+                  Battle across iconic Kingston locations from Trench Town to Blue Mountains in stunning cyberpunk aesthetics
                 </p>
               </div>
-              <div className="text-center p-8 bg-gray-900/50 rounded-xl border border-pink-500/30 hover:border-pink-400 transition-colors">
-                <Play className="w-16 h-16 mx-auto mb-4 text-pink-400" />
-                <h3 className="text-2xl font-bold mb-3 text-pink-400">SPECIAL MOVES</h3>
-                <p className="text-gray-300">
-                  Unleash powerful combos and finishing moves
+              
+              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-pink-900/50 to-transparent border-2 border-pink-500/50 hover:border-pink-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-pink-500/50 backdrop-blur-md">
+                <div className="text-7xl animate-bounce" style={{ animationDelay: '0.4s' }}>🎮</div>
+                <h3 className="text-3xl font-bold text-pink-400 drop-shadow-lg">SPECIAL MOVES</h3>
+                <p className="text-gray-200 text-lg">
+                  Master devastating combos and signature special moves inspired by Jamaican martial arts and street fighting
                 </p>
               </div>
             </div>
@@ -185,18 +191,24 @@ const MarvelRivalsLanding = () => {
         </section>
 
         {/* Final CTA */}
-        <section className="py-20 px-4 text-center">
-          <h2 className="text-5xl md:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-            READY FOR KOMBAT?
-          </h2>
-          <Button
-            size="lg"
-            onClick={() => navigate('/game')}
-            className="text-2xl px-16 py-10 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-400 hover:via-purple-400 hover:to-pink-400 text-white font-bold rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 animate-pulse"
-          >
-            <Play className="mr-4 h-8 w-8" />
-            START PLAYING NOW
-          </Button>
+        <section className="py-32 px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-cyan-900/40 animate-pulse" />
+          <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
+            <h2 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(168,85,247,0.8)] animate-fade-in">
+              READY TO FIGHT?
+            </h2>
+            <p className="text-3xl text-gray-100 font-bold drop-shadow-lg">
+              Step into the ring and prove your worth in the streets of Kingston
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/character-select')}
+              className="text-3xl px-20 py-10 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-400 hover:to-purple-400 text-white font-bold shadow-2xl shadow-cyan-500/70 hover:scale-125 transition-all duration-500 border-4 border-cyan-400 hover:shadow-purple-500/90 animate-pulse"
+            >
+              <Play className="mr-4 h-10 w-10" />
+              START YOUR JOURNEY
+            </Button>
+          </div>
         </section>
       </div>
     </div>
