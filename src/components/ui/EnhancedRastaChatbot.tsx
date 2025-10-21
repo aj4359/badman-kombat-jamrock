@@ -121,6 +121,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [quickTips, setQuickTips] = useState<GameplayTip[]>([]);
+  const [hasPlayedInitialAnimation, setHasPlayedInitialAnimation] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize with contextual welcome message
@@ -156,6 +157,14 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // One-time pulse animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasPlayedInitialAnimation(true);
+    }, 3000); // Pulse for 3 seconds, then stop
+    return () => clearTimeout(timer);
+  }, []);
 
   // Text-only mode - no voice functionality
 
@@ -391,11 +400,11 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-[100] w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg border-2 border-yellow-400 animate-pulse pointer-events-auto"
+          className={`fixed bottom-6 right-6 z-[100] w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg border-2 border-yellow-400 pointer-events-auto ${!hasPlayedInitialAnimation ? 'animate-pulse' : ''}`}
           size="icon"
         >
-          <div className="relative flex items-center justify-center w-full h-full">
-            <JamaicanPixelAvatar size="sm" emotion="cool" showParticles={true} />
+          <div className="relative">
+            <JamaicanPixelAvatar size="sm" emotion="cool" showParticles={false} />
             <MessageCircle className="absolute -bottom-1 -right-1 w-4 h-4 text-white bg-blue-500 rounded-full p-0.5" />
           </div>
         </Button>

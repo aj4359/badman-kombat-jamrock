@@ -50,7 +50,8 @@ export const JamaicanPixelAvatar: React.FC<JamaicanPixelAvatarProps> = ({
   };
 
   const isBlinking = blinkTimer > 175;
-  const bobOffset = Math.sin(animationFrame * 0.2) * 2;
+  // Reduced bobbing animation - much subtler
+  const bobOffset = Math.sin(animationFrame * 0.05) * 0.5;
 
   return (
     <div className={cn('relative inline-block', sizeClasses[size], className)}>
