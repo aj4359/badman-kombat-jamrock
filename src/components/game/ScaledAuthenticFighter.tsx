@@ -86,6 +86,18 @@ const AUTHENTIC_FIGHTER_PROFILES = {
       rasta_colors: ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'],
       mystical_energy: 'hsl(120, 100%, 70%)'
     }
+  },
+  johnwick: {
+    name: 'John Wick "Baba Yaga"',
+    style: 'tactical_assassin',
+    colors: {
+      skin: 'hsl(30, 40%, 50%)',
+      suit: 'hsl(0, 0%, 8%)',
+      shirt: 'hsl(0, 0%, 95%)',
+      tie: 'hsl(0, 80%, 40%)',
+      gun: 'hsl(0, 0%, 20%)',
+      muzzle_flash: 'hsl(45, 100%, 60%)'
+    }
   }
 };
 
@@ -182,41 +194,8 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     return; // ✅ EXIT - Animated sprite rendered!
   }
   
-  // Fallback to full sprite sheet if frameCoords not available
-  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0) {
-    if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
-    if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
-    if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
-    if (effects.glow || effects.special) {
-      ctx.shadowColor = '#FFD700';
-      ctx.shadowBlur = 20;
-    }
-    if (effects.flash) ctx.globalCompositeOperation = 'lighter';
-    
-    const scale = 2.5;
-    const spriteWidth = spriteImage.naturalWidth || spriteImage.width;
-    const spriteHeight = spriteImage.naturalHeight || spriteImage.height;
-    const finalWidth = spriteWidth * scale;
-    const finalHeight = spriteHeight * scale;
-    
-    const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
-    const drawY = fighter.y + fighter.height - finalHeight;
-    
-    const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
-                       (typeof fighter.facing === 'number' && fighter.facing === -1);
-    if (facingLeft) {
-      ctx.save();
-      ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
-      ctx.scale(-1, 1);
-      ctx.drawImage(spriteImage, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
-      ctx.restore();
-    } else {
-      ctx.drawImage(spriteImage, drawX, drawY, finalWidth, finalHeight);
-    }
-    
-    ctx.restore();
-    return;
-  }
+  // ❌ REMOVED: Full sprite sheet fallback (was causing flat 2D images)
+  // Now falls through to geometric rendering if frameCoords not available
   
   // PHASE 4: Geometric rendering fallback with colored shapes (not white)
   ctx.save();
@@ -263,6 +242,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       break;
     case 'rootsman':
       renderRootsmanMystic(ctx, fighter, effects, pose);
+      break;
+    case 'johnwick':
+      renderJohnWickAssassin(ctx, fighter, effects, pose);
       break;
     default:
       renderDefaultStreetFighter(ctx, fighter, effects, pose);
@@ -649,6 +631,113 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
     }
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
+  }
+  
+  ctx.restore();
+}
+
+function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY * SCALE);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
+  
+  // Shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
+  
+  // Black dress shoes
+  ctx.fillStyle = 'hsl(0, 0%, 5%)';
+  ctx.fillRect(-20*SCALE, -12*SCALE, 20*SCALE, 12*SCALE);
+  ctx.fillRect(0, -12*SCALE, 20*SCALE, 12*SCALE);
+  
+  // Black suit pants
+  ctx.fillStyle = 'hsl(0, 0%, 10%)';
+  ctx.fillRect(-18*SCALE, -48*SCALE + pose.leftLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.leftLegBend * SCALE);
+  ctx.fillRect(2*SCALE, -48*SCALE + pose.rightLegOffsetY * SCALE, 16*SCALE, 36*SCALE + pose.rightLegBend * SCALE);
+  
+  // Black suit jacket
+  ctx.fillStyle = 'hsl(0, 0%, 8%)';
+  ctx.fillRect(-24*SCALE, -96*SCALE, 48*SCALE, 48*SCALE);
+  
+  // White shirt
+  ctx.fillStyle = 'hsl(0, 0%, 95%)';
+  ctx.fillRect(-18*SCALE, -90*SCALE, 36*SCALE, 12*SCALE);
+  
+  // Red tie
+  ctx.fillStyle = 'hsl(0, 80%, 40%)';
+  ctx.fillRect(-6*SCALE, -90*SCALE, 12*SCALE, 24*SCALE);
+  
+  // Arms in black suit sleeves
+  ctx.fillStyle = 'hsl(0, 0%, 8%)';
+  ctx.save();
+  ctx.translate(-30*SCALE, -90*SCALE);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.leftArmExtension) * SCALE);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(30*SCALE, -90*SCALE);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 12*SCALE, (36 + pose.rightArmExtension) * SCALE);
+  ctx.restore();
+  
+  // Hands (flesh tone)
+  ctx.fillStyle = 'hsl(30, 40%, 50%)';
+  ctx.save();
+  ctx.translate(-30*SCALE, -90*SCALE);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, (36 + pose.leftArmExtension) * SCALE, 12*SCALE, 12*SCALE);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(30*SCALE, -90*SCALE);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, (36 + pose.rightArmExtension) * SCALE, 12*SCALE, 12*SCALE);
+  ctx.restore();
+  
+  // Head (flesh tone)
+  ctx.fillStyle = 'hsl(30, 40%, 50%)';
+  ctx.fillRect(-21*SCALE, -132*SCALE, 42*SCALE, 36*SCALE);
+  
+  // Dark hair
+  ctx.fillStyle = 'hsl(0, 0%, 15%)';
+  ctx.fillRect(-18*SCALE, -135*SCALE, 36*SCALE, 12*SCALE);
+  
+  // Beard
+  ctx.fillStyle = 'hsl(0, 0%, 12%)';
+  ctx.fillRect(-15*SCALE, -105*SCALE, 30*SCALE, 9*SCALE);
+  
+  // Eyes (intense stare)
+  ctx.fillStyle = 'white';
+  ctx.fillRect(-12*SCALE, -118*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillRect(0, -118*SCALE, 12*SCALE, 6*SCALE);
+  ctx.fillStyle = 'hsl(200, 30%, 30%)'; // Dark blue-grey eyes
+  ctx.fillRect(-9*SCALE, -116*SCALE, 5*SCALE, 3*SCALE);
+  ctx.fillRect(3*SCALE, -116*SCALE, 5*SCALE, 3*SCALE);
+  
+  // Gun when attacking or using special
+  if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
+    ctx.fillStyle = 'hsl(0, 0%, 20%)';
+    ctx.save();
+    ctx.translate(30*SCALE, -78*SCALE);
+    ctx.rotate(-30 * Math.PI / 180);
+    ctx.fillRect(0, -3*SCALE, 24*SCALE, 6*SCALE); // Gun body
+    ctx.fillRect(24*SCALE, -2*SCALE, 6*SCALE, 4*SCALE); // Gun barrel
+    ctx.restore();
+    
+    // Muzzle flash
+    if (fighter.state.timer && fighter.state.timer < 5) {
+      ctx.fillStyle = 'hsl(45, 100%, 60%)';
+      ctx.shadowColor = 'hsl(45, 100%, 60%)';
+      ctx.shadowBlur = 15*SCALE;
+      ctx.save();
+      ctx.translate(30*SCALE, -78*SCALE);
+      ctx.rotate(-30 * Math.PI / 180);
+      ctx.fillRect(30*SCALE, -4*SCALE, 8*SCALE, 8*SCALE);
+      ctx.restore();
+      ctx.shadowBlur = 0;
+    }
   }
   
   ctx.restore();

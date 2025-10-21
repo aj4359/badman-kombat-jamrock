@@ -7,6 +7,7 @@ import jordanSheet from '@/assets/jordan-sprite-sheet.png';
 import razorSheet from '@/assets/razor-sprite-sheet.png';
 import sifuSheet from '@/assets/sifu-sprite-sheet.png';
 import rootsmanSheet from '@/assets/rootsman-sprite-sheet.png';
+import johnwickSheet from '@/assets/johnwick-sprite.png';
 
 const SPRITE_SHEET_PATHS: Record<string, string> = {
   leroy: leroySheet,
@@ -14,6 +15,7 @@ const SPRITE_SHEET_PATHS: Record<string, string> = {
   razor: razorSheet,
   sifu: sifuSheet,
   rootsman: rootsmanSheet,
+  johnwick: johnwickSheet,
 };
 
 export const useFighterSprites = () => {

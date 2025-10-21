@@ -89,6 +89,7 @@ export const FIGHTER_SPRITE_CONFIGS: Record<string, SpriteSheetConfig> = {
   razor: { frameWidth: 200, frameHeight: 200, rows: 4, cols: 6, scale: 1.5 },
   sifu: { frameWidth: 200, frameHeight: 200, rows: 4, cols: 6, scale: 1.5 },
   rootsman: { frameWidth: 200, frameHeight: 200, rows: 4, cols: 6, scale: 1.5 },
+  johnwick: { frameWidth: 64, frameHeight: 64, rows: 12, cols: 12, scale: 2.5 },
 };
 
 /**
@@ -110,6 +111,21 @@ export const ANIMATION_DEFINITIONS: Record<string, Record<string, { frames: numb
     blocking: { frames: [18, 19], duration: 6, loop: true },
     hit: { frames: [19, 18], duration: 5, loop: false },
     special: { frames: [20, 21, 22, 23, 22, 21], duration: 6, loop: false },
+  },
+  johnwick: {
+    idle: { frames: [0, 1, 2, 3], duration: 8, loop: true },
+    walking: { frames: [12, 13, 14, 15, 16, 17, 18, 19], duration: 5, loop: true },
+    jumping: { frames: [24, 25, 26, 27], duration: 6, loop: false },
+    crouching: { frames: [36, 37], duration: 8, loop: true },
+    lightPunch: { frames: [48, 49, 50, 49, 0], duration: 3, loop: false },
+    mediumPunch: { frames: [60, 61, 62, 63, 62, 0], duration: 3, loop: false },
+    heavyPunch: { frames: [72, 73, 74, 75, 76, 75, 0], duration: 4, loop: false },
+    lightKick: { frames: [84, 85, 86, 85, 0], duration: 3, loop: false },
+    mediumKick: { frames: [96, 97, 98, 97, 0], duration: 3, loop: false },
+    heavyKick: { frames: [108, 109, 110, 111, 110, 0], duration: 4, loop: false },
+    blocking: { frames: [36, 37], duration: 6, loop: true },
+    hit: { frames: [120, 121], duration: 5, loop: false },
+    special: { frames: [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143], duration: 4, loop: false },
   },
 };
 
