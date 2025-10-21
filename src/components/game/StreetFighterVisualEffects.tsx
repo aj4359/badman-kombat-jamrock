@@ -291,3 +291,57 @@ export function renderSuperMeter(
   
   ctx.restore();
 }
+
+// John Wick specific effects
+export function renderMuzzleFlash(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number
+) {
+  ctx.save();
+  
+  // Bright flash
+  const gradient = ctx.createRadialGradient(x, y, 5, x, y, 30);
+  gradient.addColorStop(0, 'rgba(255, 200, 100, 1)');
+  gradient.addColorStop(0.5, 'rgba(255, 150, 50, 0.6)');
+  gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x - 30, y - 30, 60, 60);
+  
+  // Flash lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 8; i++) {
+    const angle = (i * Math.PI * 2) / 8;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(angle) * 25, y + Math.sin(angle) * 25);
+    ctx.stroke();
+  }
+  
+  ctx.restore();
+}
+
+export function renderBulletTrail(
+  ctx: CanvasRenderingContext2D,
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number
+) {
+  ctx.save();
+  
+  const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+  gradient.addColorStop(0, 'rgba(255, 200, 100, 0.8)');
+  gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+  
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(endX, endY);
+  ctx.stroke();
+  
+  ctx.restore();
+}

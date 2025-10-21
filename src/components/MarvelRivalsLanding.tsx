@@ -88,6 +88,13 @@ const MarvelRivalsLanding = () => {
                 <Swords className="mr-3 h-6 w-6" />
                 SELECT FIGHTER
               </Button>
+              <Button
+                size="lg"
+                onClick={() => navigate('/john-wick-trailer')}
+                className="text-xl px-12 py-8 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-2xl transform hover:scale-110 transition-all duration-300 border-2 border-red-300"
+              >
+                🎬 JOHN WICK TRAILER
+              </Button>
             </div>
           </div>
         </section>

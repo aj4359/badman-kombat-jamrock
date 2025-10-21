@@ -56,6 +56,41 @@ const CINEMATIC_SEQUENCES: GameplaySequence[] = [
       { fighter: 'player1', move: 'super', timing: 1000, cameraHint: 'slow-motion' },
       { fighter: 'player2', move: 'knockdown', timing: 2500, cameraHint: 'closeup' }
     ]
+  },
+  {
+    name: 'John Wick Gun-Fu Showcase',
+    duration: 5000,
+    actions: [
+      { fighter: 'player1', move: 'forward', timing: 0, cameraHint: 'wide' },
+      { fighter: 'player1', move: 'special', timing: 500, cameraHint: 'over-shoulder' },
+      { fighter: 'player2', move: 'backward', timing: 500, cameraHint: 'closeup' },
+      { fighter: 'player1', move: 'forward', timing: 1500, cameraHint: 'medium' },
+      { fighter: 'player1', move: 'punch', timing: 2000, cameraHint: 'closeup' },
+      { fighter: 'player1', move: 'punch', timing: 2300, cameraHint: 'closeup' },
+      { fighter: 'player1', move: 'kick', timing: 2600, cameraHint: 'closeup' },
+      { fighter: 'player2', move: 'knockdown', timing: 3000, cameraHint: 'dramatic-angle' }
+    ]
+  },
+  {
+    name: 'Continental Protocol Finisher',
+    duration: 6000,
+    actions: [
+      { fighter: 'player1', move: 'backward', timing: 0, cameraHint: 'medium' },
+      { fighter: 'player2', move: 'forward', timing: 500, cameraHint: 'wide' },
+      { fighter: 'player1', move: 'super', timing: 1500, cameraHint: 'slow-motion' },
+      { fighter: 'player2', move: 'knockdown', timing: 4000, cameraHint: 'closeup' }
+    ]
+  },
+  {
+    name: 'Rapid Fire Assault',
+    duration: 4000,
+    actions: [
+      { fighter: 'player1', move: 'special', timing: 0, cameraHint: 'over-shoulder' },
+      { fighter: 'player1', move: 'special', timing: 800, cameraHint: 'over-shoulder' },
+      { fighter: 'player1', move: 'special', timing: 1600, cameraHint: 'over-shoulder' },
+      { fighter: 'player2', move: 'jump', timing: 2000, cameraHint: 'wide' },
+      { fighter: 'player1', move: 'special', timing: 2500, cameraHint: 'closeup' }
+    ]
   }
 ];
 

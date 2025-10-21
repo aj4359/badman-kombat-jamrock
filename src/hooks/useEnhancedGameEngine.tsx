@@ -31,7 +31,7 @@ export interface SpecialMove {
     size: number;
     range: number;
     color: string;
-    type: 'fireball' | 'soundwave' | 'energy';
+    type: 'fireball' | 'soundwave' | 'energy' | 'bullet';
   };
 }
 

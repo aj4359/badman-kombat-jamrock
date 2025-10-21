@@ -11,7 +11,7 @@ export interface Projectile {
   damage: number;
   owner: string;
   color: string;
-  type: 'fireball' | 'soundwave' | 'energy';
+  type: 'fireball' | 'soundwave' | 'energy' | 'bullet';
   life: number;
   maxLife: number;
   hitbox: {
@@ -61,7 +61,7 @@ export interface SuperMove {
   input: string;
   damage: number;
   cost: number; // Super meter cost (usually 100 for full super)
-  type: 'projectile' | 'melee' | 'command';
+  type: 'projectile' | 'melee' | 'command' | 'cinematic';
   frames: {
     startup: number;
     active: number;
@@ -180,6 +180,6 @@ export interface SpecialMove {
     size: number;
     range: number;
     color: string;
-    type: 'fireball' | 'soundwave' | 'energy';
+    type: 'fireball' | 'soundwave' | 'energy' | 'bullet';
   };
 }

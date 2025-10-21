@@ -306,5 +306,67 @@ export const ENHANCED_FIGHTER_DATA: Record<string, FighterData> = {
       secondary: 'hsl(100, 70%, 50%)',
       aura: 'hsl(120, 80%, 40%)'
     }
+  },
+
+  johnwick: {
+    id: 'johnwick',
+    name: 'John Wick "Baba Yaga"',
+    stats: {
+      power: 95,
+      speed: 90,
+      defense: 80,
+      walkSpeed: 4.5,
+      jumpForce: -15
+    },
+    specialMoves: [
+      {
+        name: 'Precision Headshot',
+        input: 'down,down-right,right,punch',
+        damage: 35,
+        cost: 30,
+        type: 'projectile',
+        frames: { startup: 8, active: 6, recovery: 18 },
+        projectile: {
+          speed: 12,
+          size: 20,
+          range: 700,
+          color: 'hsl(30, 100%, 50%)',
+          type: 'bullet'
+        }
+      },
+      {
+        name: 'Gun-Fu Combo',
+        input: 'right,right,punch',
+        damage: 28,
+        cost: 25,
+        type: 'melee',
+        frames: { startup: 4, active: 8, recovery: 20 },
+        effects: { type: 'combo', duration: 40 }
+      }
+    ],
+    superMoves: [
+      {
+        name: 'Continental Protocol',
+        input: 'down,down-right,right,down,down-right,right,punch',
+        damage: 75,
+        cost: 100,
+        type: 'cinematic',
+        frames: { startup: 15, active: 60, recovery: 30 },
+        invulnerable: true,
+        effects: { type: 'cinematic', duration: 180 }
+      }
+    ],
+    voiceLines: [
+      { trigger: 'special', text: 'Yeah, I\'m thinking I\'m back.' },
+      { trigger: 'super', text: 'BABA YAGA!' },
+      { trigger: 'victory', text: 'It\'s not what you did... it\'s who you did it to.' },
+      { trigger: 'ko', text: 'No... not like this...' },
+      { trigger: 'hurt', text: 'Argh!' }
+    ],
+    colors: {
+      primary: 'hsl(0, 0%, 15%)',
+      secondary: 'hsl(30, 100%, 50%)',
+      aura: 'hsl(0, 80%, 40%)'
+    }
   }
 };
