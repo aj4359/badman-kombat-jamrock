@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,7 +29,14 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<MarvelRivalsLanding />} />
+            <Route 
+              path="/" 
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                  <MarvelRivalsLanding />
+                </Suspense>
+              } 
+            />
             <Route path="/cyberpunk" element={<Index />} />
             <Route path="/landing" element={<BadManKombatLandingPage />} />
             <Route path="/character-select" element={<CharacterSelect />} />

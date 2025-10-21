@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Play, Swords, Sparkles } from 'lucide-react';
 import ParticleSystem from '@/components/ui/ParticleSystem';
 import leroyPoster from '@/assets/leroy-poster.png';
 import fighterLineup from '@/assets/fighter-lineup.png';
-import trailerVideo from '/assets/bmk-trailer.mp4';
 
 const MarvelRivalsLanding = () => {
   const navigate = useNavigate();
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [shouldLoadHeavyContent, setShouldLoadHeavyContent] = useState(false);
+
+  useEffect(() => {
+    // Delay heavy content loading to ensure page renders first
+    const timer = setTimeout(() => {
+      setShouldLoadHeavyContent(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const fighters = [
     { id: 'leroy', name: 'LEROY', img: '/src/assets/leroy-sprite.png' },
@@ -25,22 +33,28 @@ const MarvelRivalsLanding = () => {
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Particle Background */}
-      <ParticleSystem />
+      {shouldLoadHeavyContent && <ParticleSystem />}
 
       {/* Video Background */}
-      <div className="fixed inset-0 z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-20"
-          onLoadedData={() => setVideoLoaded(true)}
-        >
-          <source src={trailerVideo} type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/20 to-black" />
-      </div>
+      {shouldLoadHeavyContent && (
+        <div className="fixed inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-20"
+            onLoadedData={() => setVideoLoaded(true)}
+            onError={(e) => {
+              console.warn('Video loading failed, continuing without video:', e);
+              setVideoLoaded(true);
+            }}
+          >
+            <source src="/assets/bmk-trailer.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/20 to-black" />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative z-10">
