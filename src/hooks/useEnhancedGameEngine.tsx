@@ -311,48 +311,61 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     return fighter;
   }, []); // PHASE 2: Empty deps array for stable reference
 
-  // PHASE 4: ADD SAFEGUARDS - Single initialization flag and error boundaries
+  // ✅ PHASE 1 FIX: Prevent re-initialization loops
   const initializationCompleteRef = useRef(false);
+  const initializationInProgressRef = useRef(false);
   
   const initializeFighters = useCallback(() => {
+    // ✅ SAFETY CHECK 1: Already initialized
     if (initializationCompleteRef.current) {
-      console.log('⚠️ initializeFighters: Already initialized, skipping');
+      console.log('✅ [PHASE 1] Already initialized, skipping');
       return;
     }
     
-    console.log('🚀 DIAGNOSTIC: initializeFighters called');
-    console.log('🔥 DIAGNOSTIC: Fighter data received:', fighterData);
+    // ✅ SAFETY CHECK 2: Initialization in progress
+    if (initializationInProgressRef.current) {
+      console.log('⏳ [PHASE 1] Initialization in progress, skipping duplicate call');
+      return;
+    }
+    
+    initializationInProgressRef.current = true;
+    console.log('🚀 [PHASE 1] Initializing fighters...');
     
     try {
+      // ✅ SAFETY CHECK 3: Validate fighter data
       const p1Data = fighterData?.player1 || { id: 'leroy', name: 'LEROY' };
       const p2Data = fighterData?.player2 || { id: 'jordan', name: 'JORDAN' };
       
-      console.log('🔥 DIAGNOSTIC: Creating fighters:', { p1: p1Data.id, p2: p2Data.id });
+      if (!p1Data.id || !p2Data.id) {
+        throw new Error('Invalid fighter data: missing IDs');
+      }
+      
+      console.log('✅ [PHASE 1] Creating fighters:', { p1: p1Data.id, p2: p2Data.id });
       
       const player1 = createFighter(p1Data.id, p1Data.name, CANVAS_WIDTH / 2 - 150);
       const player2 = createFighter(p2Data.id, p2Data.name, CANVAS_WIDTH / 2 + 70);
       
-      setGameState(prev => {
-        const newState = {
-          ...prev,
-          fighters: { player1, player2 },
-          screen: 'fighting' as const,
-          round: 1,
-          timer: 99
-        };
-        console.log('✅ Fighters set in game state:', {
-          p1: player1.name,
-          p2: player2.name
-        });
-        return newState;
-      });
+      // ✅ SAFETY CHECK 4: Validate created fighters
+      if (!player1 || !player2) {
+        throw new Error('Fighter creation failed');
+      }
+      
+      setGameState(prev => ({
+        ...prev,
+        fighters: { player1, player2 },
+        screen: 'fighting' as const,
+        round: 1,
+        timer: 99
+      }));
       
       initializationCompleteRef.current = true;
-      console.log('🎉 Fighter initialization COMPLETE!');
+      console.log('✅ [PHASE 1] Initialization complete!');
       
     } catch (error) {
-      console.error('💥 initializeFighters FAILED:', error);
+      console.error('❌ [PHASE 1] Initialization failed:', error);
       initializationCompleteRef.current = false;
+    } finally {
+      initializationInProgressRef.current = false;
     }
   }, [createFighter, fighterData]);
 

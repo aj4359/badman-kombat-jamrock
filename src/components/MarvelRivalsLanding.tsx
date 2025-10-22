@@ -50,11 +50,11 @@ const MarvelRivalsLanding = () => {
             className="w-full h-full object-cover opacity-20"
             onLoadedData={() => setVideoLoaded(true)}
             onError={(e) => {
-              console.warn('Video loading failed, continuing without video:', e);
+              console.warn('✅ [PHASE 1] Video background optional, continuing:', e);
               setVideoLoaded(true);
             }}
           >
-            <source src="/assets/bmk-trailer.mp4" type="video/mp4" />
+            <source src="assets/bmk-trailer.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/20 to-black" />
         </div>

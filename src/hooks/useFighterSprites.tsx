@@ -26,67 +26,67 @@ export const useFighterSprites = () => {
 
   useEffect(() => {
     const loadSprites = async () => {
-      console.log('🎨 Loading pixel art sprite sheets...');
+      console.log('🎨 [PHASE 1 FIX] Loading sprite sheets with error handling...');
+      
       const loadPromises = Object.entries(SPRITE_SHEET_PATHS).map(
         ([fighterId, path]) =>
-          new Promise<void>((resolve, reject) => {
-            console.log(`🎨 Loading ${fighterId}:`, { path, type: typeof path });
-            
-            if (!path || typeof path !== 'string') {
-              console.error(`❌ Invalid path for ${fighterId}:`, path);
-              resolve();
+          new Promise<void>((resolve) => {
+            // ✅ SAFETY CHECK: Validate path exists
+            if (!path || typeof path !== 'string' || path.includes('undefined')) {
+              console.warn(`⚠️ [PHASE 1] No sprite sheet for ${fighterId}, using geometric fallback`);
+              resolve(); // Don't crash, just skip
               return;
             }
             
             const img = new Image();
+            
             img.onload = async () => {
-              console.log(`✅ ${fighterId} loaded:`, {
-                width: img.naturalWidth,
-                height: img.naturalHeight
-              });
-              
-              if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-                console.error(`❌ ${fighterId} has zero dimensions`);
+              try {
+                if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                  console.warn(`⚠️ [PHASE 1] ${fighterId} sprite has zero dimensions, using fallback`);
+                  resolve();
+                  return;
+                }
+                
+                spriteImages.current[fighterId] = img;
+                
+                const config = FIGHTER_SPRITE_CONFIGS[fighterId];
+                if (config) {
+                  const frames = await extractFramesFromSpriteSheet(img, config);
+                  spriteFrames.current[fighterId] = frames;
+                  const animations = createAnimationSequences(frames, fighterId);
+                  animationControllers.current[fighterId] = new AnimationController(animations);
+                  console.log(`✅ [PHASE 1] ${fighterId}: ${frames.length} frames loaded`);
+                }
                 resolve();
-                return;
+              } catch (error) {
+                console.warn(`⚠️ [PHASE 1] Error processing ${fighterId} sprite:`, error);
+                resolve(); // Don't crash
               }
-              
-              spriteImages.current[fighterId] = img;
-              
-              // Extract frames from sprite sheet
-              const config = FIGHTER_SPRITE_CONFIGS[fighterId];
-              if (config) {
-                const frames = await extractFramesFromSpriteSheet(img, config);
-                spriteFrames.current[fighterId] = frames;
-                
-                // Create animation sequences
-                const animations = createAnimationSequences(frames, fighterId);
-                animationControllers.current[fighterId] = new AnimationController(animations);
-                
-                console.log(`✅ ${fighterId}: ${frames.length} frames`);
-              }
-              resolve();
             };
-            img.onerror = (error) => {
-              console.error(`❌ SPRITE FAILED: ${fighterId}`, {
-                path,
-                src: img.src,
-                error
-              });
-              console.warn(`🎨 Geometric fallback: ${fighterId}`);
-              resolve();
+            
+            img.onerror = () => {
+              console.warn(`⚠️ [PHASE 1] Sprite file not found for ${fighterId}, using geometric fallback`);
+              resolve(); // Don't crash, geometric rendering will handle it
             };
-            img.src = path;
+            
+            // ✅ SAFETY: Wrap in try/catch
+            try {
+              img.src = path;
+            } catch (error) {
+              console.warn(`⚠️ [PHASE 1] Failed to set src for ${fighterId}:`, error);
+              resolve();
+            }
           })
       );
 
       try {
         await Promise.all(loadPromises);
-        setIsLoaded(true);
-        console.log('✅ All pixel art sprites loaded successfully!');
+        console.log('✅ [PHASE 1] Sprite loading complete (with fallbacks)');
       } catch (error) {
-        console.error('❌ Error loading sprite sheets:', error);
-        setIsLoaded(true); // Still set loaded to allow geometric fallback
+        console.warn('⚠️ [PHASE 1] Sprite loading had errors, continuing with geometric fallbacks:', error);
+      } finally {
+        setIsLoaded(true); // Always set loaded to proceed with game
       }
     };
 

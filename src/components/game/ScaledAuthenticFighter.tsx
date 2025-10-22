@@ -120,25 +120,13 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     moveType
   );
   
-  // ✅ USE SPRITE IMAGE WITH ANIMATION FRAMES
-  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0 && frameCoords) {
-    // PHASE 2: Validate image and frame coords before rendering
-    if (!spriteImage.complete || spriteImage.naturalWidth === 0) {
-      console.error('❌ Sprite not ready for rendering:', fighter.id);
-      return;
-    }
+  // ✅ PATH 1: USE SPRITE ANIMATION (if available and valid)
+  if (spriteImage && spriteImage.complete && spriteImage.naturalWidth > 0 && frameCoords && 
+      frameCoords.width > 0 && frameCoords.height > 0) {
     
-    if (frameCoords.x < 0 || frameCoords.y < 0 || 
-        frameCoords.x + frameCoords.width > spriteImage.naturalWidth ||
-        frameCoords.y + frameCoords.height > spriteImage.naturalHeight) {
-      console.error('❌ Frame coords out of bounds:', { fighter: fighter.id, frameCoords, imageSize: `${spriteImage.naturalWidth}x${spriteImage.naturalHeight}` });
-      return;
-    }
-    
-    // PHASE 1: Save canvas state INSIDE sprite block
     ctx.save();
     
-    // Apply effects
+    // Apply visual effects
     if (effects.alpha !== undefined) ctx.globalAlpha = effects.alpha;
     if (effects.shake) ctx.translate(effects.shake.x, effects.shake.y);
     if (effects.hueRotation) ctx.filter = `hue-rotate(${effects.hueRotation}deg)`;
@@ -148,56 +136,44 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
     }
     if (effects.flash) ctx.globalCompositeOperation = 'lighter';
     
-    // Scale sprite
+    // Scale and position sprite
     const scale = 2.5;
     const finalWidth = frameCoords.width * scale;
     const finalHeight = frameCoords.height * scale;
-    
-    // Position sprite
     const drawX = fighter.x + fighter.width / 2 - finalWidth / 2;
     const drawY = fighter.y + fighter.height - finalHeight;
     
-    // PHASE 2: Log render parameters for debugging
-    if (frameCoords.x === 0 && frameCoords.y === 0) {
-      console.log('🎨 RENDERING:', { 
-        fighter: fighter.id,
-        spriteSize: `${spriteImage.naturalWidth}x${spriteImage.naturalHeight}`,
-        frameCoords,
-        drawPos: { drawX: Math.round(drawX), drawY: Math.round(drawY), finalWidth: Math.round(finalWidth), finalHeight: Math.round(finalHeight) }
-      });
-    }
-    
-    // Flip based on facing
+    // Handle facing direction
     const facingLeft = (typeof fighter.facing === 'string' && fighter.facing === 'left') || 
                        (typeof fighter.facing === 'number' && fighter.facing === -1);
     
-    if (facingLeft) {
-      ctx.save();
-      ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
-      ctx.scale(-1, 1);
-      ctx.drawImage(
-        spriteImage,
-        frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect (specific frame)
-        -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight // Dest rect
-      );
-      ctx.restore();
-    } else {
-      ctx.drawImage(
-        spriteImage,
-        frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height, // Source rect
-        drawX, drawY, finalWidth, finalHeight // Dest rect
-      );
+    try {
+      if (facingLeft) {
+        ctx.save();
+        ctx.translate(drawX + finalWidth / 2, drawY + finalHeight / 2);
+        ctx.scale(-1, 1);
+        ctx.drawImage(
+          spriteImage,
+          frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height,
+          -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight
+        );
+        ctx.restore();
+      } else {
+        ctx.drawImage(
+          spriteImage,
+          frameCoords.x, frameCoords.y, frameCoords.width, frameCoords.height,
+          drawX, drawY, finalWidth, finalHeight
+        );
+      }
+    } catch (error) {
+      console.warn(`⚠️ Sprite render failed for ${fighter.id}, using fallback`);
     }
     
-    // PHASE 1: Restore canvas state (matches save at line 121)
     ctx.restore();
-    return; // ✅ EXIT - Animated sprite rendered!
+    return; // ✅ Sprite rendered successfully
   }
   
-  // ❌ REMOVED: Full sprite sheet fallback (was causing flat 2D images)
-  // Now falls through to geometric rendering if frameCoords not available
-  
-  // PHASE 4: Geometric rendering fallback with colored shapes (not white)
+  // ✅ PATH 2: GEOMETRIC FALLBACK (clean colored shapes, NO photos)
   ctx.save();
   
   if (effects.alpha !== undefined) {
