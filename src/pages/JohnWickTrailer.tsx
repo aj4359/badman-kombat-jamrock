@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViralStreetFighterCanvas } from '@/components/game/ViralStreetFighterCanvas';
 import { TrailerOverlays } from '@/components/game/TrailerOverlays';
@@ -57,10 +57,10 @@ const JohnWickTrailer = () => {
     advancePhase();
   };
   
-  const fighterData = {
+  const fighterData = useMemo(() => ({
     player1: { id: 'johnwick', name: 'JOHN WICK' },
     player2: { id: opponents[currentOpponent], name: opponents[currentOpponent].toUpperCase() }
-  };
+  }), [currentOpponent]);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-slate-950 to-black">

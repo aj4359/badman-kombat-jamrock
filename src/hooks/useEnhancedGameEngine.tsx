@@ -314,6 +314,12 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
   // ✅ PHASE 1 FIX: Prevent re-initialization loops
   const initializationCompleteRef = useRef(false);
   const initializationInProgressRef = useRef(false);
+  const fighterDataRef = useRef(fighterData);
+  
+  // Update ref when fighterData changes
+  useEffect(() => {
+    fighterDataRef.current = fighterData;
+  }, [fighterData]);
   
   const initializeFighters = useCallback(() => {
     // ✅ SAFETY CHECK 1: Already initialized
@@ -332,9 +338,9 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     console.log('🚀 [PHASE 1] Initializing fighters...');
     
     try {
-      // ✅ SAFETY CHECK 3: Validate fighter data
-      const p1Data = fighterData?.player1 || { id: 'leroy', name: 'LEROY' };
-      const p2Data = fighterData?.player2 || { id: 'jordan', name: 'JORDAN' };
+      // ✅ SAFETY CHECK 3: Validate fighter data (use ref to avoid dependency)
+      const p1Data = fighterDataRef.current?.player1 || { id: 'leroy', name: 'LEROY' };
+      const p2Data = fighterDataRef.current?.player2 || { id: 'jordan', name: 'JORDAN' };
       
       if (!p1Data.id || !p2Data.id) {
         throw new Error('Invalid fighter data: missing IDs');
@@ -367,7 +373,7 @@ export const useEnhancedGameEngine = (fighterData?: { player1: any; player2: any
     } finally {
       initializationInProgressRef.current = false;
     }
-  }, [createFighter, fighterData]);
+  }, [createFighter]); // Removed fighterData from deps to prevent infinite loop
 
   const checkCollision = useCallback((rect1: any, rect2: any): boolean => {
     return rect1.x < rect2.x + rect2.width &&
