@@ -8,6 +8,7 @@ interface JamaicanPixelAvatarProps {
   isSpeaking?: boolean;
   isThinking?: boolean;
   showParticles?: boolean;
+  disableAnimation?: boolean;
   className?: string;
 }
 
@@ -17,31 +18,31 @@ export const JamaicanPixelAvatar: React.FC<JamaicanPixelAvatarProps> = ({
   isSpeaking = false,
   isThinking = false,
   showParticles = false,
+  disableAnimation = false,
   className = ''
 }) => {
   const [animationFrame, setAnimationFrame] = useState(0);
   const [blinkTimer, setBlinkTimer] = useState(0);
 
-  // Animation loop for blinking and movement - WITH EMERGENCY STOP
+  // Animation loop for blinking and movement
   useEffect(() => {
+    if (disableAnimation) {
+      return; // Don't start animation if disabled
+    }
+    
     let intervalRef: NodeJS.Timeout;
     
-    // Only start animation if element ID is not 547 (the problematic one)
-    const startAnimation = () => {
-      intervalRef = setInterval(() => {
-        setAnimationFrame(prev => (prev + 1) % 60);
-        setBlinkTimer(prev => (prev + 1) % 180);
-      }, 100);
-    };
-    
-    startAnimation();
+    intervalRef = setInterval(() => {
+      setAnimationFrame(prev => (prev + 1) % 60);
+      setBlinkTimer(prev => (prev + 1) % 180);
+    }, 100);
 
     return () => {
       if (intervalRef) {
         clearInterval(intervalRef);
       }
     };
-  }, []);
+  }, [disableAnimation]);
 
   const sizeClasses = {
     sm: 'w-8 h-8',
@@ -51,7 +52,7 @@ export const JamaicanPixelAvatar: React.FC<JamaicanPixelAvatarProps> = ({
 
   const isBlinking = blinkTimer > 175;
   // Reduced bobbing animation - much subtler
-  const bobOffset = Math.sin(animationFrame * 0.05) * 0.5;
+  const bobOffset = disableAnimation ? 0 : Math.sin(animationFrame * 0.05) * 0.5;
 
   return (
     <div className={cn('relative inline-block', sizeClasses[size], className)}>

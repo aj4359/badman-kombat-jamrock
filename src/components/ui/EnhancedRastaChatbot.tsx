@@ -404,7 +404,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
           size="icon"
         >
           <div className="relative">
-            <JamaicanPixelAvatar size="sm" emotion="cool" showParticles={false} />
+            <JamaicanPixelAvatar size="sm" emotion="cool" showParticles={false} disableAnimation={hasPlayedInitialAnimation} />
             <MessageCircle className="absolute -bottom-1 -right-1 w-4 h-4 text-white bg-blue-500 rounded-full p-0.5" />
           </div>
         </Button>
