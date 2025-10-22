@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViralStreetFighterCanvas } from '@/components/game/ViralStreetFighterCanvas';
 import { TrailerOverlays } from '@/components/game/TrailerOverlays';
@@ -8,9 +8,11 @@ import { ArrowLeft, Play, Download } from 'lucide-react';
 
 const JohnWickTrailer = () => {
   const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentPhase, setCurrentPhase] = useState<'title' | 'gameplay' | 'victory' | 'none'>('none');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentOpponent, setCurrentOpponent] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
   
   const opponents = ['leroy', 'jordan', 'razor', 'sifu'];
   
@@ -83,7 +85,11 @@ const JohnWickTrailer = () => {
         <div className="max-w-6xl mx-auto">
           {/* Canvas */}
           <div className="relative aspect-video bg-black rounded-lg overflow-hidden border-2 border-red-900/50 mb-6">
-            <ViralStreetFighterCanvas fighterData={fighterData} />
+            <ViralStreetFighterCanvas 
+              fighterData={fighterData} 
+              canvasRef={canvasRef}
+              isRecording={isRecording}
+            />
             <TrailerOverlays
               phase={currentPhase}
               fighterName={currentPhase === 'title' ? 'BABA YAGA' : undefined}
@@ -134,7 +140,14 @@ const JohnWickTrailer = () => {
         </div>
       </div>
       
-      <CinematicRecorder canvasRef={null} onRecordingStart={startTrailer} />
+      <CinematicRecorder 
+        canvasRef={canvasRef} 
+        onRecordingStart={() => {
+          setIsRecording(true);
+          startTrailer();
+        }}
+        onRecordingStop={() => setIsRecording(false)}
+      />
     </div>
   );
 };

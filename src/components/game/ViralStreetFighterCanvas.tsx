@@ -29,6 +29,8 @@ interface ViralStreetFighterCanvasProps {
     background: string;
     music: string;
   };
+  canvasRef?: React.RefObject<HTMLCanvasElement>;
+  isRecording?: boolean;
 }
 
 // Map fighter state to sprite animation name
@@ -55,9 +57,12 @@ const mapFighterStateToAnimation = (state: string): string => {
 
 export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> = ({ 
   fighterData,
-  stage 
+  stage,
+  canvasRef: externalCanvasRef,
+  isRecording = false
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const internalCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = externalCanvasRef || internalCanvasRef;
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const initializationRef = useRef(false);
@@ -196,8 +201,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       const p1Speed = Math.sqrt((p1.velocityX || 0) ** 2 + (p1.velocityY || 0) ** 2);
       const p2Speed = Math.sqrt((p2.velocityX || 0) ** 2 + (p2.velocityY || 0) ** 2);
       
-      // Motion blur trails for fast movement
-      if (p1Speed > 3) {
+      // Motion blur trails for fast movement (reduced during recording)
+      if (!isRecording && p1Speed > 3) {
         renderMotionBlur(ctx, {
           x: p1.x,
           y: p1.y,
@@ -207,7 +212,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         });
       }
       
-      if (p2Speed > 3) {
+      if (!isRecording && p2Speed > 3) {
         renderMotionBlur(ctx, {
           x: p2.x,
           y: p2.y,
@@ -217,12 +222,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         });
       }
       
-      // Speed lines during attacks (Marvel Rivals style)
+      // Speed lines during attacks (reduced during recording)
       if (p1.state.current === 'attacking' && p1.state.timer && p1.state.timer < 10) {
         renderSpeedLines(ctx, p1.x + p1.width/2, p1.y + p1.height/2, p1.facing, 1.5);
         
-        // Ghost trail for heavy attacks
-        for (let i = 1; i <= 3; i++) {
+        // Ghost trail for heavy attacks (only 1 ghost during recording)
+        const ghostCount = isRecording ? 1 : 3;
+        for (let i = 1; i <= ghostCount; i++) {
           const p1SpriteGhost = getSpriteData(fighterData?.player1?.id || '');
           renderAuthenticFighter({
             ctx,
@@ -236,8 +242,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       if (p2.state.current === 'attacking' && p2.state.timer && p2.state.timer < 10) {
         renderSpeedLines(ctx, p2.x + p2.width/2, p2.y + p2.height/2, p2.facing, 1.5);
         
-        // Ghost trail for heavy attacks
-        for (let i = 1; i <= 3; i++) {
+        // Ghost trail for heavy attacks (only 1 ghost during recording)
+        const ghostCount = isRecording ? 1 : 3;
+        for (let i = 1; i <= ghostCount; i++) {
           const p2SpriteGhost = getSpriteData(fighterData?.player2?.id || '');
           renderAuthenticFighter({
             ctx,
@@ -339,7 +346,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     const fps = deltaTime > 0 ? Math.round(1000 / deltaTime) : 0;
     ctx.fillText(`FPS: ${fps}`, 10, 20);
     
-  }, [getSpriteData, getAnimationFrame, getShakeOffset, updateEffects, drawHitSparks, fighterData]);
+  }, [getSpriteData, getAnimationFrame, getShakeOffset, updateEffects, drawHitSparks, fighterData, isRecording]);
 
   // Animation loop
   useEffect(() => {

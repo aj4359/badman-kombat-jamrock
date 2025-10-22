@@ -15,11 +15,11 @@ interface RecordingConfig {
 
 const DEFAULT_CONFIG: RecordingConfig = {
   resolution: { width: 1920, height: 1080 },
-  frameRate: 60,
+  frameRate: 30, // Lowered to 30fps for stability
   duration: 30000, // 30 seconds
   format: 'webm',
   codec: 'vp9',
-  bitrate: 8000000
+  bitrate: 5000000 // Reduced bitrate for smoother recording
 };
 
 interface CinematicRecorderProps {
@@ -113,8 +113,10 @@ export const CinematicRecorder: React.FC<CinematicRecorderProps> = ({
       setRecordedBlob(null);
       startTimeRef.current = Date.now();
 
-      // Update progress
-      progressIntervalRef.current = setInterval(() => {
+      // Update progress with requestIdleCallback for better performance
+      const updateProgress = () => {
+        if (!startTimeRef.current) return;
+        
         const elapsed = Date.now() - startTimeRef.current;
         const progressPercent = Math.min((elapsed / finalConfig.duration) * 100, 100);
         setProgress(progressPercent);
@@ -122,8 +124,17 @@ export const CinematicRecorder: React.FC<CinematicRecorderProps> = ({
         // Auto-stop after duration
         if (elapsed >= finalConfig.duration) {
           stopRecording();
+        } else if (progressIntervalRef.current) {
+          // Use requestIdleCallback if available, otherwise setTimeout
+          if ('requestIdleCallback' in window) {
+            (window as any).requestIdleCallback(updateProgress);
+          } else {
+            setTimeout(updateProgress, 100);
+          }
         }
-      }, 100);
+      };
+      
+      progressIntervalRef.current = setInterval(updateProgress, 100) as any;
 
       onRecordingStart?.();
 
