@@ -75,6 +75,20 @@ const AUTHENTIC_FIGHTER_PROFILES = {
       rasta_colors: ['hsl(120, 100%, 30%)', 'hsl(60, 100%, 50%)', 'hsl(0, 100%, 50%)'],
       mystical_energy: 'hsl(120, 100%, 70%)'
     }
+  },
+  johnwick: {
+    name: 'John Wick "Baba Yaga"',
+    style: 'assassin',
+    colors: {
+      skin: 'hsl(30, 25%, 45%)',
+      suit: 'hsl(0, 0%, 5%)',
+      shirt: 'hsl(0, 0%, 95%)',
+      tie: 'hsl(0, 0%, 10%)',
+      hair: 'hsl(25, 15%, 15%)',
+      gun: 'hsl(0, 0%, 20%)',
+      muzzle_flash: 'hsl(60, 100%, 70%)',
+      aura: 'hsl(0, 0%, 0%)'
+    }
   }
 };
 
@@ -200,6 +214,9 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
       break;
     case 'rootsman':
       renderRootsmanMystic(ctx, fighter, effects, pose);
+      break;
+    case 'johnwick':
+      renderJohnWickAssassin(ctx, fighter, effects, pose);
       break;
     default:
       renderDefaultStreetFighter(ctx, fighter, effects, pose);
@@ -689,6 +706,113 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
       ctx.stroke();
     }
     
+    ctx.shadowBlur = 0;
+  }
+  
+  ctx.restore();
+}
+
+function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
+  const profile = AUTHENTIC_FIGHTER_PROFILES.johnwick;
+  
+  ctx.save();
+  ctx.translate(0, pose.bodyOffsetY);
+  ctx.scale(1, pose.bodySquash);
+  ctx.rotate((pose.bodyTilt * Math.PI) / 180);
+  
+  // Shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(-37.5, 12.5, 225, 15);
+  
+  // Black dress shoes
+  ctx.fillStyle = profile.colors.suit;
+  ctx.fillRect(-50, -30, 45, 30);
+  ctx.fillRect(5, -30, 45, 30);
+  
+  // Legs in black suit pants with animation
+  ctx.fillStyle = profile.colors.suit;
+  ctx.fillRect(-45, -120 + pose.leftLegOffsetY, 40, 90 + pose.leftLegBend);
+  ctx.fillRect(5, -120 + pose.rightLegOffsetY, 40, 90 + pose.rightLegBend);
+  
+  // Black suit jacket
+  ctx.fillStyle = profile.colors.suit;
+  ctx.fillRect(-60, -240, 120, 120);
+  
+  // White dress shirt
+  ctx.fillStyle = profile.colors.shirt;
+  ctx.fillRect(-40, -230, 80, 80);
+  
+  // Black tie
+  ctx.fillStyle = profile.colors.tie;
+  ctx.fillRect(-10, -230, 20, 90);
+  
+  // Arms with animation - suit sleeves
+  ctx.fillStyle = profile.colors.suit;
+  ctx.save();
+  ctx.translate(-75, -225);
+  ctx.rotate((pose.leftArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.leftArmExtension);
+  ctx.restore();
+  
+  ctx.save();
+  ctx.translate(75, -225);
+  ctx.rotate((pose.rightArmAngle * Math.PI) / 180);
+  ctx.fillRect(0, 0, 30, 90 + pose.rightArmExtension);
+  
+  // Gun in right hand when attacking
+  if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
+    ctx.fillStyle = profile.colors.gun;
+    ctx.fillRect(5, 85 + pose.rightArmExtension, 15, 30);
+    
+    // Muzzle flash
+    ctx.fillStyle = profile.colors.muzzle_flash;
+    ctx.shadowColor = profile.colors.muzzle_flash;
+    ctx.shadowBlur = 20;
+    ctx.fillRect(10, 115 + pose.rightArmExtension, 8, 15);
+    ctx.shadowBlur = 0;
+  }
+  ctx.restore();
+  
+  // Hands
+  ctx.fillStyle = profile.colors.skin;
+  ctx.fillRect(-85, -135, 20, 20);
+  ctx.fillRect(65, -135, 20, 20);
+  
+  // Head
+  ctx.fillStyle = profile.colors.skin;
+  ctx.save();
+  ctx.translate(pose.headOffsetX, pose.headOffsetY);
+  ctx.rotate((pose.headTilt * Math.PI) / 180);
+  ctx.fillRect(-52.5, -330, 105, 90);
+  ctx.restore();
+  
+  // Dark hair with beard
+  ctx.fillStyle = profile.colors.hair;
+  ctx.fillRect(-52.5, -340, 105, 40);
+  ctx.fillRect(-30, -255, 60, 25); // Beard
+  
+  // Eyes - intense stare
+  ctx.fillStyle = 'white';
+  ctx.fillRect(-35, -295, 25, 12);
+  ctx.fillRect(10, -295, 25, 12);
+  ctx.fillStyle = 'hsl(30, 20%, 20%)';
+  ctx.fillRect(-28, -290, 12, 8);
+  ctx.fillRect(17, -290, 12, 8);
+  
+  // Dark aura when in special mode
+  if (effects.special || fighter.state.current === 'special') {
+    ctx.strokeStyle = profile.colors.aura;
+    ctx.lineWidth = 5;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 40;
+    
+    for (let i = 0; i < 3; i++) {
+      ctx.globalAlpha = 0.6 - i * 0.15;
+      ctx.beginPath();
+      ctx.arc(0, -180, 80 + i * 25, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }
   
