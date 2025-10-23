@@ -278,13 +278,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       const p1FrameCoords = getAnimationFrame(fighterData?.player1?.id || '', p1AnimName, p1FrameIndex);
       const p2FrameCoords = getAnimationFrame(fighterData?.player2?.id || '', p2AnimName, p2FrameIndex);
       
-      // TRAILER MODE: Using geometric rendering for consistent art style until all sprites ready
+      // RENDER FIGHTERS WITH PIXEL ART SPRITES
       const p1SpriteImage = getSpriteData(fighterData?.player1?.id || '');
       const p1HasValidSprite = p1SpriteImage && p1SpriteImage.complete && p1SpriteImage.naturalWidth > 0;
       renderAuthenticFighter({
         ctx,
         fighter: p1,
-        spriteImage: null, // Force geometric rendering
+        spriteImage: p1HasValidSprite ? p1SpriteImage : null,
         frameCoords: p1HasValidSprite && p1FrameCoords ? p1FrameCoords : null,
         effects: {
           alpha: p1.state.current === 'stunned' ? 0.7 : 1,
@@ -299,7 +299,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       renderAuthenticFighter({
         ctx,
         fighter: p2,
-        spriteImage: null, // Force geometric rendering
+        spriteImage: p2HasValidSprite ? p2SpriteImage : null,
         frameCoords: p2HasValidSprite && p2FrameCoords ? p2FrameCoords : null,
         effects: {
           alpha: p2.state.current === 'stunned' ? 0.7 : 1,
