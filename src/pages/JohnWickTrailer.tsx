@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ViralStreetFighterCanvas } from '@/components/game/ViralStreetFighterCanvas';
 import { TrailerOverlays } from '@/components/game/TrailerOverlays';
 import { CinematicRecorder } from '@/components/game/CinematicRecorder';
+import { CinematicEffects } from '@/components/game/CinematicEffects';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Play, Download } from 'lucide-react';
+import { ArrowLeft, Play } from 'lucide-react';
 
 const JohnWickTrailer = () => {
   const navigate = useNavigate();
@@ -13,6 +14,10 @@ const JohnWickTrailer = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentOpponent, setCurrentOpponent] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [killCount, setKillCount] = useState(0);
+  const [comboCount, setComboCount] = useState(0);
+  const [showHeadshot, setShowHeadshot] = useState(false);
+  const [bulletTime, setBulletTime] = useState(false);
   
   const opponents = ['leroy', 'jordan', 'razor', 'sifu'];
   
@@ -34,11 +39,29 @@ const JohnWickTrailer = () => {
         
         if (phase === 'gameplay') {
           const opponentInterval = setInterval(() => {
-            setCurrentOpponent(prev => (prev + 1) % opponents.length);
+            setCurrentOpponent(prev => {
+              const newOpp = (prev + 1) % opponents.length;
+              setKillCount(prev + 1);
+              return newOpp;
+            });
           }, 6000);
+          
+          // Simulate combat effects
+          const effectsInterval = setInterval(() => {
+            setComboCount(Math.floor(Math.random() * 15) + 5);
+            if (Math.random() > 0.7) {
+              setShowHeadshot(true);
+              setTimeout(() => setShowHeadshot(false), 800);
+            }
+            if (Math.random() > 0.8) {
+              setBulletTime(true);
+              setTimeout(() => setBulletTime(false), 1500);
+            }
+          }, 2000);
           
           setTimeout(() => {
             clearInterval(opponentInterval);
+            clearInterval(effectsInterval);
             currentIndex++;
             advancePhase();
           }, duration);
@@ -93,8 +116,17 @@ const JohnWickTrailer = () => {
             <TrailerOverlays
               phase={currentPhase}
               fighterName={currentPhase === 'title' ? 'BABA YAGA' : undefined}
-              comboCount={currentPhase === 'gameplay' ? 8 : undefined}
-              isSlowMotion={false}
+              comboCount={currentPhase === 'gameplay' ? comboCount : undefined}
+              isSlowMotion={bulletTime}
+            />
+            <CinematicEffects
+              showFilmGrain={true}
+              showVignette={true}
+              colorGrade="johnwick"
+              bulletTime={bulletTime}
+              killCount={currentPhase === 'gameplay' ? killCount : 0}
+              comboCount={currentPhase === 'gameplay' ? comboCount : 0}
+              showHeadshot={showHeadshot}
             />
           </div>
           
