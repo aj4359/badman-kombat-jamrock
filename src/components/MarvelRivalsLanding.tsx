@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Play, Swords, Sparkles } from 'lucide-react';
+import { Play, Swords, Sparkles, Zap, Trophy } from 'lucide-react';
 import ParticleSystem from '@/components/ui/ParticleSystem';
+import { FighterPreview } from '@/components/landing/FighterPreview';
+import { GameModes } from '@/components/landing/GameModes';
+import { StageCarousel } from '@/components/landing/StageCarousel';
+import { SocialProof } from '@/components/landing/SocialProof';
 import leroyPoster from '@/assets/leroy-poster.png';
 import fighterLineup from '@/assets/fighter-lineup.png';
 import leroySprite from '@/assets/leroy-sprite.png';
@@ -26,12 +30,54 @@ const MarvelRivalsLanding = () => {
   }, []);
 
   const fighters = [
-    { id: 'leroy', name: 'LEROY', img: leroySprite, title: 'Cyber Storm' },
-    { id: 'jordan', name: 'JORDAN', img: jordanSprite, title: 'Sound Master' },
-    { id: 'razor', name: 'RAZOR', img: razorSprite, title: 'Neon Blade' },
-    { id: 'rootsman', name: 'ROOTSMAN', img: rootsmanSprite, title: 'Tech-Nature' },
-    { id: 'sifu', name: 'SIFU', img: sifuSprite, title: 'Steel Wire' },
-    { id: 'voltage', name: 'VOLTAGE', img: voltageSprite, title: 'Electric Queen' }
+    { 
+      id: 'leroy', 
+      name: 'LEROY', 
+      img: leroySprite, 
+      title: 'Cyber Storm',
+      stats: { speed: 8, power: 9, technique: 7 },
+      voiceLine: "Ya feel di power of di streets!"
+    },
+    { 
+      id: 'jordan', 
+      name: 'JORDAN', 
+      img: jordanSprite, 
+      title: 'Sound Master',
+      stats: { speed: 10, power: 9, technique: 9 },
+      voiceLine: "Air superiority on and off the court!"
+    },
+    { 
+      id: 'razor', 
+      name: 'RAZOR', 
+      img: razorSprite, 
+      title: 'Neon Blade',
+      stats: { speed: 9, power: 8, technique: 8 },
+      voiceLine: "Kingston streets made me who I am!"
+    },
+    { 
+      id: 'rootsman', 
+      name: 'ROOTSMAN', 
+      img: rootsmanSprite, 
+      title: 'Tech-Nature',
+      stats: { speed: 7, power: 8, technique: 9 },
+      voiceLine: "Jah guide mi every step!"
+    },
+    { 
+      id: 'sifu', 
+      name: 'SIFU', 
+      img: sifuSprite, 
+      title: 'Steel Wire',
+      stats: { speed: 10, power: 7, technique: 10 },
+      voiceLine: "Ancient wisdom flows through me."
+    },
+    { 
+      id: 'voltage', 
+      name: 'VOLTAGE', 
+      img: voltageSprite, 
+      title: 'Electric Queen',
+      stats: { speed: 9, power: 8, technique: 9 },
+      voiceLine: "Feel the voltage surge!"
+    }
   ];
 
   return (
@@ -123,74 +169,66 @@ const MarvelRivalsLanding = () => {
           </div>
         </section>
 
-        {/* Fighter Roster */}
-        <section className="py-20 px-4 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 via-pink-900/10 to-cyan-900/10" />
-          <div className="max-w-7xl mx-auto relative z-10">
-            <h2 className="text-6xl font-bold text-center mb-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(168,85,247,0.5)] animate-fade-in">
-              CHOOSE YOUR WARRIOR
-            </h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-              {fighters.map((fighter, index) => (
-                <div
-                  key={fighter.id}
-                  onClick={() => navigate('/character-select')}
-                  className="relative group cursor-pointer transform transition-all duration-500 hover:scale-125 hover:z-10"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="aspect-square rounded-xl bg-gradient-to-br from-purple-900/80 to-cyan-900/80 border-4 border-purple-500/50 group-hover:border-cyan-400 transition-all overflow-hidden backdrop-blur-md shadow-2xl group-hover:shadow-cyan-500/50 relative">
-                    <img 
-                      src={fighter.img} 
-                      alt={fighter.name}
-                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-cyan-500/0 group-hover:from-purple-500/20 group-hover:to-cyan-500/20 transition-all duration-500" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl flex flex-col items-center justify-end pb-6 px-2">
-                    <span className="text-white font-bold text-xl mb-1 drop-shadow-lg">{fighter.name}</span>
-                    <span className="text-cyan-400 text-sm font-semibold">{fighter.title}</span>
-                  </div>
-                </div>
-              ))}
+      {/* Fighter Roster */}
+      <section className="py-20 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 via-pink-900/10 to-cyan-900/10" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className="text-6xl font-bold text-center mb-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            CHOOSE YOUR WARRIOR
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+            {fighters.map((fighter) => (
+              <FighterPreview
+                key={fighter.id}
+                id={fighter.id}
+                name={fighter.name}
+                title={fighter.title}
+                image={fighter.img}
+                stats={fighter.stats}
+                voiceLine={fighter.voiceLine}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className="text-6xl font-bold text-center mb-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            GAME FEATURES
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 hover:border-cyan-400 transition-all hover:scale-105">
+              <Swords className="w-16 h-16 mb-4 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+              <h3 className="text-2xl font-bold mb-3">UNIQUE FIGHTERS</h3>
+              <p className="text-gray-300">Master diverse fighting styles from Kingston streets to ancient temples</p>
+            </div>
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/30 hover:border-purple-400 transition-all hover:scale-105">
+              <Zap className="w-16 h-16 mb-4 text-purple-400 group-hover:text-purple-300 transition-colors" />
+              <h3 className="text-2xl font-bold mb-3">EPIC STAGES</h3>
+              <p className="text-gray-300">Battle across iconic Jamaican locations with dynamic environments</p>
+            </div>
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-pink-900/20 to-cyan-900/20 border border-pink-500/30 hover:border-pink-400 transition-all hover:scale-105">
+              <Trophy className="w-16 h-16 mb-4 text-pink-400 group-hover:text-pink-300 transition-colors" />
+              <h3 className="text-2xl font-bold mb-3">SPECIAL MOVES</h3>
+              <p className="text-gray-300">Unleash devastating combos and signature finishing moves</p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Features Section */}
-        <section className="py-20 px-4 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/20 to-transparent" />
-          <div className="max-w-7xl mx-auto relative z-10">
-            <div className="grid md:grid-cols-3 gap-12">
-              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-purple-900/50 to-transparent border-2 border-purple-500/50 hover:border-purple-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-purple-500/50 backdrop-blur-md">
-                <div className="text-7xl animate-bounce">⚡</div>
-                <h3 className="text-3xl font-bold text-cyan-400 drop-shadow-lg">UNIQUE FIGHTERS</h3>
-                <p className="text-gray-200 text-lg">
-                  9 authentic Jamaican warriors with distinct fighting styles and backstories rooted in 1980s Kingston culture
-                </p>
-              </div>
-              
-              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-cyan-900/50 to-transparent border-2 border-cyan-500/50 hover:border-cyan-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-cyan-500/50 backdrop-blur-md">
-                <div className="text-7xl animate-bounce" style={{ animationDelay: '0.2s' }}>🏙️</div>
-                <h3 className="text-3xl font-bold text-purple-400 drop-shadow-lg">EPIC STAGES</h3>
-                <p className="text-gray-200 text-lg">
-                  Battle across iconic Kingston locations from Trench Town to Blue Mountains in stunning cyberpunk aesthetics
-                </p>
-              </div>
-              
-              <div className="text-center space-y-6 p-8 rounded-xl bg-gradient-to-br from-pink-900/50 to-transparent border-2 border-pink-500/50 hover:border-pink-400 transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-pink-500/50 backdrop-blur-md">
-                <div className="text-7xl animate-bounce" style={{ animationDelay: '0.4s' }}>🎮</div>
-                <h3 className="text-3xl font-bold text-pink-400 drop-shadow-lg">SPECIAL MOVES</h3>
-                <p className="text-gray-200 text-lg">
-                  Master devastating combos and signature special moves inspired by Jamaican martial arts and street fighting
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+      {/* Game Modes */}
+      <GameModes />
 
-        {/* Final CTA */}
+      {/* Stage Carousel */}
+      <StageCarousel />
+
+      {/* Social Proof */}
+      <SocialProof />
+
+      {/* Final CTA */}
         <section className="py-32 px-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-cyan-900/40 animate-pulse" />
           <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">

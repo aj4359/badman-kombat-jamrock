@@ -18,6 +18,7 @@ import TrailerGenerator from "./pages/TrailerGenerator";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import TeaserCreator from "./pages/TeaserCreator";
 import JohnWickTrailer from "./pages/JohnWickTrailer";
+import GameOverviewRecorder from "./pages/GameOverviewRecorder";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
             <Route path="/teaser-creator" element={<TeaserCreator />} />
             <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
+            <Route path="/game-overview" element={<GameOverviewRecorder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
