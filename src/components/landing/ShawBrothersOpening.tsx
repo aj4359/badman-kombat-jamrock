@@ -8,15 +8,28 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
   const [phase, setPhase] = useState<'fade-in' | 'hold' | 'fade-out'>('fade-in');
 
   useEffect(() => {
+    console.log('[INTRO] 🎬 Shaw Brothers phase started');
+    
     // Play gong sound
     const audio = new Audio('/assets/audio/shaw-brothers-intro.mp3');
     audio.volume = 0.7;
-    audio.play().catch(() => console.log('Audio blocked'));
+    audio.play()
+      .then(() => console.log('[INTRO] ✅ Shaw Brothers gong playing'))
+      .catch((err) => console.warn('[INTRO] ⚠️ Audio blocked:', err.message));
 
     // Phase transitions
-    const timer1 = setTimeout(() => setPhase('hold'), 1000);
-    const timer2 = setTimeout(() => setPhase('fade-out'), 3500);
-    const timer3 = setTimeout(onComplete, 5000);
+    const timer1 = setTimeout(() => {
+      console.log('[INTRO] Shaw Brothers: fade-in → hold');
+      setPhase('hold');
+    }, 1000);
+    const timer2 = setTimeout(() => {
+      console.log('[INTRO] Shaw Brothers: hold → fade-out');
+      setPhase('fade-out');
+    }, 3500);
+    const timer3 = setTimeout(() => {
+      console.log('[INTRO] ✅ Shaw Brothers complete');
+      onComplete();
+    }, 5000);
 
     return () => {
       clearTimeout(timer1);

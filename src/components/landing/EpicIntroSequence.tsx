@@ -34,11 +34,14 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
     music.loop = true;
     
     const playMusic = () => {
-      music.play().catch(() => console.log('Music playback blocked'));
+      music.play()
+        .then(() => console.log('[INTRO] 🎵 Background music playing'))
+        .catch((err) => console.warn('[INTRO] ⚠️ Music blocked:', err.message));
     };
 
     // Start music on title reveal
     if (phase === 'title-reveal') {
+      console.log('[INTRO] Starting background music');
       playMusic();
     }
 

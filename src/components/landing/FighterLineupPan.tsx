@@ -10,13 +10,18 @@ export const FighterLineupPan: React.FC<FighterLineupPanProps> = ({ onComplete }
   const fighters = Object.values(ENHANCED_FIGHTER_DATA);
 
   useEffect(() => {
+    console.log('[INTRO] 👊 Fighter Lineup phase started');
+    
     const interval = setInterval(() => {
       setCurrentFighter(prev => {
         if (prev >= fighters.length - 1) {
+          console.log('[INTRO] ✅ Fighter Lineup complete');
           setTimeout(onComplete, 1500);
           return prev;
         }
-        return prev + 1;
+        const nextFighter = prev + 1;
+        console.log(`[INTRO] Fighter ${nextFighter + 1}/${fighters.length}: ${fighters[nextFighter].name}`);
+        return nextFighter;
       });
     }, 1500);
 
@@ -76,8 +81,11 @@ export const FighterLineupPan: React.FC<FighterLineupPanProps> = ({ onComplete }
                       color: fighter.colors.primary
                     }}
                     onError={(e) => {
-                      // Fallback for missing images
+                      console.warn(`[INTRO] ⚠️ Missing sprite image: ${fighter.id}-sprite.png`);
                       e.currentTarget.style.display = 'none';
+                    }}
+                    onLoad={() => {
+                      console.log(`[INTRO] ✅ Loaded sprite: ${fighter.id}-sprite.png`);
                     }}
                   />
                   

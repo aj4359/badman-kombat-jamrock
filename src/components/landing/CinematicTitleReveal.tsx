@@ -14,6 +14,8 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
   const fullSubtitle = 'WHERE STREET FIGHTING MEETS JAMAICAN SOUL';
 
   useEffect(() => {
+    console.log('[INTRO] 🔥 Title Reveal phase started');
+    
     // Zoom in animation
     const zoomInterval = setInterval(() => {
       setZoom(prev => Math.max(1, prev - 0.01));
@@ -23,6 +25,8 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
     fullTitle.forEach((letter, index) => {
       setTimeout(() => {
         setLetters(prev => [...prev, letter]);
+        if (index === 6) console.log('[INTRO] Title: BADMAN revealed');
+        if (index === fullTitle.length - 1) console.log('[INTRO] Title: KOMBAT revealed');
         if (index === 6 || index === fullTitle.length - 1) {
           setShake(true);
           setTimeout(() => setShake(false), 200);
@@ -32,6 +36,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
 
     // Subtitle typewriter
     setTimeout(() => {
+      console.log('[INTRO] Subtitle typing started');
       let currentText = '';
       fullSubtitle.split('').forEach((char, index) => {
         setTimeout(() => {
@@ -42,7 +47,10 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
     }, 3500);
 
     // Complete
-    setTimeout(onComplete, 8000);
+    setTimeout(() => {
+      console.log('[INTRO] ✅ Title Reveal complete');
+      onComplete();
+    }, 8000);
 
     return () => clearInterval(zoomInterval);
   }, [onComplete]);
