@@ -15,7 +15,7 @@ const Index = () => {
   const [showIntro, setShowIntro] = useState(true);
 
   if (showIntro) {
-    return <EpicIntroSequence onComplete={() => setShowIntro(false)} skipOnRepeat={true} />;
+    return <EpicIntroSequence onComplete={() => setShowIntro(false)} skipOnRepeat={false} />;
   }
 
   return (
