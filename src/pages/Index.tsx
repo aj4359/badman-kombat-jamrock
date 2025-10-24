@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { EpicIntroSequence } from '@/components/landing/EpicIntroSequence';
 import Hero from '@/components/Hero';
 import FighterShowcase from '@/components/FighterShowcase';
 import GameplayTrailer from '@/components/GameplayTrailer';
@@ -11,6 +12,11 @@ import { Zap } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showIntro, setShowIntro] = useState(true);
+
+  if (showIntro) {
+    return <EpicIntroSequence onComplete={() => setShowIntro(false)} skipOnRepeat={true} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
