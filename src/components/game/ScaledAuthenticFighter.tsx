@@ -176,10 +176,11 @@ export function renderAuthenticFighter({ ctx, fighter, effects = {}, spriteImage
   // ✅ PATH 2: GEOMETRIC FALLBACK (clean colored shapes, NO photos)
   ctx.save();
   
+  // ✅ PHASE 4: Full opacity for professional look
   if (effects.alpha !== undefined) {
     ctx.globalAlpha = effects.alpha;
   } else {
-    ctx.globalAlpha = 0.85; // ✅ TRANSPARENCY: Make geometric fallback semi-transparent so stage shows through
+    ctx.globalAlpha = 1.0;
   }
   
   if (effects.shake) {
@@ -237,9 +238,11 @@ function renderJordanSoundMaster(ctx: CanvasRenderingContext2D, fighter: Fighter
   ctx.scale(1, pose.bodySquash);
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
-  // Shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
+  // ✅ PHASE 4: Enhanced shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.beginPath();
+  ctx.ellipse(0, 5*SCALE, 30*SCALE, 4*SCALE, 0, 0, Math.PI * 2);
+  ctx.fill();
   
   // Sneakers
   ctx.fillStyle = 'hsl(0, 0%, 15%)';

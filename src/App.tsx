@@ -34,11 +34,11 @@ const App = () => (
               path="/" 
               element={
                 <Suspense fallback={<div className="min-h-screen bg-black" />}>
-                  <MarvelRivalsLanding />
+                  <Index />
                 </Suspense>
               } 
             />
-            <Route path="/cyberpunk" element={<Index />} />
+            <Route path="/marvel" element={<MarvelRivalsLanding />} />
             <Route path="/landing" element={<BadManKombatLandingPage />} />
             <Route path="/character-select" element={<CharacterSelect />} />
             <Route path="/vs-screen" element={<EnhancedVSScreen />} />
