@@ -80,9 +80,16 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
 
   // Single initialization to prevent loops - FIXED DEPENDENCIES
   useEffect(() => {
+    console.log('🎨 [CANVAS] Component mounted');
+    console.log('🎨 [CANVAS] Fighter Data:', fighterData);
+    
     if (!initializationRef.current) {
+      console.log('👊 [CANVAS] Initializing fighters...');
       initializationRef.current = true;
       initializeFighters();
+      console.log('✅ [CANVAS] Fighters initialized');
+    } else {
+      console.log('⚠️ [CANVAS] Skipping re-initialization (already initialized)');
     }
   }, []); // Empty dependency array - initialize only once on mount
   

@@ -368,6 +368,17 @@ const CharacterSelect = () => {
 
   return (
     <div className="min-h-screen bg-gradient-cyber flex flex-col items-center justify-start p-8 pb-32 overflow-y-auto">
+      {/* DEBUG: Visual Status Display */}
+      <div className="fixed top-4 right-4 bg-black/90 text-white p-4 z-50 text-xs font-mono border-2 border-neon-cyan rounded-lg">
+        <div className="text-neon-cyan font-bold mb-2">🔍 DEBUG STATUS</div>
+        <div className="text-neon-pink">P1: {selectedP1 || '❌ NONE'}</div>
+        <div className="text-neon-green">P2: {selectedP2 || '❌ NONE'}</div>
+        <div className={canProceed ? 'text-neon-green' : 'text-neon-orange'}>
+          Can Start: {canProceed ? '✅ YES' : '❌ NO'}
+        </div>
+        <div className="text-neon-cyan mt-2">Audio: {isLoaded ? '✅' : '⏳'}</div>
+      </div>
+
       <div className="text-center mb-6">
         <h1 className="text-5xl font-retro font-bold text-neon-cyan mb-4 glitch" data-text="BADMAN KOMBAT">
           BADMAN KOMBAT
@@ -384,6 +395,8 @@ const CharacterSelect = () => {
           const progressionData = progressionFighters.find(f => f.id === fighter.id);
           const isUnlocked = progressionData?.unlocked ?? false;
           const unlockCondition = getUnlockConditions(fighter.id);
+          
+          console.log(`🔓 Fighter ${fighter.id}: Unlocked=${isUnlocked}, ProgressionData=`, progressionData);
           
            return (
            <div key={fighter.id} className="relative">
@@ -570,7 +583,7 @@ const CharacterSelect = () => {
         </div>
       )}
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 mb-6">
         <Button 
           onClick={() => navigate('/')}
           className="text-lg px-8 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all"
@@ -591,6 +604,45 @@ const CharacterSelect = () => {
         </Button>
       </div>
 
+      {/* Quick Access Navigation */}
+      <div className="flex flex-wrap gap-3 justify-center mb-8 max-w-2xl">
+        <Button 
+          onClick={() => navigate('/tutorial')}
+          variant="outline"
+          className="text-sm border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10"
+        >
+          📖 Tutorial
+        </Button>
+        <Button 
+          onClick={() => navigate('/drone-trailer')}
+          variant="outline"
+          className="text-sm border-neon-pink/50 text-neon-pink hover:bg-neon-pink/10"
+        >
+          🎬 Drone Trailer
+        </Button>
+        <Button 
+          onClick={() => navigate('/fighter-generator')}
+          variant="outline"
+          className="text-sm border-neon-green/50 text-neon-green hover:bg-neon-green/10"
+        >
+          ✨ Fighter Generator
+        </Button>
+        <Button 
+          onClick={() => navigate('/arcade')}
+          variant="outline"
+          className="text-sm border-neon-orange/50 text-neon-orange hover:bg-neon-orange/10"
+        >
+          🎮 Arcade Mode
+        </Button>
+        <Button 
+          onClick={() => navigate('/rankings')}
+          variant="outline"
+          className="text-sm border-neon-purple/50 text-neon-purple hover:bg-neon-purple/10"
+        >
+          🏆 Rankings
+        </Button>
+      </div>
+
       {/* Fighter Gallery */}
       <FighterGallery />
 
@@ -599,6 +651,7 @@ const CharacterSelect = () => {
         onNavigateToGame={() => navigate('/game')}
         onNavigateToCharacterSelect={() => navigate('/character-select')}
         onNavigateToHome={() => navigate('/')}
+        onNavigateToTutorial={() => navigate('/tutorial')}
       />
     </div>
   );

@@ -17,6 +17,10 @@ const Game = () => {
     player2: { id: 'jordan', name: 'JORDAN' }
   };
 
+  console.log('🎮 [GAME PAGE] Mounted');
+  console.log('📦 [GAME PAGE] Fighter Data:', fighterData);
+  console.log('📦 [GAME PAGE] Location State:', location.state);
+
   // ESC key handler for pause menu
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
