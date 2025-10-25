@@ -3,6 +3,7 @@ import { useEnhancedGameEngine } from '@/hooks/useEnhancedGameEngine';
 import { useAudioManager } from '@/hooks/useAudioManager';
 import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { useFighterSprites } from '@/hooks/useFighterSprites';
+import { useColorGrading } from '@/hooks/useColorGrading';
 import { renderAuthenticFighter } from './ScaledAuthenticFighter';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -92,8 +93,10 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     drawHitSparks,
     getShakeOffset,
     updateEffects,
-    drawProjectileTrail
+    drawProjectileTrail,
+    applyCinematicEffects
   } = visualEffectsHook;
+  const { applyColorGrading, grading } = useColorGrading();
   
   // Auto-play Shaw Bros intro, THEN Champion loop (no overlap)
   useEffect(() => {
@@ -338,6 +341,29 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     
     // 5. DRAW VISUAL EFFECTS
     drawHitSparks(ctx);
+    
+    // Apply cinematic effects for super moves
+    if (p1?.state.current === 'special' && p1.state.timer && p1.state.timer < 15) {
+      applyCinematicEffects(ctx, canvas.width, canvas.height, 'freeze', {
+        x: p1.x + p1.width / 2,
+        y: p1.y + p1.height / 2,
+        scale: 1.4,
+        intensity: 0.8
+      });
+    }
+    if (p2?.state.current === 'special' && p2.state.timer && p2.state.timer < 15) {
+      applyCinematicEffects(ctx, canvas.width, canvas.height, 'freeze', {
+        x: p2.x + p2.width / 2,
+        y: p2.y + p2.height / 2,
+        scale: 1.4,
+        intensity: 0.8
+      });
+    }
+    
+    // Apply color grading to entire canvas
+    if (grading.intensity > 0) {
+      applyColorGrading(ctx, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+    }
     
     // 6. FPS COUNTER (debug)
     ctx.fillStyle = '#00FF00';

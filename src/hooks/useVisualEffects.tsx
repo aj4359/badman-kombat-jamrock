@@ -1,5 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
 import { HitSpark, Projectile } from '@/types/gameTypes';
+import { 
+  applyChromaticAberration, 
+  applyRadialBlur, 
+  renderEnergyVortex,
+  renderFreezeFrame,
+  renderTimeDilation,
+  ChromaticAberration,
+  RadialBlur,
+  EnergyVortex
+} from '@/utils/cinematicEffects';
 
 interface ScreenShake {
   intensity: number;
@@ -183,12 +193,43 @@ export const useVisualEffects = () => {
     }
   }, [addHitSpark, addScreenShake, addFlashEffect]);
 
+  const applyCinematicEffects = useCallback((
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    effectType: 'chromatic' | 'radialBlur' | 'vortex' | 'freeze' | 'timeDilation',
+    params?: any
+  ) => {
+    switch (effectType) {
+      case 'chromatic':
+        applyChromaticAberration(ctx, width, height, params?.offset || 5);
+        break;
+      case 'radialBlur':
+        if (params) {
+          applyRadialBlur(ctx, params as RadialBlur);
+        }
+        break;
+      case 'vortex':
+        if (params) {
+          renderEnergyVortex(ctx, params as EnergyVortex);
+        }
+        break;
+      case 'freeze':
+        renderFreezeFrame(ctx, params?.x || width/2, params?.y || height/2, params?.scale, params?.intensity);
+        break;
+      case 'timeDilation':
+        renderTimeDilation(ctx, params?.intensity || 0.5);
+        break;
+    }
+  }, []);
+
   return {
     addScreenShake,
     addHitStop,
     addFlashEffect,
     addHitSpark,
     createComboEffect,
+    applyCinematicEffects,
     updateEffects,
     getShakeOffset,
     isHitStopActive,

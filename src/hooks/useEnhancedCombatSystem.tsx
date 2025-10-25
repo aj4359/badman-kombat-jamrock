@@ -4,11 +4,13 @@ import { CombatSystem, CombatState } from '@/components/game/CombatSystem';
 import { useVisualEffects } from './useVisualEffects';
 import { useFightAudio } from './useFightAudio';
 import { useAudioManager } from './useAudioManager';
+import { useColorGrading } from './useColorGrading';
 
 export const useEnhancedCombatSystem = () => {
   const visualEffects = useVisualEffects();
   const fightAudio = useFightAudio();
   const audioManager = useAudioManager();
+  const { setColorGradingMode } = useColorGrading();
   
   const lastHitTimerRef = useRef<Map<string, number>>(new Map());
 
@@ -66,6 +68,8 @@ export const useEnhancedCombatSystem = () => {
           defender.y + 30, 
           comboCount
         );
+        // Trigger combo color grading
+        setColorGradingMode('combo', 1000);
       } else {
         fightAudio.onHit(attackType === 'heavy' || attackType === 'special' || attackType === 'super' ? 'heavy' : 'medium');
       }
@@ -92,6 +96,9 @@ export const useEnhancedCombatSystem = () => {
       // Special effects for super moves
       if (attackType === 'super') {
         visualEffects.addFlashEffect('hsl(60, 100%, 80%)', 0.8, 300);
+        setColorGradingMode('special', 1500);
+      } else if (attackType === 'special') {
+        setColorGradingMode('special', 1000);
       }
       
       return hitResult;
@@ -206,6 +213,8 @@ export const useEnhancedCombatSystem = () => {
       newFighter.y + 30, 
       10
     );
+    // Trigger special color grading for super moves
+    setColorGradingMode('special', 2000);
     
     return newFighter;
   }, [fightAudio, audioManager, visualEffects]);
