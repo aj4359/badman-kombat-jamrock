@@ -20,13 +20,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 3D Ultimate Button */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Action Buttons */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
         <Button 
           onClick={() => navigate('/3d-ultimate')}
           className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 text-white font-bold text-lg px-6 py-6 animate-pulse hover:scale-110 transition-transform"
         >
           <Zap className="mr-2" /> PLAY 3D ULTIMATE
+        </Button>
+        <Button 
+          onClick={() => navigate('/fighter-generator')}
+          className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform"
+        >
+          🎨 AI Fighter Generator
         </Button>
       </div>
 
