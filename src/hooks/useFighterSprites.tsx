@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { extractFramesFromSpriteSheet, createAnimationSequences, AnimationController, FIGHTER_SPRITE_CONFIGS } from '@/utils/spriteSheetLoader';
 
-// ✅ PHASE 2 FIX: Use single sprite images instead of non-existent sprite sheets
-import leroySprite from '@/assets/leroy-sprite.png';
-import jordanSprite from '@/assets/jordan-sprite.png';
-import razorSprite from '@/assets/razor-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
-import rootsmanSprite from '@/assets/rootsman-sprite.png';
-import johnwickSprite from '@/assets/johnwick-sprite.png';
+// ✅ PHASE 1 FIX: Use sprite sheet images
+import leroySprite from '@/assets/leroy-sprite-sheet.png';
+import jordanSprite from '@/assets/jordan-sprite-sheet.png';
+import razorSprite from '@/assets/razor-sprite-sheet.png';
+import sifuSprite from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
+import johnwickSprite from '@/assets/johnwick-sprite-sheet.png';
 
 const SPRITE_PATHS: Record<string, string> = {
   leroy: leroySprite,

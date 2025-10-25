@@ -101,12 +101,32 @@ const BadManKombatUltimate3D = () => {
               1980s Kingston Street Fights • Dancehall Meets Martial Arts<br />
               <span className="text-yellow-400">Project CYBER YARD</span>
             </p>
-            <Button 
-              onClick={() => setGameState('select')} 
-              className="text-3xl px-12 py-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 border-4 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] transition-all duration-300 transform hover:scale-110"
-            >
-              ENTER THE RING
-            </Button>
+            <div className="flex flex-col gap-6">
+              <Button 
+                onClick={() => setGameState('select')} 
+                className="text-3xl px-12 py-8 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 border-4 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] transition-all duration-300 transform hover:scale-110"
+              >
+                ENTER THE RING
+              </Button>
+              <Button 
+                onClick={() => window.location.href = '/john-wick-trailer'} 
+                className="text-2xl px-10 py-6 bg-gradient-to-r from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 border-4 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.6)] hover:shadow-[0_0_50px_rgba(239,68,68,0.8)] transition-all duration-300 transform hover:scale-105"
+              >
+                JOHN WICK TRAILER
+              </Button>
+              <Button 
+                onClick={() => window.location.href = '/game-overview'} 
+                className="text-2xl px-10 py-6 bg-gradient-to-r from-purple-900 to-purple-700 hover:from-purple-800 hover:to-purple-600 border-4 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:shadow-[0_0_50px_rgba(34,211,238,0.8)] transition-all duration-300 transform hover:scale-105"
+              >
+                GAME OVERVIEW
+              </Button>
+              <Button 
+                onClick={() => window.location.href = '/'} 
+                className="text-xl px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 border-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:shadow-[0_0_50px_rgba(255,255,255,0.6)] transition-all duration-300 transform hover:scale-105"
+              >
+                VIEW EPIC INTRO
+              </Button>
+            </div>
           </div>
         </div>
       )}
