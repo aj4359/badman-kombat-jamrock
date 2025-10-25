@@ -25,9 +25,12 @@ export const useScreenEffects = () => {
   });
 
   const addScreenShake = useCallback((intensity: number = 10, duration: number = 300) => {
+    // Amplify intensity by 2x for more impact
+    const amplifiedIntensity = intensity * 2;
+    
     setEffects(prev => ({
       ...prev,
-      shake: { intensity, duration, active: true }
+      shake: { intensity: amplifiedIntensity, duration, active: true }
     }));
 
     setTimeout(() => {
@@ -38,10 +41,13 @@ export const useScreenEffects = () => {
     }, duration);
   }, []);
 
-  const addHitstop = useCallback((duration: number = 100) => {
+  const addHitstop = useCallback((duration: number = 100, isSuper: boolean = false) => {
+    // Extended freeze frames: 12-15 frames for super moves (200-250ms at 60fps)
+    const extendedDuration = isSuper ? 200 + Math.random() * 50 : duration;
+    
     setEffects(prev => ({
       ...prev,
-      hitstop: { active: true, duration }
+      hitstop: { active: true, duration: extendedDuration }
     }));
 
     setTimeout(() => {
@@ -49,7 +55,7 @@ export const useScreenEffects = () => {
         ...prev,
         hitstop: { active: false, duration: 0 }
       }));
-    }, duration);
+    }, extendedDuration);
   }, []);
 
   const addFlash = useCallback((color: string = '#ffffff', intensity: number = 0.3, duration: number = 150) => {

@@ -102,21 +102,43 @@ export function renderImpactWave(
 ) {
   ctx.save();
   
+  // 3X LARGER impact waves with intense glow
   ctx.globalAlpha = wave.opacity;
   ctx.strokeStyle = wave.color;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 12; // Increased from 4
+  ctx.shadowColor = wave.color;
+  ctx.shadowBlur = 40;
   
-  // Outer ring
+  // Outer ring - much larger
+  ctx.beginPath();
+  ctx.arc(wave.x, wave.y, wave.radius * 3, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Middle ring
+  ctx.globalAlpha = wave.opacity * 0.7;
+  ctx.lineWidth = 8;
+  ctx.shadowBlur = 30;
+  ctx.beginPath();
+  ctx.arc(wave.x, wave.y, wave.radius * 2, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Inner ring - bright core
+  ctx.globalAlpha = wave.opacity * 0.9;
+  ctx.lineWidth = 6;
+  ctx.shadowBlur = 20;
   ctx.beginPath();
   ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
   ctx.stroke();
   
-  // Inner ring
-  ctx.globalAlpha = wave.opacity * 0.5;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(wave.x, wave.y, wave.radius * 0.7, 0, Math.PI * 2);
-  ctx.stroke();
+  // Add persistent glow trail
+  ctx.globalAlpha = wave.opacity * 0.3;
+  ctx.fillStyle = wave.color;
+  const gradient = ctx.createRadialGradient(wave.x, wave.y, 0, wave.x, wave.y, wave.radius * 3);
+  gradient.addColorStop(0, `${wave.color}80`);
+  gradient.addColorStop(0.5, `${wave.color}40`);
+  gradient.addColorStop(1, `${wave.color}00`);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(wave.x - wave.radius * 3, wave.y - wave.radius * 3, wave.radius * 6, wave.radius * 6);
   
   ctx.restore();
 }

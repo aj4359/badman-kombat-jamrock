@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { ParticleBurst } from './ParticleBurst';
 
 interface ComboDisplayProps {
   comboCount: number;
@@ -48,7 +49,6 @@ export const EnhancedComboDisplay: React.FC<ComboDisplayProps> = ({
         setShowRating(true);
         setAnimationKey(prev => prev + 1);
         
-        // Hide rating after 1.5 seconds
         setTimeout(() => setShowRating(false), 1500);
       }
     } else {
@@ -60,77 +60,92 @@ export const EnhancedComboDisplay: React.FC<ComboDisplayProps> = ({
   if (comboCount < 2) return null;
 
   const decayPercentage = (comboDecay / 60) * 100;
+  const scale = 1 + Math.min(comboCount * 0.05, 0.8);
+  const pulseScale = 1 + Math.sin(Date.now() / 100) * 0.15;
+  const isLegendary = comboCount >= 20;
   
   return (
-    <div className={cn(
-      'absolute z-30 flex flex-col items-center transition-all duration-300',
-      playerSide === 'left' ? 'left-8 top-32' : 'right-8 top-32',
-      isActive ? 'scale-110' : 'scale-100'
-    )}>
-      {/* Main Combo Counter */}
-      <div className={cn(
-        'bg-black/80 backdrop-blur border-2 rounded-lg px-6 py-3 mb-2',
-        playerSide === 'left' ? 'border-neon-cyan' : 'border-neon-pink',
-        'animate-pulse'
-      )}>
-        <div className="text-center">
-          <div className={cn(
-            'text-3xl font-retro font-bold',
-            playerSide === 'left' ? 'text-neon-cyan' : 'text-neon-pink'
-          )}>
-            {comboCount}
-          </div>
-          <div className="text-sm font-retro text-white/80">
-            HIT COMBO
-          </div>
-          <div className="text-xs text-white/60">
-            {comboDamage} DMG
+    <>
+      {/* Legendary Screen-Wide Banner */}
+      {isLegendary && (
+        <div className="fixed top-0 left-0 right-0 z-[100] animate-fade-in">
+          <div className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 py-6 shadow-2xl">
+            <div className="text-center">
+              <div className="text-6xl font-black text-white animate-pulse uppercase tracking-widest"
+                   style={{ 
+                     textShadow: '0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.8), 0 4px 10px rgba(0,0,0,0.5)',
+                     animation: 'bounce 0.5s infinite'
+                   }}>
+                ⚡⚡⚡ LEGENDARY COMBO ACTIVATED ⚡⚡⚡
+              </div>
+            </div>
           </div>
         </div>
-        
-        {/* Decay Bar */}
-        <div className="w-full h-1 bg-white/20 rounded-full mt-2 overflow-hidden">
-          <div 
-            className={cn(
-              'h-full transition-all duration-100 rounded-full',
-              playerSide === 'left' ? 'bg-neon-cyan' : 'bg-neon-pink'
+      )}
+
+      {/* Main Combo Display - CENTER-TOP, HUGE SIZE */}
+      <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50"
+           style={{ 
+             transform: `translate(-50%, 0) scale(${scale * pulseScale})`,
+             transition: 'transform 0.1s ease-out'
+           }}>
+        <div className="relative">
+          {/* Intense Glow Background - Pulsing */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/70 to-orange-500/70 blur-3xl animate-pulse" 
+               style={{ transform: `scale(${pulseScale * 1.2})` }} />
+          
+          {/* Outer Glow Ring */}
+          <div className="absolute inset-0 bg-gradient-radial from-yellow-400/40 via-orange-500/20 to-transparent blur-2xl"
+               style={{ transform: `scale(${pulseScale * 1.5})` }} />
+          
+          {/* Main Display Container */}
+          <div className="relative bg-gradient-to-b from-black/95 to-black/90 rounded-3xl px-16 py-8 border-8 border-yellow-400 shadow-[0_0_60px_rgba(255,215,0,0.8)]">
+            {/* Combo Count - MASSIVE 180px */}
+            <div className="text-center">
+              <div className="text-[180px] font-black text-yellow-300 leading-none"
+                   style={{ 
+                     textShadow: '0 0 40px currentColor, 0 0 80px currentColor, 0 8px 20px rgba(0,0,0,0.8)',
+                     WebkitTextStroke: '4px rgba(0,0,0,0.5)'
+                   }}>
+                {comboCount}
+              </div>
+              
+              {/* Rating Text - Bigger and bolder */}
+              <div className="text-4xl font-black tracking-widest uppercase text-orange-400 mt-2"
+                   style={{ textShadow: '0 0 20px currentColor, 0 4px 8px rgba(0,0,0,0.8)' }}>
+                {currentRating?.text || 'COMBO!'}
+              </div>
+              
+              {/* Damage Display - More prominent */}
+              <div className="text-white text-3xl font-bold mt-3"
+                   style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                {comboDamage.toFixed(0)} DAMAGE
+              </div>
+            </div>
+            
+            {/* Combo Decay Bar - Larger and more visible */}
+            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-80 h-4 bg-gray-900/80 rounded-full overflow-hidden border-2 border-gray-700">
+              <div 
+                className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-400 transition-all duration-100 shadow-[0_0_20px_rgba(255,215,0,0.6)]"
+                style={{ width: `${decayPercentage}%` }}
+              />
+            </div>
+            
+            {/* Milestone Indicators */}
+            {comboCount >= 5 && comboCount % 5 === 0 && (
+              <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <div className="text-6xl">🌟</div>
+              </div>
             )}
-            style={{ width: `${decayPercentage}%` }}
-          />
+          </div>
         </div>
       </div>
 
-      {/* Combo Rating */}
-      {showRating && currentRating && (
-        <div 
-          key={animationKey}
-          className={cn(
-            'text-2xl font-retro font-bold animate-bounce',
-            currentRating.color,
-            'drop-shadow-lg'
-          )}
-          style={{
-            animation: 'bounce 0.5s ease-out, fadeOut 1.5s ease-in 0.5s forwards'
-          }}
-        >
-          {currentRating.text}
-        </div>
+      {/* Particle Burst on Milestone */}
+      {comboCount % 5 === 0 && comboCount >= 5 && (
+        <ParticleBurst count={comboCount} />
       )}
-
-      {/* Floating Damage Numbers */}
-      {comboCount > 0 && (
-        <style>
-          {`
-            @keyframes fadeOut {
-              to {
-                opacity: 0;
-                transform: translateY(-20px);
-              }
-            }
-          `}
-        </style>
-      )}
-    </div>
+    </>
   );
 };
 
