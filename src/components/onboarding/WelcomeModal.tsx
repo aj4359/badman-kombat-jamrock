@@ -43,21 +43,30 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
 
         <div className="grid gap-4 mt-6">
           {/* Tutorial Option */}
-          <Button
-            onClick={onStartTutorial}
-            size="lg"
-            className="h-24 text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white group"
-          >
-            <div className="flex items-center gap-4 w-full">
-              <Gamepad2 className="h-8 w-8 group-hover:scale-110 transition-transform" />
-              <div className="flex-1 text-left">
-                <div className="text-xl">🎮 PLAY TUTORIAL</div>
-                <div className="text-sm font-normal opacity-90">
-                  Learn di moves, master di combat (Recommended!)
+          <div className="relative">
+            <div className="absolute -top-3 -right-3 z-10 bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-lg">
+              RECOMMENDED
+            </div>
+            <Button
+              onClick={onStartTutorial}
+              size="lg"
+              className="h-28 text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white group w-full relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center gap-4 w-full relative z-10">
+                <Gamepad2 className="h-10 w-10 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <div className="flex-1 text-left">
+                  <div className="text-2xl mb-1">🎮 START TUTORIAL</div>
+                  <div className="text-sm font-normal opacity-90">
+                    Learn di moves, master di combat
+                  </div>
+                  <div className="text-xs font-normal opacity-75 mt-1">
+                    ⏱️ Takes only 5 minutes
+                  </div>
                 </div>
               </div>
-            </div>
-          </Button>
+            </Button>
+          </div>
 
           {/* Quick Match Option */}
           <Button

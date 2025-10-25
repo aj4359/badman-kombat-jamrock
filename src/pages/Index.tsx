@@ -9,9 +9,8 @@ import Footer from '@/components/Footer';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
 import { SiteTourGuide } from '@/components/onboarding/SiteTourGuide';
+import { TutorialPromptBanner } from '@/components/onboarding/TutorialPromptBanner';
 import { useFirstTimeVisitor } from '@/hooks/useFirstTimeVisitor';
-import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -61,30 +60,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Action Buttons - Fixed positioning to avoid overlap */}
-      <div className="fixed top-20 right-4 z-40 flex flex-col gap-3">
-        <Button 
-          onClick={() => navigate('/3d-ultimate')}
-          className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 text-white font-bold text-lg px-6 py-4 animate-pulse hover:scale-110 transition-transform shadow-2xl"
-        >
-          <Zap className="mr-2 h-5 w-5" /> PLAY 3D ULTIMATE
-        </Button>
-        <Button 
-          onClick={() => navigate('/fighter-generator')}
-          className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform shadow-2xl"
-        >
-          🎨 AI Fighter Generator
-        </Button>
-        <Button 
-          onClick={() => navigate('/tutorial')}
-          className="bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform shadow-2xl"
-        >
-          📖 Tutorial
-        </Button>
-      </div>
-
       {/* Hero Section */}
-      <Hero isFirstVisit={isFirstVisit && !loading} />
+      <Hero isFirstVisit={isFirstVisit && !loading} tutorialCompleted={!isFirstVisit} />
       
       {/* Fighter Selection */}
       <FighterShowcase />
@@ -121,6 +98,11 @@ const Index = () => {
         onComplete={handleTourComplete}
         onSkip={handleTourComplete}
       />
+
+      {/* Tutorial Prompt Banner - Only show for users who haven't completed tutorial */}
+      {!loading && isFirstVisit && !showWelcome && (
+        <TutorialPromptBanner onStartTutorial={() => navigate('/tutorial')} />
+      )}
     </div>
   );
 };

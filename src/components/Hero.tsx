@@ -9,9 +9,10 @@ import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
 interface HeroProps {
   isFirstVisit?: boolean;
+  tutorialCompleted?: boolean;
 }
 
-const Hero: React.FC<HeroProps> = ({ isFirstVisit = false }) => {
+const Hero: React.FC<HeroProps> = ({ isFirstVisit = false, tutorialCompleted = false }) => {
   const navigate = useNavigate();
   const { isLoaded, currentLayer, settings, playLayer, emergencyAudioKillSwitch, toggleMute } = useAudioManager();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -114,54 +115,115 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false }) => {
           <div className="absolute -inset-4 bg-gradient-neon opacity-20 blur-xl rounded-full animate-pulse" />
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <NavigationBeacon show={isFirstVisit} label="Start here!" position="top">
-            <Button 
-              variant="combat" 
-              size="lg" 
-              className="text-lg px-8 py-4 animate-neon-pulse"
-              onClick={() => navigate('/game', {
-                state: {
-                  fighterData: {
-                    player1: { id: 'leroy', name: 'LEROY' },
-                    player2: { id: 'jordan', name: 'JORDAN' }
+        {/* Action Buttons - Conditional based on tutorial status */}
+        <div className="flex flex-col gap-4 items-center mb-12 max-w-2xl mx-auto">
+          {!tutorialCompleted ? (
+            <>
+              {/* First-time visitor: Tutorial is primary CTA */}
+              <NavigationBeacon show={isFirstVisit} label="Start here!" position="top">
+                <Button 
+                  variant="combat" 
+                  size="lg" 
+                  className="text-xl px-12 py-6 animate-neon-pulse w-full sm:w-auto min-w-[300px]"
+                  onClick={() => navigate('/tutorial')}
+                >
+                  🎮 START TUTORIAL
+                </Button>
+              </NavigationBeacon>
+              <p className="text-neon-green text-sm font-body">Learn the moves • Takes 5 minutes</p>
+              
+              {/* Secondary options */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-base px-6 py-4"
+                  onClick={() => navigate('/character-select')}
+                >
+                  SELECT FIGHTER
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-base px-6 py-4"
+                  onClick={() => {
+                    const trailerSection = document.getElementById('trailer');
+                    trailerSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  WATCH TRAILER
+                </Button>
+              </div>
+              
+              {/* Skip option for experienced players */}
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-muted-foreground hover:text-foreground text-sm mt-2"
+                onClick={() => navigate('/game', {
+                  state: {
+                    fighterData: {
+                      player1: { id: 'leroy', name: 'LEROY' },
+                      player2: { id: 'jordan', name: 'JORDAN' }
+                    }
                   }
-                }
-              })}
-            >
-              ⚡ QUICK PLAY ⚡
-            </Button>
-          </NavigationBeacon>
-          <Button 
-            variant="neon" 
-            size="lg" 
-            className="text-lg px-8 py-4"
-            onClick={handleStartKombat}
-          >
-            START KOMBAT
-          </Button>
-          <Button 
-            variant="jamaica" 
-            size="lg" 
-            className="text-lg px-8 py-4"
-            onClick={() => {
-              const trailerSection = document.getElementById('trailer');
-              trailerSection?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            WATCH TRAILER
-          </Button>
-          <NavigationBeacon show={isFirstVisit} label="Learn di moves!" position="top">
-            <Button 
-              variant="retro" 
-              size="lg" 
-              className="text-lg px-8 py-4"
-              onClick={() => navigate('/character-select')}
-            >
-              SELECT FIGHTER
-            </Button>
-          </NavigationBeacon>
+                })}
+              >
+                Skip to Quick Match →
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* Returning player: Quick Match is primary CTA */}
+              <Button 
+                variant="combat" 
+                size="lg" 
+                className="text-xl px-12 py-6 animate-neon-pulse w-full sm:w-auto min-w-[300px]"
+                onClick={() => navigate('/game', {
+                  state: {
+                    fighterData: {
+                      player1: { id: 'leroy', name: 'LEROY' },
+                      player2: { id: 'jordan', name: 'JORDAN' }
+                    }
+                  }
+                })}
+              >
+                ⚡ QUICK MATCH ⚡
+              </Button>
+              <p className="text-neon-cyan text-sm font-body">Jump into battle</p>
+              
+              {/* Secondary options */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Button 
+                  variant="neon" 
+                  size="lg" 
+                  className="text-base px-6 py-4"
+                  onClick={() => navigate('/character-select')}
+                >
+                  SELECT FIGHTER
+                </Button>
+                <Button 
+                  variant="jamaica" 
+                  size="lg" 
+                  className="text-base px-6 py-4"
+                  onClick={() => {
+                    const trailerSection = document.getElementById('trailer');
+                    trailerSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  WATCH TRAILER
+                </Button>
+                <Button 
+                  variant="retro" 
+                  size="lg" 
+                  className="text-base px-6 py-4"
+                  onClick={() => navigate('/tutorial')}
+                >
+                  TUTORIAL
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Game Features */}
