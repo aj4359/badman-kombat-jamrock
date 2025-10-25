@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +35,15 @@ export default function FighterGenerator() {
   const addLog = (message: string) => {
     setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
   };
+
+  // Auto-start generation if ?autostart=true parameter is present
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('autostart') === 'true' && !generating) {
+      addLog('🤖 Auto-starting generation...');
+      generateAllFighters();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const generateAllFighters = async () => {
     setGenerating(true);

@@ -127,6 +127,12 @@ const BadManKombatUltimate3D = () => {
                 GAME OVERVIEW
               </Button>
               <Button 
+                onClick={() => window.location.href = '/fighter-generator?autostart=true'} 
+                className="text-2xl px-10 py-6 bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 hover:from-purple-500 hover:via-pink-400 hover:to-red-400 border-4 border-pink-400 shadow-[0_0_30px_rgba(236,72,153,0.6)] hover:shadow-[0_0_50px_rgba(236,72,153,0.8)] transition-all duration-300 transform hover:scale-105"
+              >
+                🎨 AI FIGHTER GENERATOR
+              </Button>
+              <Button 
                 onClick={() => window.location.href = '/'} 
                 className="text-xl px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 border-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:shadow-[0_0_50px_rgba(255,255,255,0.6)] transition-all duration-300 transform hover:scale-105"
               >
