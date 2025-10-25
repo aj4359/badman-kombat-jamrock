@@ -366,20 +366,65 @@ const CharacterSelect = () => {
   const selectedP2Fighter = fighters.find(f => f.id === selectedP2);
   const canProceed = selectedP1 && selectedP2;
 
+  const [showDebug, setShowDebug] = useState(false);
+
+  // Escape key handler for quick exit
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        navigate('/');
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [navigate]);
+
   return (
-    <div className="min-h-screen bg-gradient-cyber flex flex-col items-center justify-start p-8 pb-32 overflow-y-auto">
-      {/* DEBUG: Visual Status Display */}
-      <div className="fixed top-4 right-4 bg-black/90 text-white p-4 z-50 text-xs font-mono border-2 border-neon-cyan rounded-lg">
-        <div className="text-neon-cyan font-bold mb-2">🔍 DEBUG STATUS</div>
-        <div className="text-neon-pink">P1: {selectedP1 || '❌ NONE'}</div>
-        <div className="text-neon-green">P2: {selectedP2 || '❌ NONE'}</div>
-        <div className={canProceed ? 'text-neon-green' : 'text-neon-orange'}>
-          Can Start: {canProceed ? '✅ YES' : '❌ NO'}
+    <div className="min-h-screen bg-gradient-cyber flex flex-col items-center justify-start p-8 pb-48 overflow-y-auto">
+      {/* EMERGENCY EXIT BUTTON */}
+      <Button
+        onClick={() => navigate('/')}
+        className="fixed top-4 left-4 z-[100] bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 text-lg shadow-lg"
+      >
+        ← EXIT
+      </Button>
+
+      {/* TOP NAVIGATION BAR */}
+      <div className="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-md border-b-2 border-neon-cyan">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="font-retro text-neon-cyan text-xl">CHARACTER SELECT</h1>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate('/')} variant="ghost" className="text-neon-cyan">
+              🏠 Home
+            </Button>
+            <Button onClick={() => navigate('/tutorial')} variant="ghost" className="text-neon-green">
+              📖 Help
+            </Button>
+            <Button 
+              onClick={() => setShowDebug(!showDebug)} 
+              variant="ghost" 
+              className="text-neon-pink text-xs"
+            >
+              {showDebug ? '🔍 Hide Debug' : '🔍 Debug'}
+            </Button>
+          </div>
         </div>
-        <div className="text-neon-cyan mt-2">Audio: {isLoaded ? '✅' : '⏳'}</div>
       </div>
 
-      <div className="text-center mb-6">
+      {/* COLLAPSIBLE DEBUG PANEL */}
+      {showDebug && (
+        <div className="fixed top-16 right-4 bg-black/90 text-white p-4 z-50 text-xs font-mono border-2 border-neon-cyan rounded-lg">
+          <div className="text-neon-cyan font-bold mb-2">🔍 DEBUG STATUS</div>
+          <div className="text-neon-pink">P1: {selectedP1 || '❌ NONE'}</div>
+          <div className="text-neon-green">P2: {selectedP2 || '❌ NONE'}</div>
+          <div className={canProceed ? 'text-neon-green' : 'text-neon-orange'}>
+            Can Start: {canProceed ? '✅ YES' : '❌ NO'}
+          </div>
+          <div className="text-neon-cyan mt-2">Audio: {isLoaded ? '✅' : '⏳'}</div>
+        </div>
+      )}
+
+      <div className="text-center mb-6 mt-20">
         <h1 className="text-5xl font-retro font-bold text-neon-cyan mb-4 glitch" data-text="BADMAN KOMBAT">
           BADMAN KOMBAT
         </h1>

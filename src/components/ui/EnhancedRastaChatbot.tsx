@@ -450,7 +450,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-6 right-6 z-[100] w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg border-2 border-yellow-400 pointer-events-auto ${!hasPlayedInitialAnimation ? 'animate-pulse' : ''}`}
+          className={`fixed bottom-32 right-6 z-[60] w-14 h-14 rounded-full bg-gradient-to-r from-green-500 to-yellow-500 hover:scale-110 transition-all duration-300 shadow-lg border-2 border-yellow-400 pointer-events-auto ${!hasPlayedInitialAnimation ? 'animate-pulse' : ''}`}
           size="icon"
         >
           <div className="relative">
@@ -460,9 +460,9 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
         </Button>
       )}
 
-      {/* Enhanced Chat Window */}
+      {/* Enhanced Chat Window - Smaller and better positioned */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 z-[100] w-96 h-[500px] bg-background/95 backdrop-blur border-2 border-jamaica-green/50 shadow-neon-green pointer-events-auto">
+        <Card className="fixed bottom-48 right-6 z-[70] w-80 h-[400px] max-h-[60vh] bg-background/95 backdrop-blur border-2 border-jamaica-green/50 shadow-neon-green pointer-events-auto">
           <CardHeader className="bg-gradient-jamaica text-background p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
