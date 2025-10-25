@@ -18,6 +18,7 @@ import sifuSprite from '@/assets/sifu-sprite.png';
 import rootsmanSprite from '@/assets/rootsman-sprite.png';
 import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
+import johnwickSprite from '@/assets/johnwick-sprite.png';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 
 // Removed - moved inside component for better error handling
@@ -229,6 +230,29 @@ const fighters = [
       { name: 'Community Pride', input: '↓↙←→ + P+K', description: 'Ultimate combo inspired by protecting his neighborhood' }
     ],
     backstory: 'Marcus grew up fighting in the streets of downtown Kingston, learning to defend his community from gangs and corruption. His iron fists represent the unbreakable spirit of the Jamaican people.'
+  },
+  {
+    id: 'johnwick',
+    name: 'John Wick',
+    title: 'The Baba Yaga',
+    description: 'The legendary assassin who came to Jamaica seeking peace, only to be drawn back into combat. His precision and deadly efficiency make him the most feared fighter in the underground circuits.',
+    origin: 'Continental Hotel, New York',
+    age: 45,
+    height: "6'1\"",
+    weight: '185 lbs',
+    color: 'hsl(0, 0%, 20%)',
+    image: johnwickSprite,
+    stats: {
+      power: 95,
+      speed: 90,
+      defense: 85
+    },
+    specialMoves: [
+      { name: 'Pencil Strike', input: '→→ + P', description: 'Lightning-fast precision strike with devastating accuracy' },
+      { name: 'Gun-Fu Kata', input: '↓↘→ + K', description: 'Combination of martial arts and tactical shooting techniques' },
+      { name: 'Excommunicado', input: '↓↓ + P+K', description: 'Ultimate combo that channels years of assassin training' }
+    ],
+    backstory: 'After the events in New York, John Wick sought refuge in Jamaica, hoping to finally find peace. But when the underground fighting world threatened the locals who gave him shelter, he couldn\'t stand idle. Now he fights not for coins or revenge, but to protect those who showed him kindness.'
   }
 ];
 
