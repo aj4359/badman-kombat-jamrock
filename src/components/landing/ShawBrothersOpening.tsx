@@ -17,19 +17,19 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
       .then(() => console.log('[INTRO] ✅ Shaw Brothers gong playing'))
       .catch((err) => console.warn('[INTRO] ⚠️ Audio blocked:', err.message));
 
-    // Phase transitions
+    // Phase transitions - Extended timing for more epic intro
     const timer1 = setTimeout(() => {
       console.log('[INTRO] Shaw Brothers: fade-in → hold');
       setPhase('hold');
-    }, 1000);
+    }, 1500);
     const timer2 = setTimeout(() => {
       console.log('[INTRO] Shaw Brothers: hold → fade-out');
       setPhase('fade-out');
-    }, 3500);
+    }, 6000);
     const timer3 = setTimeout(() => {
       console.log('[INTRO] ✅ Shaw Brothers complete');
       onComplete();
-    }, 5000);
+    }, 8000);
 
     return () => {
       clearTimeout(timer1);

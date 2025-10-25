@@ -21,7 +21,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
       setZoom(prev => Math.max(1, prev - 0.01));
     }, 50);
 
-    // Letter by letter reveal
+    // Letter by letter reveal - Slower for more dramatic effect
     fullTitle.forEach((letter, index) => {
       setTimeout(() => {
         setLetters(prev => [...prev, letter]);
@@ -31,10 +31,10 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
           setShake(true);
           setTimeout(() => setShake(false), 200);
         }
-      }, 500 + index * 150);
+      }, 800 + index * 250);
     });
 
-    // Subtitle typewriter
+    // Subtitle typewriter - Delayed for more suspense
     setTimeout(() => {
       console.log('[INTRO] Subtitle typing started');
       let currentText = '';
@@ -42,15 +42,15 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
         setTimeout(() => {
           currentText += char;
           setSubtitle(currentText);
-        }, index * 50);
+        }, index * 60);
       });
-    }, 3500);
+    }, 6000);
 
-    // Complete
+    // Complete - Extended duration
     setTimeout(() => {
       console.log('[INTRO] ✅ Title Reveal complete');
       onComplete();
-    }, 8000);
+    }, 12000);
 
     return () => clearInterval(zoomInterval);
   }, [onComplete]);

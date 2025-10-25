@@ -59,8 +59,8 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false }) => {
       <div className="absolute inset-0 bg-gradient-cyber opacity-80" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
 
-      {/* Audio Controls */}
-      <div className="absolute top-6 right-6 z-50 flex gap-2">
+      {/* Audio Controls - Positioned to not overlap with action buttons */}
+      <div className="absolute top-4 left-4 z-50 flex gap-2">
         {!isPlaying ? (
           <Button
             variant="cyber"

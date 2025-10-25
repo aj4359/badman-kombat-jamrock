@@ -12,18 +12,19 @@ export const FighterLineupPan: React.FC<FighterLineupPanProps> = ({ onComplete }
   useEffect(() => {
     console.log('[INTRO] 👊 Fighter Lineup phase started');
     
+    // Slower fighter transition for better showcase
     const interval = setInterval(() => {
       setCurrentFighter(prev => {
         if (prev >= fighters.length - 1) {
           console.log('[INTRO] ✅ Fighter Lineup complete');
-          setTimeout(onComplete, 1500);
+          setTimeout(onComplete, 2500);
           return prev;
         }
         const nextFighter = prev + 1;
         console.log(`[INTRO] Fighter ${nextFighter + 1}/${fighters.length}: ${fighters[nextFighter].name}`);
         return nextFighter;
       });
-    }, 1500);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [fighters.length, onComplete]);

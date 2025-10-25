@@ -61,19 +61,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Action Buttons */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+      {/* Action Buttons - Fixed positioning to avoid overlap */}
+      <div className="fixed top-20 right-4 z-40 flex flex-col gap-3">
         <Button 
           onClick={() => navigate('/3d-ultimate')}
-          className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 text-white font-bold text-lg px-6 py-6 animate-pulse hover:scale-110 transition-transform"
+          className="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 text-white font-bold text-lg px-6 py-4 animate-pulse hover:scale-110 transition-transform shadow-2xl"
         >
-          <Zap className="mr-2" /> PLAY 3D ULTIMATE
+          <Zap className="mr-2 h-5 w-5" /> PLAY 3D ULTIMATE
         </Button>
         <Button 
           onClick={() => navigate('/fighter-generator')}
-          className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform"
+          className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform shadow-2xl"
         >
           🎨 AI Fighter Generator
+        </Button>
+        <Button 
+          onClick={() => navigate('/tutorial')}
+          className="bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold px-6 py-3 hover:scale-110 transition-transform shadow-2xl"
+        >
+          📖 Tutorial
         </Button>
       </div>
 
