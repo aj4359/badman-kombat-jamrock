@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 interface ShawBrothersOpeningProps {
   onComplete: () => void;
@@ -6,19 +6,22 @@ interface ShawBrothersOpeningProps {
 
 export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComplete }) => {
   const [phase, setPhase] = useState<'fade-in' | 'hold' | 'fade-out'>('fade-in');
+  const gongAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     console.log('[INTRO] 🎬 Shaw Brothers phase started - EXTENDED 28s VERSION');
     
-    // Play initial gong sound
-    const gongAudio = new Audio('/assets/audio/shaw-brothers-intro.mp3');
-    gongAudio.volume = 0.7;
+    // Create audio instance once
+    gongAudioRef.current = new Audio('/assets/audio/shaw-brothers-intro.mp3');
+    gongAudioRef.current.volume = 0.7;
     
     const playGong = () => {
-      gongAudio.currentTime = 0;
-      gongAudio.play()
-        .then(() => console.log('[INTRO] ✅ Gong playing'))
-        .catch((err) => console.warn('[INTRO] ⚠️ Gong blocked:', err.message));
+      if (gongAudioRef.current) {
+        gongAudioRef.current.currentTime = 0;
+        gongAudioRef.current.play()
+          .then(() => console.log('[INTRO] ✅ Gong playing'))
+          .catch((err) => console.warn('[INTRO] ⚠️ Gong blocked:', err.message));
+      }
     };
     
     playGong();
@@ -51,9 +54,12 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearInterval(gongInterval);
-      gongAudio.pause();
+      if (gongAudioRef.current) {
+        gongAudioRef.current.pause();
+        gongAudioRef.current = null;
+      }
     };
-  }, [onComplete, phase]);
+  }, [onComplete]);
 
   const opacity = phase === 'fade-in' ? 'opacity-0' : phase === 'hold' ? 'opacity-100' : 'opacity-0';
   const transition = 'transition-opacity duration-1000';
