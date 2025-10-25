@@ -27,6 +27,7 @@ interface EnhancedRastaChatbotProps {
   onNavigateToGame?: () => void;
   onNavigateToCharacterSelect?: () => void;
   onNavigateToHome?: () => void;
+  onNavigateToTutorial?: () => void;
 }
 
 // Comprehensive gameplay guidance database
@@ -110,7 +111,8 @@ const JAMAICAN_RESPONSES = {
 export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   onNavigateToGame,
   onNavigateToCharacterSelect,
-  onNavigateToHome
+  onNavigateToHome,
+  onNavigateToTutorial
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -227,21 +229,21 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       };
     }
 
-    // Greeting responses with more variety
-    if (input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('yo') || input.includes('wah gwaan') || input.includes('irie')) {
-      const greetings = [
-        "Wah gwaan mi bredrin! Bless up yuhself! Welcome to di digital yard!",
-        "Irie massive! Big up yuhself! Mi glad fi see yuh reach ya so!",
-        "Respect youth! How yuh stay? Ready fi some serious ting?",
-        "Bless up mi friend! Wah yuh seh? Come mek wi reason little bit!",
-        "One love bredrin! Yuh looking well today! Ready fi di vibes?"
+    // Tutorial navigation
+    if (input.includes('tutorial') || input.includes('learn') || input.includes('teach') || input.includes('train') || input.includes('how to play')) {
+      setTimeout(() => onNavigateToTutorial?.(), 2000);
+      const tutorialResponses = [
+        "Respect! Time fi learn di basics! Mi a take yuh to di training ground. Master di moves, bredrin!",
+        "Irie! Every champion start somewhere! Let mi show yuh di fundamentals, seen?",
+        "Big up! Yuh smart fi want learn properly! Training makes perfect, rude boy!",
+        "Blessed! Come mek wi practice together! Step by step, yuh'll be unstoppable!"
       ];
       return {
-        text: greetings[Math.floor(Math.random() * greetings.length)],
-        emotion: 'greeting'
+        text: tutorialResponses[Math.floor(Math.random() * tutorialResponses.length)],
+        emotion: 'excited'
       };
     }
-    
+
     // Help responses
     if (input.includes('help') || input.includes('guide') || input.includes('how') || input.includes('wat') || input.includes('explain')) {
       const helpResponses = [

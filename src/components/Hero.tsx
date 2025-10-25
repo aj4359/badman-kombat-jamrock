@@ -3,10 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { useAudioManager } from "@/hooks/useAudioManager";
+import { NavigationBeacon } from "@/components/onboarding/NavigationBeacon";
 import heroImage from "@/assets/leroy-poster.png";
 import gameLogoBg from "@/assets/game-logo-bg.jpg";
 
-const Hero = () => {
+interface HeroProps {
+  isFirstVisit?: boolean;
+}
+
+const Hero: React.FC<HeroProps> = ({ isFirstVisit = false }) => {
   const navigate = useNavigate();
   const { isLoaded, currentLayer, settings, playLayer, emergencyAudioKillSwitch, toggleMute } = useAudioManager();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -40,7 +45,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
@@ -111,21 +116,23 @@ const Hero = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <Button 
-            variant="combat" 
-            size="lg" 
-            className="text-lg px-8 py-4 animate-neon-pulse"
-            onClick={() => navigate('/game', {
-              state: {
-                fighterData: {
-                  player1: { id: 'leroy', name: 'LEROY' },
-                  player2: { id: 'jordan', name: 'JORDAN' }
+          <NavigationBeacon show={isFirstVisit} label="Start here!" position="top">
+            <Button 
+              variant="combat" 
+              size="lg" 
+              className="text-lg px-8 py-4 animate-neon-pulse"
+              onClick={() => navigate('/game', {
+                state: {
+                  fighterData: {
+                    player1: { id: 'leroy', name: 'LEROY' },
+                    player2: { id: 'jordan', name: 'JORDAN' }
+                  }
                 }
-              }
-            })}
-          >
-            ⚡ QUICK PLAY ⚡
-          </Button>
+              })}
+            >
+              ⚡ QUICK PLAY ⚡
+            </Button>
+          </NavigationBeacon>
           <Button 
             variant="neon" 
             size="lg" 
@@ -145,14 +152,16 @@ const Hero = () => {
           >
             WATCH TRAILER
           </Button>
-          <Button 
-            variant="retro" 
-            size="lg" 
-            className="text-lg px-8 py-4"
-            onClick={() => navigate('/character-select')}
-          >
-            SELECT FIGHTER
-          </Button>
+          <NavigationBeacon show={isFirstVisit} label="Learn di moves!" position="top">
+            <Button 
+              variant="retro" 
+              size="lg" 
+              className="text-lg px-8 py-4"
+              onClick={() => navigate('/character-select')}
+            >
+              SELECT FIGHTER
+            </Button>
+          </NavigationBeacon>
         </div>
 
         {/* Game Features */}

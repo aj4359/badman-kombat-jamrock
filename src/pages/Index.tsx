@@ -7,15 +7,56 @@ import GameplayTrailer from '@/components/GameplayTrailer';
 import KombatArena from '@/components/KombatArena';
 import Footer from '@/components/Footer';
 import { RastaChatbot } from '@/components/RastaChatbot';
+import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import { SiteTourGuide } from '@/components/onboarding/SiteTourGuide';
+import { useFirstTimeVisitor } from '@/hooks/useFirstTimeVisitor';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
   const [showIntro, setShowIntro] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const { isFirstVisit, loading, markAsVisited, markSiteTourCompleted } = useFirstTimeVisitor();
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    if (isFirstVisit && !loading) {
+      setShowWelcome(true);
+    }
+  };
+
+  const handleWelcomeClose = () => {
+    setShowWelcome(false);
+    markAsVisited();
+  };
+
+  const handleStartTutorial = () => {
+    setShowWelcome(false);
+    markAsVisited();
+    navigate('/tutorial');
+  };
+
+  const handleStartQuickMatch = () => {
+    setShowWelcome(false);
+    markAsVisited();
+    navigate('/3d-ultimate');
+  };
+
+  const handleStartTour = () => {
+    setShowWelcome(false);
+    markAsVisited();
+    setShowTour(true);
+  };
+
+  const handleTourComplete = () => {
+    setShowTour(false);
+    markSiteTourCompleted();
+  };
 
   if (showIntro) {
-    return <EpicIntroSequence onComplete={() => setShowIntro(false)} skipOnRepeat={false} />;
+    return <EpicIntroSequence onComplete={handleIntroComplete} skipOnRepeat={false} />;
   }
 
   return (
@@ -37,7 +78,7 @@ const Index = () => {
       </div>
 
       {/* Hero Section */}
-      <Hero />
+      <Hero isFirstVisit={isFirstVisit && !loading} />
       
       {/* Fighter Selection */}
       <FighterShowcase />
@@ -56,6 +97,23 @@ const Index = () => {
         onNavigateToGame={() => navigate('/game')}
         onNavigateToCharacterSelect={() => navigate('/character-select')}
         onNavigateToHome={() => navigate('/')}
+        onNavigateToTutorial={() => navigate('/tutorial')}
+      />
+
+      {/* Welcome Modal */}
+      <WelcomeModal
+        open={showWelcome}
+        onClose={handleWelcomeClose}
+        onStartTutorial={handleStartTutorial}
+        onStartQuickMatch={handleStartQuickMatch}
+        onStartTour={handleStartTour}
+      />
+
+      {/* Site Tour Guide */}
+      <SiteTourGuide
+        active={showTour}
+        onComplete={handleTourComplete}
+        onSkip={handleTourComplete}
       />
     </div>
   );
