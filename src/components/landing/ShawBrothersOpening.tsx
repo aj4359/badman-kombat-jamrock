@@ -8,6 +8,7 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
   const [phase, setPhase] = useState<'fade-in' | 'hold' | 'fade-out'>('fade-in');
   const gongAudioRef = useRef<HTMLAudioElement | null>(null);
   const phaseRef = useRef<'fade-in' | 'hold' | 'fade-out'>('fade-in');
+  const gongIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -33,10 +34,16 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
     playGong();
     
     // Loop gong every 3 seconds - check phaseRef instead of phase
-    const gongInterval = setInterval(() => {
+    gongIntervalRef.current = setInterval(() => {
       console.log('[INTRO] Gong interval check - phaseRef.current:', phaseRef.current);
       if (phaseRef.current === 'hold') {
         playGong();
+      } else if (phaseRef.current === 'fade-out') {
+        // Stop the interval when fading out
+        if (gongIntervalRef.current) {
+          clearInterval(gongIntervalRef.current);
+          console.log('[INTRO] 🔕 Gong interval stopped during fade-out');
+        }
       }
     }, 3000);
 
@@ -61,13 +68,30 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
-      clearInterval(gongInterval);
+      if (gongIntervalRef.current) {
+        clearInterval(gongIntervalRef.current);
+      }
       if (gongAudioRef.current) {
         gongAudioRef.current.pause();
         gongAudioRef.current = null;
       }
     };
   }, [onComplete]);
+
+  // Force cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('[INTRO] 🛑 Force stopping gong on unmount');
+      if (gongIntervalRef.current) {
+        clearInterval(gongIntervalRef.current);
+      }
+      if (gongAudioRef.current) {
+        gongAudioRef.current.pause();
+        gongAudioRef.current.currentTime = 0;
+        gongAudioRef.current = null;
+      }
+    };
+  }, []);
 
   const opacity = phase === 'fade-in' ? 'opacity-0' : phase === 'hold' ? 'opacity-100' : 'opacity-0';
   const transition = 'transition-opacity duration-1000';
