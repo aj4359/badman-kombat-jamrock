@@ -6,6 +6,7 @@ import { useAudioManager } from '@/hooks/useAudioManager';
 import { Lock } from 'lucide-react';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { FighterGallery } from '@/components/FighterGallery';
+import { useToast } from '@/hooks/use-toast';
 
 // Import fighter images
 import leroySprite from '@/assets/leroy-sprite.png';
@@ -19,32 +20,7 @@ import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 
-// Enhanced handleStartFight function
-const handleStartFight = (selectedP1: string | null, selectedP2: string | null, selectedP1Fighter: any, selectedP2Fighter: any, navigate: any) => {
-  if (selectedP1 && selectedP2) {
-    // Enhanced fighter data passing with full integration
-    const enhancedFighterData = {
-      player1: {
-        ...selectedP1Fighter,
-        enhancedData: ENHANCED_FIGHTER_DATA[selectedP1] || ENHANCED_FIGHTER_DATA.leroy,
-        selectionTime: Date.now()
-      },
-      player2: {
-        ...selectedP2Fighter,
-        enhancedData: ENHANCED_FIGHTER_DATA[selectedP2] || ENHANCED_FIGHTER_DATA.jordan,
-        selectionTime: Date.now()
-      }
-    };
-    
-    navigate('/vs-screen', {
-      state: {
-        fighters: enhancedFighterData,
-        gameMode: 'versus',
-        integratedData: true
-      }
-    });
-  }
-};
+// Removed - moved inside component for better error handling
 
 const fighters = [
   {
@@ -258,6 +234,7 @@ const fighters = [
 
 const CharacterSelect = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { fighters: progressionFighters, getUnlockConditions } = useProgressionSystem();
   const { playLayer, isLoaded } = useAudioManager();
   const [selectedP1, setSelectedP1] = useState<string | null>(null);
@@ -270,6 +247,81 @@ const CharacterSelect = () => {
       playLayer('ambient');
     }
   }, [isLoaded, playLayer]);
+
+  // Enhanced handleStartFight with error handling
+  const handleStartFight = () => {
+    console.log('🎮 [CHARACTER SELECT] Start Fight button clicked');
+    console.log('🎮 [CHARACTER SELECT] Selected P1:', selectedP1);
+    console.log('🎮 [CHARACTER SELECT] Selected P2:', selectedP2);
+    
+    try {
+      // Defensive checks
+      if (!selectedP1 || !selectedP2) {
+        console.error('❌ [CHARACTER SELECT] Missing fighter selections');
+        toast({
+          title: "Selection Required",
+          description: "Please select both fighters before starting",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const selectedP1Fighter = fighters.find(f => f.id === selectedP1);
+      const selectedP2Fighter = fighters.find(f => f.id === selectedP2);
+
+      if (!selectedP1Fighter || !selectedP2Fighter) {
+        console.error('❌ [CHARACTER SELECT] Fighter data not found');
+        toast({
+          title: "Error Loading Fighters",
+          description: "Could not load fighter data. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ [CHARACTER SELECT] Fighter data validated');
+      console.log('✅ [CHARACTER SELECT] P1 Fighter:', selectedP1Fighter.name);
+      console.log('✅ [CHARACTER SELECT] P2 Fighter:', selectedP2Fighter.name);
+
+      // Enhanced fighter data passing with full integration and fallbacks
+      const enhancedFighterData = {
+        player1: {
+          ...selectedP1Fighter,
+          enhancedData: ENHANCED_FIGHTER_DATA[selectedP1] || ENHANCED_FIGHTER_DATA.leroy || {},
+          selectionTime: Date.now()
+        },
+        player2: {
+          ...selectedP2Fighter,
+          enhancedData: ENHANCED_FIGHTER_DATA[selectedP2] || ENHANCED_FIGHTER_DATA.jordan || {},
+          selectionTime: Date.now()
+        }
+      };
+
+      console.log('🚀 [CHARACTER SELECT] Navigating to VS Screen with data:', enhancedFighterData);
+      
+      navigate('/vs-screen', {
+        state: {
+          fighters: enhancedFighterData,
+          gameMode: 'versus',
+          integratedData: true
+        }
+      });
+
+      console.log('✅ [CHARACTER SELECT] Navigation completed');
+      
+      toast({
+        title: "Fight Starting!",
+        description: `${selectedP1Fighter.name} vs ${selectedP2Fighter.name}`,
+      });
+    } catch (error) {
+      console.error('❌ [CHARACTER SELECT] Error starting fight:', error);
+      toast({
+        title: "Navigation Error",
+        description: "Failed to start the fight. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleFighterSelect = (fighterId: string, player: 1 | 2) => {
     console.log(`🎮 Fighter Selected: ${fighterId} for Player ${player}`);
@@ -496,11 +548,7 @@ const CharacterSelect = () => {
         </Button>
         <Button 
           disabled={!canProceed}
-          onClick={() => {
-            if (canProceed) {
-              handleStartFight(selectedP1, selectedP2, selectedP1Fighter, selectedP2Fighter, navigate);
-            }
-          }}
+          onClick={handleStartFight}
           className={`text-lg px-8 font-bold transform transition-all shadow-lg ${
             canProceed 
               ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black hover:scale-105 animate-neon-pulse' 
