@@ -22,6 +22,9 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
   const [showSkipHint, setShowSkipHint] = useState(false);
   const battlefieldMusicRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialized = useRef(false);
+
+  console.log('[INTRO] EpicIntroSequence render - phase:', phase, 'isComplete:', isComplete);
 
   useEffect(() => {
     // Show skip hint after 2 seconds
@@ -31,11 +34,20 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
 
   // Initialize audio instances once on mount
   useEffect(() => {
+    if (hasInitialized.current) {
+      console.log('[INTRO] ⚠️ Attempted re-initialization blocked!');
+      return;
+    }
+    
+    hasInitialized.current = true;
+    console.log('[INTRO] 🎵 Initializing audio system...');
+    
     battlefieldMusicRef.current = new Audio('/assets/audio/bmk-champion-loop.mp3');
     battlefieldMusicRef.current.volume = 0;
     battlefieldMusicRef.current.loop = true;
     
     return () => {
+      console.log('[INTRO] 🛑 Cleaning up audio system');
       if (battlefieldMusicRef.current) {
         battlefieldMusicRef.current.pause();
         battlefieldMusicRef.current = null;
@@ -43,6 +55,7 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
       if (fadeIntervalRef.current) {
         clearInterval(fadeIntervalRef.current);
       }
+      hasInitialized.current = false;
     };
   }, []);
 

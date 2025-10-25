@@ -55,8 +55,11 @@ const Index = () => {
   };
 
   if (showIntro) {
+    console.log('[INDEX] Rendering intro sequence');
     return <EpicIntroSequence onComplete={handleIntroComplete} skipOnRepeat={false} />;
   }
+  
+  console.log('[INDEX] Rendering main page');
 
   return (
     <div className="min-h-screen bg-background">

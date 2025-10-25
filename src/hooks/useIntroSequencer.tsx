@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type IntroPhase = 'shaw-brothers' | 'title-reveal' | 'fighter-lineup' | 'complete';
 
@@ -10,22 +10,26 @@ interface IntroSequencerOptions {
 export const useIntroSequencer = ({ onComplete, skipOnRepeat = true }: IntroSequencerOptions) => {
   const [phase, setPhase] = useState<IntroPhase>('shaw-brothers');
   const [isSkipped, setIsSkipped] = useState(false);
-
-  useEffect(() => {
-    // Check if intro has been seen before
-    if (skipOnRepeat) {
-      const hasSeenIntro = localStorage.getItem('bmk-intro-seen');
-      if (hasSeenIntro === 'true') {
-        skip();
-      }
-    }
-  }, [skipOnRepeat]);
+  const hasAutoSkipped = useRef(false);
 
   const skip = useCallback(() => {
+    console.log('[INTRO] Skip triggered');
     setIsSkipped(true);
     setPhase('complete');
     onComplete();
   }, [onComplete]);
+
+  // Auto-skip check
+  useEffect(() => {
+    if (skipOnRepeat && !hasAutoSkipped.current) {
+      const hasSeenIntro = localStorage.getItem('bmk-intro-seen');
+      if (hasSeenIntro === 'true') {
+        console.log('[INTRO] Auto-skipping intro (already seen)');
+        hasAutoSkipped.current = true;
+        skip();
+      }
+    }
+  }, [skipOnRepeat, skip]);
 
   const nextPhase = useCallback(() => {
     setPhase(current => {
