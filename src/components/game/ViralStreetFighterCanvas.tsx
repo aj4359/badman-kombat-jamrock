@@ -13,6 +13,7 @@ import { renderProfessionalHealthBars, renderFighterNames } from './Professional
 import { ControlDisplay } from './ControlDisplay';
 import { FocusPrompt } from './FocusPrompt';
 import { VoiceLineDisplay } from '@/components/ui/VoiceLineDisplay';
+import { VictoryScreen } from './VictoryScreen';
 import { 
   renderMotionBlur, 
   renderSpeedLines, 
@@ -524,6 +525,16 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         <div>P2 Health: {gameState.fighters.player2?.health}</div>
         <div>Audio: {audioManager.isLoaded ? '✓' : '✗'}</div>
       </div>
+      
+      {/* Victory Screen */}
+      {gameState.winner && (
+        <VictoryScreen 
+          winner={gameState.winner} 
+          onRestart={() => {
+            initializeFighters();
+          }}
+        />
+      )}
     </div>
   );
 };
