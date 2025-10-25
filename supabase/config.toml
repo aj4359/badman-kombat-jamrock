@@ -1,1 +1,7 @@
 project_id = "mvgbnvvvgevjcatcnnqy"
+
+[functions.game-ai]
+verify_jwt = false
+
+[functions.generate-fighter-sprite]
+verify_jwt = false

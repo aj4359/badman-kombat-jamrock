@@ -15,6 +15,7 @@ import GameOverviewRecorder from "./pages/GameOverviewRecorder";
 import JohnWickTrailer from "./pages/JohnWickTrailer";
 import LiveStream from "./pages/LiveStream";
 import NotFound from "./pages/NotFound";
+import FighterGenerator from "./pages/FighterGenerator";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
             <Route path="/game-overview" element={<GameOverviewRecorder />} />
             <Route path="/live-stream" element={<LiveStream />} />
+            <Route path="/fighter-generator" element={<FighterGenerator />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
