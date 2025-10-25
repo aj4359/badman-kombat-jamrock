@@ -109,6 +109,12 @@ const BadManKombatUltimate3D = () => {
                 ENTER THE RING
               </Button>
               <Button 
+                onClick={() => window.location.href = '/live-stream'} 
+                className="text-2xl px-10 py-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 border-4 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:shadow-[0_0_50px_rgba(34,211,238,0.8)] transition-all duration-300 transform hover:scale-105"
+              >
+                🔴 LIVE STREAM MODE
+              </Button>
+              <Button 
                 onClick={() => window.location.href = '/john-wick-trailer'} 
                 className="text-2xl px-10 py-6 bg-gradient-to-r from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 border-4 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.6)] hover:shadow-[0_0_50px_rgba(239,68,68,0.8)] transition-all duration-300 transform hover:scale-105"
               >

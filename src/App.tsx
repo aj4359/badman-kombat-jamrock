@@ -4,21 +4,22 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import CharacterSelect from "./pages/CharacterSelect";
+import Game from "./pages/Game";
+import ArcadeMode from "./pages/ArcadeMode";
+import Teaser from "./pages/Teaser";
+import TeaserCreator from "./pages/TeaserCreator";
+import TrailerGenerator from "./pages/TrailerGenerator";
+import GameOverviewRecorder from "./pages/GameOverviewRecorder";
+import JohnWickTrailer from "./pages/JohnWickTrailer";
+import LiveStream from "./pages/LiveStream";
+import NotFound from "./pages/NotFound";
+import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
+import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
 import MarvelRivalsLanding from "./components/MarvelRivalsLanding";
 import BadManKombatLandingPage from "./components/BadManKombatLandingPage";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import CharacterSelect from "./pages/CharacterSelect";
-import Game from "./pages/Game";
-import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
-import ArcadeMode from "./pages/ArcadeMode";
-import Teaser from "./pages/Teaser";
-import TrailerGenerator from "./pages/TrailerGenerator";
-import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
-import TeaserCreator from "./pages/TeaserCreator";
-import JohnWickTrailer from "./pages/JohnWickTrailer";
-import GameOverviewRecorder from "./pages/GameOverviewRecorder";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/teaser-creator" element={<TeaserCreator />} />
             <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
             <Route path="/game-overview" element={<GameOverviewRecorder />} />
+            <Route path="/live-stream" element={<LiveStream />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
