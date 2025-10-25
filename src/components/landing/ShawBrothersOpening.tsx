@@ -60,7 +60,7 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
         <div className="text-center space-y-2">
           <p className="font-retro text-2xl md:text-4xl text-[#FFD700] tracking-widest"
              style={{ textShadow: '0 0 20px rgba(255, 215, 0, 0.6)' }}>
-            KINGSTON FILMS
+            TA GURULABS
           </p>
           <p className="font-body text-xl md:text-2xl text-[#FFD700]/80 tracking-wider">
             PRESENTS
