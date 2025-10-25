@@ -153,6 +153,14 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false, tutorialCompleted = f
                 >
                   WATCH TRAILER
                 </Button>
+                <Button 
+                  variant="destructive" 
+                  size="lg" 
+                  className="text-base px-6 py-4 bg-black border-red-600 hover:bg-red-950"
+                  onClick={() => navigate('/johnwick-trailer')}
+                >
+                  JOHN WICK
+                </Button>
               </div>
               
               {/* Skip option for experienced players */}
@@ -212,6 +220,14 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false, tutorialCompleted = f
                   }}
                 >
                   WATCH TRAILER
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  size="lg" 
+                  className="text-base px-6 py-4 bg-black border-red-600 hover:bg-red-950"
+                  onClick={() => navigate('/johnwick-trailer')}
+                >
+                  JOHN WICK
                 </Button>
                 <Button 
                   variant="retro" 

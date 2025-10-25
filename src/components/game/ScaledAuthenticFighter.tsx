@@ -616,14 +616,19 @@ function renderRootsmanMystic(ctx: CanvasRenderingContext2D, fighter: Fighter, e
 }
 
 function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter, effects: any, pose: Pose) {
+  const profile = AUTHENTIC_FIGHTER_PROFILES.johnwick;
+  
   ctx.save();
   ctx.translate(0, pose.bodyOffsetY * SCALE);
   ctx.scale(1, pose.bodySquash);
   ctx.rotate((pose.bodyTilt * Math.PI) / 180);
   
-  // Shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  // Enhanced shadow with red glow
+  ctx.shadowColor = 'rgba(139, 0, 0, 0.6)';
+  ctx.shadowBlur = 15*SCALE;
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(-15*SCALE, 5*SCALE, 90*SCALE, 6*SCALE);
+  ctx.shadowBlur = 0;
   
   // Black dress shoes
   ctx.fillStyle = 'hsl(0, 0%, 5%)';
@@ -697,7 +702,7 @@ function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter,
   
   // Gun when attacking or using special
   if (fighter.state.current === 'attacking' || fighter.state.current === 'special') {
-    ctx.fillStyle = 'hsl(0, 0%, 20%)';
+    ctx.fillStyle = profile.colors.gun;
     ctx.save();
     ctx.translate(30*SCALE, -78*SCALE);
     ctx.rotate(-30 * Math.PI / 180);
@@ -707,8 +712,8 @@ function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter,
     
     // Muzzle flash
     if (fighter.state.timer && fighter.state.timer < 5) {
-      ctx.fillStyle = 'hsl(45, 100%, 60%)';
-      ctx.shadowColor = 'hsl(45, 100%, 60%)';
+      ctx.fillStyle = profile.colors.muzzle_flash;
+      ctx.shadowColor = profile.colors.muzzle_flash;
       ctx.shadowBlur = 15*SCALE;
       ctx.save();
       ctx.translate(30*SCALE, -78*SCALE);
@@ -718,6 +723,25 @@ function renderJohnWickAssassin(ctx: CanvasRenderingContext2D, fighter: Fighter,
       ctx.shadowBlur = 0;
     }
   }
+  
+  // Red glow aura for John Wick (always visible for recognition)
+  ctx.strokeStyle = 'hsl(0, 100%, 40%)';
+  ctx.lineWidth = 2*SCALE;
+  ctx.shadowColor = 'hsl(0, 100%, 40%)';
+  ctx.shadowBlur = 10*SCALE;
+  ctx.globalAlpha = 0.3;
+  ctx.strokeRect(-27*SCALE, -138*SCALE, 54*SCALE, 150*SCALE);
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+  
+  // Name label for visibility
+  ctx.fillStyle = 'white';
+  ctx.shadowColor = 'black';
+  ctx.shadowBlur = 4*SCALE;
+  ctx.font = `bold ${10*SCALE}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.fillText('JOHN WICK', 0, -145*SCALE);
+  ctx.shadowBlur = 0;
   
   ctx.restore();
 }

@@ -8,43 +8,64 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
   const [phase, setPhase] = useState<'fade-in' | 'hold' | 'fade-out'>('fade-in');
 
   useEffect(() => {
-    console.log('[INTRO] 🎬 Shaw Brothers phase started');
+    console.log('[INTRO] 🎬 Shaw Brothers phase started - EXTENDED 28s VERSION');
     
-    // Play gong sound
-    const audio = new Audio('/assets/audio/shaw-brothers-intro.mp3');
-    audio.volume = 0.7;
-    audio.play()
-      .then(() => console.log('[INTRO] ✅ Shaw Brothers gong playing'))
-      .catch((err) => console.warn('[INTRO] ⚠️ Audio blocked:', err.message));
+    // Play initial gong sound
+    const gongAudio = new Audio('/assets/audio/shaw-brothers-intro.mp3');
+    gongAudio.volume = 0.7;
+    
+    const playGong = () => {
+      gongAudio.currentTime = 0;
+      gongAudio.play()
+        .then(() => console.log('[INTRO] ✅ Gong playing'))
+        .catch((err) => console.warn('[INTRO] ⚠️ Gong blocked:', err.message));
+    };
+    
+    playGong();
+    
+    // Loop gong every 3 seconds during hold phase
+    const gongInterval = setInterval(() => {
+      if (phase === 'hold') {
+        playGong();
+      }
+    }, 3000);
 
-    // Phase transitions - Extended timing for more epic intro
+    // Phase transitions - EXTENDED to 28 seconds total
     const timer1 = setTimeout(() => {
       console.log('[INTRO] Shaw Brothers: fade-in → hold');
       setPhase('hold');
     }, 1500);
+    
     const timer2 = setTimeout(() => {
       console.log('[INTRO] Shaw Brothers: hold → fade-out');
       setPhase('fade-out');
-    }, 6000);
+    }, 25000); // Extended from 6s to 25s
+    
     const timer3 = setTimeout(() => {
       console.log('[INTRO] ✅ Shaw Brothers complete');
       onComplete();
-    }, 8000);
+    }, 28000); // Extended from 8s to 28s
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
-      audio.pause();
+      clearInterval(gongInterval);
+      gongAudio.pause();
     };
-  }, [onComplete]);
+  }, [onComplete, phase]);
 
   const opacity = phase === 'fade-in' ? 'opacity-0' : phase === 'hold' ? 'opacity-100' : 'opacity-0';
   const transition = 'transition-opacity duration-1000';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#8B0000]">
-      <div className={`${opacity} ${transition} flex flex-col items-center gap-8`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#8B0000] overflow-hidden">
+      {/* Explosion flash at 25 second mark */}
+      {phase === 'fade-out' && (
+        <div className="absolute inset-0 bg-white animate-flash z-[100]" />
+      )}
+      
+      <div className={`${opacity} ${transition} flex flex-col items-center gap-8 ${phase === 'hold' ? 'animate-pulse' : ''}`}>
         {/* Shaw Brothers Logo */}
         <div className="relative">
           <div className="absolute inset-0 bg-[#FFD700] blur-3xl opacity-50 animate-neon-pulse" />

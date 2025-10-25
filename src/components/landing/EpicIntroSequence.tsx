@@ -27,27 +27,65 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Background music
+  // Background music with battlefield explosion at Shaw Brothers climax
   useEffect(() => {
-    const music = new Audio('/assets/bmk-soundtrack.mp3');
-    music.volume = 0.3;
-    music.loop = true;
+    const battlefieldMusic = new Audio('/assets/audio/bmk-champion-loop.mp3');
+    battlefieldMusic.volume = 0;
+    battlefieldMusic.loop = true;
     
-    const playMusic = () => {
-      music.play()
-        .then(() => console.log('[INTRO] 🎵 Background music playing'))
+    const ambientMusic = new Audio('/assets/bmk-soundtrack.mp3');
+    ambientMusic.volume = 0.3;
+    ambientMusic.loop = true;
+    
+    const playBattlefieldMusic = () => {
+      battlefieldMusic.play()
+        .then(() => {
+          console.log('[INTRO] 🔥 Battlefield music EXPLODING IN');
+          // Explosive fade-in
+          let volume = 0;
+          const fadeIn = setInterval(() => {
+            volume += 0.05;
+            if (volume >= 0.8) {
+              volume = 0.8;
+              clearInterval(fadeIn);
+            }
+            battlefieldMusic.volume = volume;
+          }, 50);
+        })
+        .catch((err) => console.warn('[INTRO] ⚠️ Battlefield music blocked:', err.message));
+    };
+    
+    const playAmbientMusic = () => {
+      ambientMusic.play()
+        .then(() => console.log('[INTRO] 🎵 Ambient background music playing'))
         .catch((err) => console.warn('[INTRO] ⚠️ Music blocked:', err.message));
     };
 
-    // Start music on title reveal
-    if (phase === 'title-reveal') {
-      console.log('[INTRO] Starting background music');
-      playMusic();
+    // Start battlefield music explosion at 25s mark during Shaw Brothers
+    if (phase === 'shaw-brothers') {
+      const explosionTimer = setTimeout(() => {
+        console.log('[INTRO] 💥 TRIGGERING BATTLEFIELD MUSIC EXPLOSION');
+        playBattlefieldMusic();
+      }, 25000); // Explode at 25 seconds
+      
+      return () => {
+        clearTimeout(explosionTimer);
+        battlefieldMusic.pause();
+        battlefieldMusic.currentTime = 0;
+      };
+    }
+    
+    // Continue battlefield music through title and fighter phases
+    if (phase === 'title-reveal' || phase === 'fighter-lineup') {
+      // Battlefield music should already be playing from Shaw Brothers phase
+      console.log('[INTRO] Continuing battlefield music through', phase);
     }
 
     return () => {
-      music.pause();
-      music.currentTime = 0;
+      battlefieldMusic.pause();
+      ambientMusic.pause();
+      battlefieldMusic.currentTime = 0;
+      ambientMusic.currentTime = 0;
     };
   }, [phase]);
 

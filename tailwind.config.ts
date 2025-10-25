@@ -147,6 +147,14 @@ export default {
             transform: "translateY(-20px)",
           },
         },
+        "flash": {
+          "0%, 100%": {
+            opacity: "0",
+          },
+          "50%": {
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -156,6 +164,7 @@ export default {
         "scale-in": "scale-in 0.5s ease-out forwards",
         "wiggle": "wiggle 0.2s ease-in-out",
         "float": "float 3s ease-in-out infinite",
+        "flash": "flash 0.5s ease-out",
       },
     },
   },

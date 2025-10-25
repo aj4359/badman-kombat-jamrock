@@ -34,7 +34,7 @@ export const CinematicEffects = ({
       {/* Film Grain */}
       {showFilmGrain && (
         <div 
-          className="absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"
+          className="absolute inset-0 pointer-events-none opacity-8 mix-blend-overlay"
           style={{
             backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' /%3E%3C/svg%3E")',
             animation: 'grain 0.5s steps(10) infinite'
@@ -47,19 +47,28 @@ export const CinematicEffects = ({
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%)'
+            background: 'radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.3) 100%)'
           }}
         />
       )}
 
       {/* Color Grade Overlay */}
       {colorGrade === 'johnwick' && (
-        <div 
-          className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-30"
-          style={{
-            background: 'linear-gradient(135deg, rgba(139,0,0,0.3), rgba(255,140,0,0.2))'
-          }}
-        />
+        <>
+          <div 
+            className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-15"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,0,0,0.3), rgba(255,140,0,0.2))'
+            }}
+          />
+          {/* Brightness Boost for John Wick */}
+          <div 
+            className="absolute inset-0 pointer-events-none mix-blend-screen opacity-10"
+            style={{
+              background: 'radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%)'
+            }}
+          />
+        </>
       )}
 
       {/* Bullet Time Effect */}
