@@ -88,9 +88,9 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
       </div>
 
       {/* Main title */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
         <div className={`transform ${shake ? 'animate-[wiggle_0.2s_ease-in-out]' : ''}`}>
-          <h1 className="font-retro text-8xl md:text-[200px] font-black tracking-wider text-center leading-none">
+          <h1 className="font-retro text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-[0.2em] text-center leading-tight break-words">
             {letters.map((letter, index) => {
               const isSpace = letter === ' ';
               const colors = [
@@ -105,7 +105,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
               return (
                 <span
                   key={index}
-                  className={`inline-block ${isSpace ? 'w-8' : color} animate-scale-in`}
+                  className={`inline-block ${isSpace ? 'w-12 sm:w-16 md:w-20 lg:w-24' : color} animate-scale-in`}
                   style={{
                     textShadow: `
                       0 0 20px currentColor,
