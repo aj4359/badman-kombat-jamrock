@@ -14,6 +14,7 @@ import TrailerGenerator from "./pages/TrailerGenerator";
 import GameOverviewRecorder from "./pages/GameOverviewRecorder";
 import JohnWickTrailer from "./pages/JohnWickTrailer";
 import DroneTrailerGenerator from "./pages/DroneTrailerGenerator";
+import Rankings from "./pages/Rankings";
 import LiveStream from "./pages/LiveStream";
 import NotFound from "./pages/NotFound";
 import FighterGenerator from "./pages/FighterGenerator";
@@ -21,6 +22,7 @@ import Tutorial from "./pages/Tutorial";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { NavigationMenu } from "./components/NavigationMenu";
 import MarvelRivalsLanding from "./components/MarvelRivalsLanding";
 import BadManKombatLandingPage from "./components/BadManKombatLandingPage";
 
@@ -58,9 +60,11 @@ const App = () => (
             <Route path="/live-stream" element={<LiveStream />} />
             <Route path="/fighter-generator" element={<FighterGenerator />} />
             <Route path="/tutorial" element={<Tutorial />} />
+            <Route path="/rankings" element={<Rankings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <NavigationMenu />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

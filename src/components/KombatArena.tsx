@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Zap } from "lucide-react";
@@ -10,6 +11,8 @@ import blueMountainsArena from '@/assets/blue-mountains-temple.jpg';
 import negrilArena from '@/assets/negril-beach-arena.jpg';
 
 const KombatArena = () => {
+  const navigate = useNavigate();
+  
   const arenas = [
     {
       name: "DOWNTOWN KINGSTON",
@@ -113,6 +116,7 @@ const KombatArena = () => {
                 <Button 
                   variant="retro" 
                   className="w-full group-hover:scale-105 transition-transform duration-200"
+                  onClick={() => navigate('/character-select', { state: { selectedArena: arena.name } })}
                 >
                   ENTER ARENA
                 </Button>
@@ -134,10 +138,10 @@ const KombatArena = () => {
             Face increasingly difficult opponents in a gauntlet of cyberpunk street fighting.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="combat" size="lg">
+            <Button variant="combat" size="lg" onClick={() => navigate('/arcade')}>
               START TOURNAMENT
             </Button>
-            <Button variant="jamaica" size="lg">
+            <Button variant="jamaica" size="lg" onClick={() => navigate('/rankings')}>
               VIEW RANKINGS
             </Button>
           </div>

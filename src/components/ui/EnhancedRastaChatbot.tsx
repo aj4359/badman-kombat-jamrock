@@ -28,6 +28,10 @@ interface EnhancedRastaChatbotProps {
   onNavigateToCharacterSelect?: () => void;
   onNavigateToHome?: () => void;
   onNavigateToTutorial?: () => void;
+  onNavigateToDroneTrailer?: () => void;
+  onNavigateToFighterGenerator?: () => void;
+  onNavigateToArcade?: () => void;
+  onNavigateToRankings?: () => void;
 }
 
 // Comprehensive gameplay guidance database
@@ -112,7 +116,11 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
   onNavigateToGame,
   onNavigateToCharacterSelect,
   onNavigateToHome,
-  onNavigateToTutorial
+  onNavigateToTutorial,
+  onNavigateToDroneTrailer,
+  onNavigateToFighterGenerator,
+  onNavigateToArcade,
+  onNavigateToRankings
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -240,6 +248,42 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
       ];
       return {
         text: tutorialResponses[Math.floor(Math.random() * tutorialResponses.length)],
+        emotion: 'excited'
+      };
+    }
+
+    // Drone Trailer navigation
+    if (input.includes('drone') || input.includes('trailer') || input.includes('cinematic') || input.includes('video')) {
+      setTimeout(() => onNavigateToDroneTrailer?.(), 2000);
+      return {
+        text: "Irie! Time fi create some epic cinematics! Drone camera ready fi action, bredrin! Watch dis!",
+        emotion: 'excited'
+      };
+    }
+
+    // Fighter Generator navigation
+    if (input.includes('create fighter') || input.includes('fighter generator') || input.includes('make fighter') || input.includes('custom fighter')) {
+      setTimeout(() => onNavigateToFighterGenerator?.(), 2000);
+      return {
+        text: "Wicked! Let wi create yuh own legendary warrior! Customize everything, seen?",
+        emotion: 'excited'
+      };
+    }
+
+    // Arcade/Tournament navigation
+    if (input.includes('arcade') || input.includes('tournament') || input.includes('single player')) {
+      setTimeout(() => onNavigateToArcade?.(), 2000);
+      return {
+        text: "Bloodfire! Time fi test yuh skills against di best! Tournament mode loading, champion!",
+        emotion: 'excited'
+      };
+    }
+
+    // Rankings/Leaderboard navigation
+    if (input.includes('ranking') || input.includes('leaderboard') || input.includes('score') || input.includes('standings')) {
+      setTimeout(() => onNavigateToRankings?.(), 2000);
+      return {
+        text: "Seen! Check out who running tings pon di leaderboard! Rankings loading now!",
         emotion: 'excited'
       };
     }
