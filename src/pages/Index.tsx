@@ -15,11 +15,14 @@ import { useFirstTimeVisitor } from '@/hooks/useFirstTimeVisitor';
 const Index = () => {
   const navigate = useNavigate();
   const [showIntro, setShowIntro] = useState(true);
+  const [introCompleted, setIntroCompleted] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const { isFirstVisit, loading, markAsVisited, markSiteTourCompleted } = useFirstTimeVisitor();
 
   const handleIntroComplete = () => {
+    console.log('[INDEX] ✅ Intro complete, switching to main page');
+    setIntroCompleted(true);
     setShowIntro(false);
     if (isFirstVisit && !loading) {
       setShowWelcome(true);
@@ -54,7 +57,7 @@ const Index = () => {
     markSiteTourCompleted();
   };
 
-  if (showIntro) {
+  if (showIntro && !introCompleted) {
     console.log('[INDEX] Rendering intro sequence');
     return <EpicIntroSequence onComplete={handleIntroComplete} skipOnRepeat={false} />;
   }

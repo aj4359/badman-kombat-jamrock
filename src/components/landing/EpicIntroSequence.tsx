@@ -72,17 +72,24 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
             console.log('[INTRO] 🔥 Battlefield music EXPLODING IN');
             
             // Explosive fade-in
-            let volume = 0;
             fadeIntervalRef.current = setInterval(() => {
-              volume += 0.05;
-              if (volume >= 0.8) {
-                volume = 0.8;
+              if (!battlefieldMusicRef.current) {
                 if (fadeIntervalRef.current) {
                   clearInterval(fadeIntervalRef.current);
                 }
+                return;
               }
-              if (battlefieldMusicRef.current) {
-                battlefieldMusicRef.current.volume = volume;
+              
+              const currentVolume = battlefieldMusicRef.current.volume;
+              const newVolume = Math.min(0.8, currentVolume + 0.05);
+              
+              battlefieldMusicRef.current.volume = newVolume;
+              
+              if (newVolume >= 0.8) {
+                if (fadeIntervalRef.current) {
+                  clearInterval(fadeIntervalRef.current);
+                }
+                console.log('[INTRO] ✅ Battlefield music at full volume');
               }
             }, 50);
           })
@@ -99,19 +106,26 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
     if (phase === 'complete') {
       console.log('[INTRO] 🎵 Fading out battlefield music...');
       
-      let volume = battlefieldMusicRef.current?.volume || 0;
-      const fadeOut = setInterval(() => {
-        volume -= 0.05;
-        if (volume <= 0 || !battlefieldMusicRef.current) {
-          clearInterval(fadeOut);
-          if (battlefieldMusicRef.current) {
-            battlefieldMusicRef.current.pause();
-            battlefieldMusicRef.current.currentTime = 0;
-          }
-        } else {
-          battlefieldMusicRef.current.volume = volume;
+      const fadeOutInterval = setInterval(() => {
+        if (!battlefieldMusicRef.current) {
+          clearInterval(fadeOutInterval);
+          return;
+        }
+        
+        const currentVolume = battlefieldMusicRef.current.volume;
+        const newVolume = Math.max(0, currentVolume - 0.05);
+        
+        battlefieldMusicRef.current.volume = newVolume;
+        
+        if (newVolume <= 0) {
+          clearInterval(fadeOutInterval);
+          battlefieldMusicRef.current.pause();
+          battlefieldMusicRef.current.currentTime = 0;
+          console.log('[INTRO] ✅ Battlefield music stopped');
         }
       }, 50);
+      
+      return () => clearInterval(fadeOutInterval);
     }
   }, [phase]);
 

@@ -7,6 +7,12 @@ interface ShawBrothersOpeningProps {
 export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComplete }) => {
   const [phase, setPhase] = useState<'fade-in' | 'hold' | 'fade-out'>('fade-in');
   const gongAudioRef = useRef<HTMLAudioElement | null>(null);
+  const phaseRef = useRef<'fade-in' | 'hold' | 'fade-out'>('fade-in');
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   useEffect(() => {
     console.log('[INTRO] 🎬 Shaw Brothers phase started - EXTENDED 28s VERSION');
@@ -26,9 +32,10 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
     
     playGong();
     
-    // Loop gong every 3 seconds during hold phase
+    // Loop gong every 3 seconds - check phaseRef instead of phase
     const gongInterval = setInterval(() => {
-      if (phase === 'hold') {
+      console.log('[INTRO] Gong interval check - phaseRef.current:', phaseRef.current);
+      if (phaseRef.current === 'hold') {
         playGong();
       }
     }, 3000);
@@ -42,14 +49,15 @@ export const ShawBrothersOpening: React.FC<ShawBrothersOpeningProps> = ({ onComp
     const timer2 = setTimeout(() => {
       console.log('[INTRO] Shaw Brothers: hold → fade-out');
       setPhase('fade-out');
-    }, 25000); // Extended from 6s to 25s
+    }, 25000);
     
     const timer3 = setTimeout(() => {
       console.log('[INTRO] ✅ Shaw Brothers complete');
       onComplete();
-    }, 28000); // Extended from 8s to 28s
+    }, 28000);
 
     return () => {
+      console.log('[INTRO] 🛑 Shaw Brothers cleanup');
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
