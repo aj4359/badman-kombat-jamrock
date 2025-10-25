@@ -254,6 +254,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
 
     // Drone Trailer navigation
     if (input.includes('drone') || input.includes('trailer') || input.includes('cinematic') || input.includes('video')) {
+      console.log('🎬 Navigating to drone trailer');
       setTimeout(() => onNavigateToDroneTrailer?.(), 2000);
       return {
         text: "Irie! Time fi create some epic cinematics! Drone camera ready fi action, bredrin! Watch dis!",
@@ -263,6 +264,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
 
     // Fighter Generator navigation
     if (input.includes('create fighter') || input.includes('fighter generator') || input.includes('make fighter') || input.includes('custom fighter')) {
+      console.log('✨ Navigating to fighter generator');
       setTimeout(() => onNavigateToFighterGenerator?.(), 2000);
       return {
         text: "Wicked! Let wi create yuh own legendary warrior! Customize everything, seen?",
@@ -272,6 +274,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
 
     // Arcade/Tournament navigation
     if (input.includes('arcade') || input.includes('tournament') || input.includes('single player')) {
+      console.log('🎮 Navigating to arcade');
       setTimeout(() => onNavigateToArcade?.(), 2000);
       return {
         text: "Bloodfire! Time fi test yuh skills against di best! Tournament mode loading, champion!",
@@ -281,6 +284,7 @@ export const EnhancedRastaChatbot: React.FC<EnhancedRastaChatbotProps> = ({
 
     // Rankings/Leaderboard navigation
     if (input.includes('ranking') || input.includes('leaderboard') || input.includes('score') || input.includes('standings')) {
+      console.log('🏆 Navigating to rankings');
       setTimeout(() => onNavigateToRankings?.(), 2000);
       return {
         text: "Seen! Check out who running tings pon di leaderboard! Rankings loading now!",

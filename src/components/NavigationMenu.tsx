@@ -54,7 +54,7 @@ export const NavigationMenu = () => {
       <Button
         variant="outline"
         size="icon"
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full combat-border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10 shadow-neon-cyan"
+        className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full combat-border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10 shadow-neon-cyan"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -62,7 +62,7 @@ export const NavigationMenu = () => {
 
       {/* Navigation Menu */}
       {isOpen && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-45 flex items-center justify-center bg-black/80 backdrop-blur-sm">
           <Card className="w-full max-w-2xl bg-background/95 combat-border border-neon-cyan shadow-neon-cyan p-8">
             {/* Header */}
             <div className="text-center mb-6">

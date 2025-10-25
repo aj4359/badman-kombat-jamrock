@@ -367,7 +367,7 @@ const CharacterSelect = () => {
   const canProceed = selectedP1 && selectedP2;
 
   return (
-    <div className="min-h-screen bg-gradient-cyber flex flex-col items-center justify-start p-8 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-cyber flex flex-col items-center justify-start p-8 pb-32 overflow-y-auto">
       <div className="text-center mb-6">
         <h1 className="text-5xl font-retro font-bold text-neon-cyan mb-4 glitch" data-text="BADMAN KOMBAT">
           BADMAN KOMBAT
@@ -379,7 +379,7 @@ const CharacterSelect = () => {
       </div>
 
       {/* Fighter Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-7xl">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-7xl w-full">
         {fighters.map((fighter) => {
           const progressionData = progressionFighters.find(f => f.id === fighter.id);
           const isUnlocked = progressionData?.unlocked ?? false;
@@ -476,7 +476,11 @@ const CharacterSelect = () => {
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleFighterSelect(fighter.id, 1);
+                      e.preventDefault();
+                      console.log('🔘 P1 Button Clicked:', fighter.id, 'Unlocked:', isUnlocked);
+                      if (isUnlocked) {
+                        handleFighterSelect(fighter.id, 1);
+                      }
                     }}
                     disabled={selectedP2 === fighter.id || !isUnlocked}
                   >
@@ -492,7 +496,11 @@ const CharacterSelect = () => {
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleFighterSelect(fighter.id, 2);
+                      e.preventDefault();
+                      console.log('🔘 P2 Button Clicked:', fighter.id, 'Unlocked:', isUnlocked);
+                      if (isUnlocked) {
+                        handleFighterSelect(fighter.id, 2);
+                      }
                     }}
                     disabled={selectedP1 === fighter.id || !isUnlocked}
                   >
