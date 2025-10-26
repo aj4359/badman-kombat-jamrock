@@ -179,7 +179,7 @@ export const EpicIntroSequence: React.FC<EpicIntroSequenceProps> = ({
       )}
       
       {phase === 'title-reveal' && (
-        <CinematicTitleReveal onComplete={nextPhase} />
+        <CinematicTitleReveal onComplete={nextPhase} isSkipped={isComplete} />
       )}
       
       {phase === 'fighter-lineup' && (

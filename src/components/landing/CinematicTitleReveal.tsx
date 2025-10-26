@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 
 interface CinematicTitleRevealProps {
   onComplete: () => void;
+  isSkipped?: boolean;
 }
 
-export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onComplete }) => {
+export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onComplete, isSkipped }) => {
   const [letters, setLetters] = useState<string[]>([]);
   const [subtitle, setSubtitle] = useState('');
   const [shake, setShake] = useState(false);
@@ -15,6 +16,16 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
 
   useEffect(() => {
     console.log('[INTRO] 🔥 Title Reveal phase started');
+    
+    // If skipped, show full title immediately
+    if (isSkipped) {
+      console.log('[INTRO] ⚡ Skip detected - instant title reveal');
+      setLetters(fullTitle);
+      setSubtitle(fullSubtitle);
+      setZoom(1);
+      setTimeout(onComplete, 1000);
+      return;
+    }
     
     // Zoom in animation
     const zoomInterval = setInterval(() => {
@@ -53,7 +64,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
     }, 12000);
 
     return () => clearInterval(zoomInterval);
-  }, [onComplete]);
+  }, [onComplete, isSkipped]);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-background">
@@ -90,7 +101,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
       {/* Main title */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
         <div className={`transform ${shake ? 'animate-[wiggle_0.2s_ease-in-out]' : ''}`}>
-          <h1 className="font-retro text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-[0.2em] text-center leading-tight break-words">
+          <h1 className="font-retro text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-[0.2em] text-center leading-tight whitespace-nowrap overflow-x-auto">
             {letters.map((letter, index) => {
               const isSpace = letter === ' ';
               const colors = [
@@ -105,7 +116,7 @@ export const CinematicTitleReveal: React.FC<CinematicTitleRevealProps> = ({ onCo
               return (
                 <span
                   key={index}
-                  className={`inline-block ${isSpace ? 'w-12 sm:w-16 md:w-20 lg:w-24' : color} animate-scale-in`}
+                  className={`inline-block ${isSpace ? 'w-8' : color} animate-scale-in`}
                   style={{
                     textShadow: `
                       0 0 20px currentColor,
