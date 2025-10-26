@@ -144,111 +144,111 @@ export const WALK_POSES: Pose[] = [
   },
 ];
 
-// Light punch animation
+// Light punch animation - PHASE 2: EXAGGERATED for visibility
 export const LIGHT_PUNCH_POSES: Pose[] = [
   // Startup (frames 0-2)
-  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: -10 },
-  { ...DEFAULT_POSE, rightArmAngle: 40, rightArmExtension: -15 },
-  // Active (frames 3-5)
-  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 60, bodyTilt: 5 },
-  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 65, bodyTilt: 8 },
-  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 60, bodyTilt: 5 },
+  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: -20 },
+  { ...DEFAULT_POSE, rightArmAngle: 50, rightArmExtension: -30, bodyTilt: -15 },
+  // Active (frames 3-5) - 3X EXTENSION
+  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 180, bodyTilt: 25 },
+  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 195, bodyTilt: 30 },
+  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 180, bodyTilt: 25 },
   // Recovery (frames 6-10)
-  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 40, bodyTilt: 3 },
-  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 20 },
-  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 10 },
+  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 120, bodyTilt: 15 },
+  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 60 },
+  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 30 },
   { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: 0 },
   { ...DEFAULT_POSE },
 ];
 
-// Medium punch animation
+// Medium punch animation - PHASE 2: EXAGGERATED
 export const MEDIUM_PUNCH_POSES: Pose[] = [
   // Startup
-  { ...DEFAULT_POSE, rightArmAngle: 45, rightArmExtension: -20, bodyTilt: -5 },
-  { ...DEFAULT_POSE, rightArmAngle: 50, rightArmExtension: -25, bodyTilt: -8 },
-  { ...DEFAULT_POSE, rightArmAngle: 55, rightArmExtension: -30, bodyTilt: -10 },
-  // Active
-  { ...DEFAULT_POSE, rightArmAngle: -10, rightArmExtension: 80, bodyTilt: 15, bodySquash: 0.95 },
-  { ...DEFAULT_POSE, rightArmAngle: -5, rightArmExtension: 85, bodyTilt: 18, bodySquash: 0.93 },
-  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 80, bodyTilt: 15, bodySquash: 0.95 },
+  { ...DEFAULT_POSE, rightArmAngle: 45, rightArmExtension: -40, bodyTilt: -15 },
+  { ...DEFAULT_POSE, rightArmAngle: 60, rightArmExtension: -50, bodyTilt: -25 },
+  { ...DEFAULT_POSE, rightArmAngle: 70, rightArmExtension: -60, bodyTilt: -30 },
+  // Active - 3X EXTENSION
+  { ...DEFAULT_POSE, rightArmAngle: -10, rightArmExtension: 240, bodyTilt: 45, bodySquash: 0.90 },
+  { ...DEFAULT_POSE, rightArmAngle: -5, rightArmExtension: 255, bodyTilt: 50, bodySquash: 0.88 },
+  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 240, bodyTilt: 45, bodySquash: 0.90 },
   // Recovery
-  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 50, bodyTilt: 10 },
-  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 30, bodyTilt: 5 },
-  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 15 },
-  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: 5 },
+  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 150, bodyTilt: 30 },
+  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 90, bodyTilt: 15 },
+  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 45 },
+  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: 15 },
   { ...DEFAULT_POSE },
 ];
 
-// Heavy punch animation
+// Heavy punch animation - PHASE 2: EXTREME EXAGGERATION
 export const HEAVY_PUNCH_POSES: Pose[] = [
   // Startup (wind-up)
-  { ...DEFAULT_POSE, rightArmAngle: 60, rightArmExtension: -30, bodyTilt: -15 },
-  { ...DEFAULT_POSE, rightArmAngle: 70, rightArmExtension: -35, bodyTilt: -20 },
-  { ...DEFAULT_POSE, rightArmAngle: 80, rightArmExtension: -40, bodyTilt: -25 },
-  { ...DEFAULT_POSE, rightArmAngle: 85, rightArmExtension: -45, bodyTilt: -28 },
-  { ...DEFAULT_POSE, rightArmAngle: 90, rightArmExtension: -50, bodyTilt: -30 },
-  // Active (massive extension)
-  { ...DEFAULT_POSE, rightArmAngle: -20, rightArmExtension: 100, bodyTilt: 25, bodySquash: 0.9 },
-  { ...DEFAULT_POSE, rightArmAngle: -15, rightArmExtension: 110, bodyTilt: 30, bodySquash: 0.88 },
-  { ...DEFAULT_POSE, rightArmAngle: -10, rightArmExtension: 105, bodyTilt: 28, bodySquash: 0.9 },
-  { ...DEFAULT_POSE, rightArmAngle: -5, rightArmExtension: 100, bodyTilt: 25, bodySquash: 0.92 },
+  { ...DEFAULT_POSE, rightArmAngle: 60, rightArmExtension: -60, bodyTilt: -35 },
+  { ...DEFAULT_POSE, rightArmAngle: 75, rightArmExtension: -70, bodyTilt: -45 },
+  { ...DEFAULT_POSE, rightArmAngle: 85, rightArmExtension: -80, bodyTilt: -55 },
+  { ...DEFAULT_POSE, rightArmAngle: 90, rightArmExtension: -90, bodyTilt: -60 },
+  { ...DEFAULT_POSE, rightArmAngle: 95, rightArmExtension: -100, bodyTilt: -65 },
+  // Active (massive extension) - 3X EXTENSION
+  { ...DEFAULT_POSE, rightArmAngle: -20, rightArmExtension: 300, bodyTilt: 60, bodySquash: 0.85 },
+  { ...DEFAULT_POSE, rightArmAngle: -15, rightArmExtension: 330, bodyTilt: 70, bodySquash: 0.82 },
+  { ...DEFAULT_POSE, rightArmAngle: -10, rightArmExtension: 315, bodyTilt: 65, bodySquash: 0.85 },
+  { ...DEFAULT_POSE, rightArmAngle: -5, rightArmExtension: 300, bodyTilt: 60, bodySquash: 0.88 },
   // Recovery
-  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 70, bodyTilt: 15 },
-  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 50, bodyTilt: 10 },
-  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 30, bodyTilt: 5 },
-  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 15 },
-  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: 5 },
+  { ...DEFAULT_POSE, rightArmAngle: 0, rightArmExtension: 210, bodyTilt: 40 },
+  { ...DEFAULT_POSE, rightArmAngle: 10, rightArmExtension: 150, bodyTilt: 25 },
+  { ...DEFAULT_POSE, rightArmAngle: 20, rightArmExtension: 90, bodyTilt: 12 },
+  { ...DEFAULT_POSE, rightArmAngle: 25, rightArmExtension: 45 },
+  { ...DEFAULT_POSE, rightArmAngle: 30, rightArmExtension: 15 },
   { ...DEFAULT_POSE },
 ];
 
-// Light kick animation
+// Light kick animation - PHASE 2: EXAGGERATED
 export const LIGHT_KICK_POSES: Pose[] = [
   // Startup
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: 20 },
-  // Active
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: -40, bodyTilt: -10 },
-  { ...DEFAULT_POSE, rightLegOffsetY: 0, rightLegBend: -50, bodyTilt: -12 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: -40, bodyTilt: -10 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -25, rightLegBend: 40, bodyTilt: -20 },
+  // Active - 3X EXTENSION
+  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: -120, bodyTilt: -30 },
+  { ...DEFAULT_POSE, rightLegOffsetY: 0, rightLegBend: -150, bodyTilt: -36 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: -120, bodyTilt: -30 },
   // Recovery
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: 10 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: 5 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -25, rightLegBend: 30 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: 15 },
   { ...DEFAULT_POSE },
 ];
 
-// Medium kick animation
+// Medium kick animation - PHASE 2: EXAGGERATED
 export const MEDIUM_KICK_POSES: Pose[] = [
   // Startup
-  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: 30, bodyTilt: -5 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -20, rightLegBend: 35, bodyTilt: -8 },
-  // Active
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: -60, bodyTilt: -15, bodySquash: 0.95 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: -70, bodyTilt: -18, bodySquash: 0.93 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -8, rightLegBend: -65, bodyTilt: -16, bodySquash: 0.94 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: -60, bodyTilt: -15, bodySquash: 0.95 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -40, rightLegBend: 60, bodyTilt: -15 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -50, rightLegBend: 70, bodyTilt: -24 },
+  // Active - 3X EXTENSION
+  { ...DEFAULT_POSE, rightLegOffsetY: -30, rightLegBend: -180, bodyTilt: -45, bodySquash: 0.88 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: -210, bodyTilt: -54, bodySquash: 0.85 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -24, rightLegBend: -195, bodyTilt: -48, bodySquash: 0.87 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -30, rightLegBend: -180, bodyTilt: -45, bodySquash: 0.88 },
   // Recovery
-  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: 20, bodyTilt: -8 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: 10, bodyTilt: -5 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: 5 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -40, rightLegBend: 40, bodyTilt: -24 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -30, rightLegBend: 30, bodyTilt: -15 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: 15 },
   { ...DEFAULT_POSE },
 ];
 
-// Heavy kick animation
+// Heavy kick animation - PHASE 2: EXTREME EXAGGERATION
 export const HEAVY_KICK_POSES: Pose[] = [
   // Startup (big wind-up)
-  { ...DEFAULT_POSE, rightLegOffsetY: -20, rightLegBend: 40, bodyTilt: -10 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -30, rightLegBend: 50, bodyTilt: -15 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -40, rightLegBend: 60, bodyTilt: -20 },
-  // Active (full extension)
-  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: -80, bodyTilt: -25, bodySquash: 0.9 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: -90, bodyTilt: -30, bodySquash: 0.88 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -12, rightLegBend: -85, bodyTilt: -28, bodySquash: 0.89 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: -80, bodyTilt: -25, bodySquash: 0.9 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -50, rightLegBend: 80, bodyTilt: -30 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -70, rightLegBend: 100, bodyTilt: -45 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -90, rightLegBend: 120, bodyTilt: -60 },
+  // Active (full extension) - 3X EXTENSION
+  { ...DEFAULT_POSE, rightLegOffsetY: -45, rightLegBend: -240, bodyTilt: -75, bodySquash: 0.80 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -30, rightLegBend: -270, bodyTilt: -90, bodySquash: 0.78 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -36, rightLegBend: -255, bodyTilt: -84, bodySquash: 0.79 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -45, rightLegBend: -240, bodyTilt: -75, bodySquash: 0.80 },
   // Recovery
-  { ...DEFAULT_POSE, rightLegOffsetY: -25, rightLegBend: 30, bodyTilt: -15 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -20, rightLegBend: 20, bodyTilt: -10 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -15, rightLegBend: 15, bodyTilt: -5 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -65, rightLegBend: 60, bodyTilt: -45 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -50, rightLegBend: 40, bodyTilt: -30 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -35, rightLegBend: 30, bodyTilt: -15 },
+  { ...DEFAULT_POSE, rightLegOffsetY: -20, rightLegBend: 20 },
   { ...DEFAULT_POSE, rightLegOffsetY: -10, rightLegBend: 10 },
-  { ...DEFAULT_POSE, rightLegOffsetY: -5, rightLegBend: 5 },
   { ...DEFAULT_POSE },
 ];
 
@@ -337,8 +337,8 @@ export function getCurrentPose(
       return DEFAULT_POSE;
   }
   
-  // Calculate which pose to use based on animation timer
-  const framesPerPose = state === 'idle' ? 12 : state === 'walking' ? 8 : 1;
+  // Calculate which pose to use based on animation timer - PHASE 1: Slower animations
+  const framesPerPose = state === 'idle' ? 18 : state === 'walking' ? 12 : 4;
   const poseIndex = Math.floor(animationTimer / framesPerPose) % poses.length;
   
   return poses[poseIndex];

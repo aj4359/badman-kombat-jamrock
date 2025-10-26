@@ -20,6 +20,18 @@ export const renderLate70sKingstonStage = (
   ctx.fillStyle = skyGradient;
   ctx.fillRect(0, 0, width, height * 0.6);
   
+  // 1.5 BLUE MOUNTAINS BACKGROUND (Before buildings)
+  ctx.fillStyle = 'hsl(220, 40%, 30%)';
+  ctx.beginPath();
+  ctx.moveTo(0, 250);
+  ctx.lineTo(200, 180);
+  ctx.lineTo(400, 220);
+  ctx.lineTo(600, 160);
+  ctx.lineTo(800, 200);
+  ctx.lineTo(1024, 170);
+  ctx.lineTo(1024, 250);
+  ctx.fill();
+  
   // 2. BACKGROUND BUILDINGS (Far layer)
   ctx.save();
   ctx.fillStyle = '#1a1a2e';
@@ -47,7 +59,7 @@ export const renderLate70sKingstonStage = (
   }
   ctx.restore();
   
-  // 3. RASTAFARI MURALS
+  // 3. RASTAFARI MURALS & BOB MARLEY POSTER
   ctx.save();
   ctx.font = 'bold 24px Arial';
   ctx.fillStyle = '#FFD700';
@@ -57,9 +69,37 @@ export const renderLate70sKingstonStage = (
   
   ctx.fillStyle = '#FF0000';
   ctx.fillText('JAH LIVE', width - 240, height * 0.38);
+  
+  // Bob Marley Poster
+  ctx.fillStyle = 'hsl(120, 100%, 30%)';
+  ctx.fillRect(400, 180, 100, 140);
+  ctx.fillStyle = 'white';
+  ctx.font = '14px Arial';
+  ctx.fillText('ONE LOVE', 420, 300);
+  
+  // Patois Graffiti
+  ctx.fillStyle = 'hsl(60, 100%, 50%)';
+  ctx.font = 'bold 24px Arial';
+  ctx.fillText('JAH BLESS', 600, 200);
+  ctx.fillStyle = 'hsl(120, 100%, 40%)';
+  ctx.fillText('IRIE VIBES', 750, 230);
+  
   ctx.restore();
   
-  // 4. PALM TREES (Swaying animation)
+  // 3.5 SOUND SYSTEM SPEAKERS (Stacked Marshall amps)
+  ctx.save();
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = 'hsl(0, 0%, 10%)';
+    ctx.fillRect(50, 300 - i * 40, 80, 38);
+    // Speaker grills
+    ctx.fillStyle = 'hsl(0, 0%, 5%)';
+    for (let dot = 0; dot < 20; dot++) {
+      ctx.fillRect(60 + (dot % 5) * 12, 310 - i * 40 + Math.floor(dot / 5) * 6, 4, 4);
+    }
+  }
+  ctx.restore();
+  
+  // 4. PALM TREES (Swaying animation) & RASTA FLAGS
   const sway = Math.sin(time * 0.001) * 3;
   ctx.save();
   for (let i = 0; i < 3; i++) {
@@ -87,6 +127,16 @@ export const renderLate70sKingstonStage = (
       ctx.restore();
     }
   }
+  
+  // Rasta Flags Waving
+  const flagWave = Math.sin(time * 0.05) * 10;
+  ctx.fillStyle = 'red';
+  ctx.fillRect(150 + flagWave, 100, 40, 15);
+  ctx.fillStyle = 'gold';
+  ctx.fillRect(150 + flagWave, 115, 40, 15);
+  ctx.fillStyle = 'green';
+  ctx.fillRect(150 + flagWave, 130, 40, 15);
+  
   ctx.restore();
   
   // 5. 1970s CARS (Parked on street)
@@ -131,7 +181,7 @@ export const renderLate70sKingstonStage = (
   ctx.fillText('SOUND SYSTEM', width - 350, height * 0.45);
   ctx.restore();
   
-  // 7. CROWD SILHOUETTES (Animated)
+  // 7. CROWD SILHOUETTES (Animated) & CHICKENS
   ctx.save();
   const bobAmount = Math.sin(time * 0.003) * 2;
   ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -158,6 +208,16 @@ export const renderLate70sKingstonStage = (
       ctx.fill();
     }
   }
+  
+  // Animated Chickens
+  const chickenGroundY = height * 0.65;
+  const chickenX = (time * 0.5) % 1024;
+  ctx.fillStyle = 'white';
+  ctx.fillRect(chickenX, chickenGroundY - 20, 15, 18); // Body
+  ctx.fillRect(chickenX + 12, chickenGroundY - 25, 8, 5); // Head
+  ctx.fillStyle = 'red';
+  ctx.fillRect(chickenX + 12, chickenGroundY - 28, 5, 3); // Comb
+  
   ctx.restore();
   
   // 8. GROUND PLANE (Cracked asphalt)

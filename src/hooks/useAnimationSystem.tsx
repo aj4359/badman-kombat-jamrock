@@ -68,7 +68,7 @@ export const useAnimationSystem = () => {
     totalFrames: number = 8
   ): number => {
     const timer = animationTimers.current.get(fighter.id) || 0;
-    const frameRate = 6; // Change frame every 6 game ticks
+    const frameRate = 10; // PHASE 1: Slower animation (was 6, now 10 - 66% slower)
     return Math.floor(timer / frameRate) % totalFrames;
   }, []);
 
