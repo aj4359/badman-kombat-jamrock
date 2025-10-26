@@ -1,6 +1,9 @@
 import { Fighter } from '@/types/gameTypes';
 import { renderJordanSoundMaster } from './characters/JordanRenderer';
 import { renderSifuMaster } from './characters/SifuRenderer';
+import { renderLeroy } from './characters/LeroyRenderer';
+import { renderRazor } from './characters/RazorRenderer';
+import { renderJohnWick } from './characters/JohnWickRenderer';
 
 interface AdvancedFighterRendererProps {
   ctx: CanvasRenderingContext2D;
@@ -48,10 +51,13 @@ export const renderAdvancedFighter = ({
       break;
     case 'leroy':
     case 'rootsman':
+      renderLeroy(ctx, fighter);
+      break;
     case 'razor':
+      renderRazor(ctx, fighter);
+      break;
     case 'johnwick':
-      // Fallback to default for characters not yet implemented
-      renderDefaultFighter(ctx, fighter);
+      renderJohnWick(ctx, fighter);
       break;
     default:
       renderDefaultFighter(ctx, fighter);
