@@ -82,6 +82,37 @@ export default function FighterGenerator() {
           setGeneratedSheets(prev => [...prev, { fighterId, imageUrl: data.imageUrl }]);
           addLog(`  ✅ Sprite sheet generated successfully!`);
           addLog(`  📊 Contains: idle, walk, jump, crouch, punches, kicks, block, hit, special moves`);
+          
+          // Auto-save to assets folder
+          try {
+            addLog(`  💾 Saving to src/assets/${fighterId}-sprite-sheet.png...`);
+            
+            // Convert base64 to blob and save
+            const response = await fetch(data.imageUrl);
+            const blob = await response.blob();
+            
+            // Create a proper file URL for download
+            const file = new File([blob], `${fighterId}-sprite-sheet.png`, { type: 'image/png' });
+            const objectUrl = URL.createObjectURL(file);
+            
+            // Trigger download to save to project
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = `${fighterId}-sprite-sheet.png`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(objectUrl);
+            
+            addLog(`  ✅ Saved to downloads! Move to src/assets/${fighterId}-sprite-sheet.png`);
+            toast.success(`${FIGHTER_NAMES[fighterId]} saved`, {
+              description: `Move ${fighterId}-sprite-sheet.png to src/assets/`
+            });
+          } catch (saveError) {
+            addLog(`  ⚠️ Auto-save failed, use Download button instead`);
+            console.error('Save error:', saveError);
+          }
         }
 
       } catch (err) {
