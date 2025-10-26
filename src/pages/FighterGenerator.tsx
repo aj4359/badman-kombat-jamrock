@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { Download, Zap, Image as ImageIcon } from 'lucide-react';
 
 const FIGHTERS = ['leroy', 'jordan', 'sifu', 'razor', 'rootsman', 'johnwick'];
-const POSES = ['idle', 'walking', 'lightPunch', 'heavyPunch', 'kick', 'special', 'victory', 'hurt'];
 
 const FIGHTER_NAMES: Record<string, string> = {
   leroy: 'Leroy "Rootsman" Zion',
@@ -18,9 +17,8 @@ const FIGHTER_NAMES: Record<string, string> = {
   johnwick: 'John Wick "Baba Yaga"',
 };
 
-type GeneratedImage = {
+type GeneratedSpriteSheet = {
   fighterId: string;
-  pose: string;
   imageUrl: string;
 };
 
@@ -28,8 +26,7 @@ export default function FighterGenerator() {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentFighter, setCurrentFighter] = useState('');
-  const [currentPose, setCurrentPose] = useState('');
-  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
+  const [generatedSheets, setGeneratedSheets] = useState<GeneratedSpriteSheet[]>([]);
   const [logs, setLogs] = useState<string[]>([]);
 
   const addLog = (message: string) => {
@@ -48,76 +45,79 @@ export default function FighterGenerator() {
   const generateAllFighters = async () => {
     setGenerating(true);
     setProgress(0);
-    setGeneratedImages([]);
+    setGeneratedSheets([]);
     setLogs([]);
     
-    const totalImages = FIGHTERS.length * POSES.length;
+    const totalSheets = FIGHTERS.length;
     let completed = 0;
 
-    addLog(`🚀 Starting generation of ${totalImages} images...`);
+    addLog(`🚀 Starting generation of ${totalSheets} sprite sheets (24 frames each)...`);
+    addLog(`📐 Each sprite sheet: 1200x800px (4 rows × 6 columns of 200x200px frames)`);
 
     for (const fighterId of FIGHTERS) {
-      addLog(`\n🥊 Generating ${FIGHTER_NAMES[fighterId]}...`);
+      setCurrentFighter(FIGHTER_NAMES[fighterId]);
+      addLog(`\n🥊 Generating sprite sheet for ${FIGHTER_NAMES[fighterId]}...`);
       
-      for (const pose of POSES) {
-        setCurrentFighter(FIGHTER_NAMES[fighterId]);
-        setCurrentPose(pose);
+      try {
+        addLog(`  🎨 Creating 24-frame animation sprite sheet...`);
         
-        try {
-          addLog(`  🎨 Creating ${pose} pose...`);
-          
-          const { data, error } = await supabase.functions.invoke('generate-fighter-sprite', {
-            body: { fighterId, pose }
-          });
-
-          if (error) {
-            addLog(`  ❌ Error: ${error.message}`);
-            toast.error(`Failed to generate ${fighterId}-${pose}`, {
-              description: error.message
-            });
-            continue;
+        const { data, error } = await supabase.functions.invoke('generate-fighter-sprite', {
+          body: { 
+            fighterId, 
+            type: 'spritesheet' // New parameter to indicate sprite sheet generation
           }
+        });
 
-          if (data?.imageUrl) {
-            setGeneratedImages(prev => [...prev, { fighterId, pose, imageUrl: data.imageUrl }]);
-            addLog(`  ✅ Generated successfully`);
-          }
-
-        } catch (err) {
-          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-          addLog(`  ❌ Exception: ${errorMsg}`);
-          toast.error(`Error generating ${fighterId}-${pose}`, {
-            description: errorMsg
+        if (error) {
+          addLog(`  ❌ Error: ${error.message}`);
+          toast.error(`Failed to generate ${fighterId} sprite sheet`, {
+            description: error.message
           });
+          completed++;
+          setProgress((completed / totalSheets) * 100);
+          continue;
         }
 
-        completed++;
-        setProgress((completed / totalImages) * 100);
-        
-        // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (data?.imageUrl) {
+          setGeneratedSheets(prev => [...prev, { fighterId, imageUrl: data.imageUrl }]);
+          addLog(`  ✅ Sprite sheet generated successfully!`);
+          addLog(`  📊 Contains: idle, walk, jump, crouch, punches, kicks, block, hit, special moves`);
+        }
+
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        addLog(`  ❌ Exception: ${errorMsg}`);
+        toast.error(`Error generating ${fighterId} sprite sheet`, {
+          description: errorMsg
+        });
       }
+
+      completed++;
+      setProgress((completed / totalSheets) * 100);
+      
+      // Longer delay for sprite sheet generation
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
     setGenerating(false);
-    addLog(`\n✨ Generation complete! ${generatedImages.length}/${totalImages} images created.`);
-    toast.success('Fighter generation complete!', {
-      description: `Generated ${generatedImages.length} images`
+    addLog(`\n✨ Generation complete! ${generatedSheets.length}/${totalSheets} sprite sheets created.`);
+    toast.success('Sprite sheet generation complete!', {
+      description: `Generated ${generatedSheets.length} sprite sheets`
     });
   };
 
   const downloadAll = () => {
-    generatedImages.forEach(({ fighterId, pose, imageUrl }) => {
+    generatedSheets.forEach(({ fighterId, imageUrl }) => {
       const link = document.createElement('a');
       link.href = imageUrl;
-      link.download = `${fighterId}-${pose}.png`;
+      link.download = `${fighterId}-sprite-sheet.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     });
     
-    toast.success('Downloading all images', {
-      description: `${generatedImages.length} files`
+    toast.success('Downloading all sprite sheets', {
+      description: `${generatedSheets.length} files`
     });
   };
 
@@ -127,10 +127,10 @@ export default function FighterGenerator() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            AI Fighter Generator
+            AI Sprite Sheet Generator
           </h1>
           <p className="text-muted-foreground text-lg">
-            Generate photorealistic 3D renders for all 6 fighters using Lovable AI
+            Generate Street Fighter-style sprite sheets (24 frames, 4×6 grid) using Lovable AI
           </p>
         </div>
 
@@ -142,7 +142,7 @@ export default function FighterGenerator() {
               Generation Control
             </CardTitle>
             <CardDescription>
-              This will generate 48 images (6 fighters × 8 poses each)
+              This will generate 6 sprite sheets (1 per fighter, 24 frames each in 4×6 grid at 1200×800px)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -168,12 +168,12 @@ export default function FighterGenerator() {
               
               <Button
                 onClick={downloadAll}
-                disabled={generatedImages.length === 0}
+                disabled={generatedSheets.length === 0}
                 variant="outline"
                 size="lg"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Download All ({generatedImages.length})
+                Download All ({generatedSheets.length})
               </Button>
             </div>
 
@@ -181,33 +181,37 @@ export default function FighterGenerator() {
               <div className="space-y-2">
                 <Progress value={progress} className="h-2" />
                 <p className="text-sm text-muted-foreground text-center">
-                  {currentFighter} - {currentPose}
+                  Generating {currentFighter} sprite sheet...
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Generated Images Grid */}
-        {generatedImages.length > 0 && (
+        {/* Generated Sprite Sheets Grid */}
+        {generatedSheets.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Generated Images ({generatedImages.length}/48)</CardTitle>
-              <CardDescription>Preview of AI-generated fighter poses</CardDescription>
+              <CardTitle>Generated Sprite Sheets ({generatedSheets.length}/6)</CardTitle>
+              <CardDescription>24-frame animation sheets in 4×6 grid (1200×800px)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                {generatedImages.map(({ fighterId, pose, imageUrl }, index) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {generatedSheets.map(({ fighterId, imageUrl }, index) => (
                   <div key={index} className="space-y-2">
-                    <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-primary/20">
+                    <div className="bg-muted rounded-lg overflow-hidden border-2 border-primary/20">
                       <img
                         src={imageUrl}
-                        alt={`${fighterId}-${pose}`}
-                        className="w-full h-full object-cover"
+                        alt={`${fighterId}-sprite-sheet`}
+                        className="w-full h-auto"
+                        style={{ imageRendering: 'pixelated' }}
                       />
                     </div>
-                    <p className="text-xs text-center text-muted-foreground truncate">
-                      {fighterId}-{pose}
+                    <p className="text-sm text-center font-medium">
+                      {FIGHTER_NAMES[fighterId]}
+                    </p>
+                    <p className="text-xs text-center text-muted-foreground">
+                      {fighterId}-sprite-sheet.png
                     </p>
                   </div>
                 ))}

@@ -5,30 +5,38 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const FIGHTER_PROMPTS: Record<string, string> = {
-  leroy: `Professional 3D render of a Jamaican street fighter named Leroy, muscular athletic build, long black dreadlocks with cyber-tech accessories, green and yellow rasta-colored shirt with circuit patterns, dark skin, confident stance, glowing cyan tattoos on arms, futuristic tech headband, dramatic studio lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
-  
-  jordan: `Professional 3D render of a Jamaican DJ fighter named Jordan, athletic build, large purple headphones, thick gold chain necklace, blue urban streetwear, medium-length dreadlocks, dark brown skin, sound wave aura effect, portable turntable accessory, dramatic lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
-  
-  sifu: `Professional 3D render of a Chinese kung fu master named Sifu, lean muscular build, white traditional gi robe with black belt, short black hair with grey streaks, Asian features, glowing golden chi energy aura, calm wise expression, wire-fu stance, dramatic lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
-  
-  razor: `Professional 3D render of a cyber ninja assassin named Razor, athletic ninja build, black tactical suit with glowing red cybernetic eyes, katana with blue energy blade, mixed ethnicity features, green digital energy field, sleek modern armor, dramatic lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
-  
-  rootsman: `Professional 3D render of a mystic Jamaican warrior named Rootsman, powerful build, very long thick dreadlocks with green/yellow/red rasta beads, dark skin, glowing green nature energy aura, earth-tone robes, wooden staff weapon, spiritual presence, dramatic lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
-  
-  johnwick: `Professional 3D render of John Wick the legendary assassin, athletic muscular build, black tactical suit, white dress shirt, dark tie, short dark hair with beard, Caucasian features, dual pistols, intense focused expression, muzzle flash effects, dramatic cinematic lighting, white background, photorealistic, Unreal Engine 5 quality, 8K resolution`,
+const FIGHTER_BASE_STYLES: Record<string, string> = {
+  leroy: `Jamaican street fighter, muscular build, long dreadlocks with tech accessories, green/yellow rasta colors, cyan glowing tattoos, dark skin, futuristic headband`,
+  jordan: `Jamaican DJ fighter, athletic build, purple headphones, gold chain, blue streetwear, medium dreadlocks, brown skin, sound wave effects`,
+  sifu: `Chinese kung fu master, lean muscular, white gi with black belt, short grey-streaked hair, Asian features, golden chi aura, wise expression`,
+  razor: `Cyber ninja assassin, athletic ninja build, black tactical suit, red cybernetic eyes, blue energy katana, mixed ethnicity, green digital effects`,
+  rootsman: `Mystic Jamaican warrior, powerful build, very long dreadlocks with rasta beads, dark skin, green nature aura, earth-tone robes, wooden staff`,
+  johnwick: `John Wick legendary assassin, muscular build, black suit, white shirt, dark tie, short dark hair and beard, Caucasian, dual pistols`,
 };
 
-const POSE_DESCRIPTIONS: Record<string, string> = {
-  idle: "standing in neutral ready fighting stance, feet shoulder-width apart, hands up in guard position",
-  walking: "mid-stride walking forward, one leg raised, balanced movement",
-  lightPunch: "throwing a quick jab, right arm extended forward, left arm protecting face",
-  heavyPunch: "winding up a powerful haymaker punch, body twisted, full power stance",
-  kick: "executing a high roundhouse kick, leg fully extended at head height",
-  special: "performing their signature special move with dramatic energy effects",
-  victory: "triumphant victory pose, arms raised in celebration, confident expression",
-  hurt: "defensive hurt pose, arms up protecting body, staggered stance",
-};
+const SPRITE_SHEET_TEMPLATE = `Create a pixel art sprite sheet in Street Fighter II style with exactly 24 frames arranged in a 4×6 grid (4 rows, 6 columns).
+
+CHARACTER STYLE: {characterStyle}
+
+FRAME LAYOUT (exactly 200×200px each frame, total image 1200×800px):
+Row 1 (Idle & Walk): [1] idle stance [2] idle variation [3] idle return [4] idle cycle [5] walk frame 1 [6] walk frame 2
+Row 2 (Movement): [7] walk frame 3 [8] walk frame 4 [9] walk frame 5 [10] walk frame 6 [11] jump up [12] jump peak
+Row 3 (Actions): [13] jump down [14] jump land [15] crouch start [16] crouch hold [17] light punch wind [18] light punch hit
+Row 4 (Attacks): [19] heavy punch wind [20] heavy kick [21] special move start [22] special move mid [23] block/hurt [24] victory pose
+
+STRICT REQUIREMENTS:
+- Retro pixel art style like Street Fighter II, Capcom arcade fighting games
+- 16-bit era pixel graphics, NOT 3D renders
+- Each frame EXACTLY 200×200 pixels in a perfect grid
+- Character facing RIGHT in all frames
+- Transparent or solid color background
+- Consistent character size and proportion across all 24 frames
+- Clear, distinct poses for each animation state
+- Bold outlines, limited color palette (16-32 colors max)
+- No modern 3D graphics, photorealism, or high-poly renders
+
+REFERENCE: Classic 1990s arcade fighters - Street Fighter II, King of Fighters, Fatal Fury pixel sprite sheets.`;
+
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -36,10 +44,10 @@ serve(async (req) => {
   }
 
   try {
-    const { fighterId, pose } = await req.json();
+    const { fighterId, type } = await req.json();
     
-    if (!fighterId || !pose) {
-      throw new Error('Missing fighterId or pose');
+    if (!fighterId) {
+      throw new Error('Missing fighterId');
     }
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -47,17 +55,17 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const basePrompt = FIGHTER_PROMPTS[fighterId];
-    const poseDescription = POSE_DESCRIPTIONS[pose];
-
-    if (!basePrompt || !poseDescription) {
-      throw new Error(`Invalid fighterId (${fighterId}) or pose (${pose})`);
+    const characterStyle = FIGHTER_BASE_STYLES[fighterId];
+    if (!characterStyle) {
+      throw new Error(`Invalid fighterId: ${fighterId}`);
     }
 
-    const fullPrompt = `${basePrompt}, ${poseDescription}`;
+    // Generate sprite sheet prompt
+    const fullPrompt = SPRITE_SHEET_TEMPLATE.replace('{characterStyle}', characterStyle);
 
-    console.log(`🎨 Generating fighter: ${fighterId} - ${pose}`);
-    console.log(`📝 Prompt: ${fullPrompt}`);
+    console.log(`🎨 Generating sprite sheet for: ${fighterId}`);
+    console.log(`📐 Creating 24-frame grid (1200×800px)`);
+    console.log(`📝 Prompt length: ${fullPrompt.length} chars`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -106,13 +114,12 @@ serve(async (req) => {
       throw new Error('No image generated');
     }
 
-    console.log(`✅ Generated ${fighterId}-${pose}`);
+    console.log(`✅ Generated sprite sheet for ${fighterId}`);
 
     return new Response(
       JSON.stringify({ 
         imageUrl,
         fighterId,
-        pose,
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
