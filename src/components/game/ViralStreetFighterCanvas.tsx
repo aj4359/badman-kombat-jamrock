@@ -5,6 +5,7 @@ import { useVisualEffects } from '@/hooks/useVisualEffects';
 import { useFighterSprites } from '@/hooks/useFighterSprites';
 import { useColorGrading } from '@/hooks/useColorGrading';
 import { renderAuthenticFighter } from './ScaledAuthenticFighter';
+import { renderAdvancedFighter } from './rendering/AdvancedFighterRenderer';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { KingstonStageBackground } from './KingstonStageBackground';
@@ -240,11 +241,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         // Ghost trail for heavy attacks (only 1 ghost during recording)
         const ghostCount = isRecording ? 1 : 3;
         for (let i = 1; i <= ghostCount; i++) {
-          const p1SpriteGhost = getSpriteData(fighterData?.player1?.id || '');
-          renderAuthenticFighter({
+          renderAdvancedFighter({
             ctx,
             fighter: { ...p1, x: p1.x - (p1.facing === 'right' ? i*15 : -i*15) },
-            spriteImage: p1SpriteGhost,
             effects: { alpha: 0.3 - (i * 0.08) }
           });
         }
@@ -256,11 +255,9 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
         // Ghost trail for heavy attacks (only 1 ghost during recording)
         const ghostCount = isRecording ? 1 : 3;
         for (let i = 1; i <= ghostCount; i++) {
-          const p2SpriteGhost = getSpriteData(fighterData?.player2?.id || '');
-          renderAuthenticFighter({
+          renderAdvancedFighter({
             ctx,
             fighter: { ...p2, x: p2.x - (p2.facing === 'right' ? i*15 : -i*15) },
-            spriteImage: p2SpriteGhost,
             effects: { alpha: 0.3 - (i * 0.08) }
           });
         }
@@ -289,34 +286,31 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       const p1FrameCoords = getAnimationFrame(fighterData?.player1?.id || '', p1AnimName, p1FrameIndex);
       const p2FrameCoords = getAnimationFrame(fighterData?.player2?.id || '', p2AnimName, p2FrameIndex);
       
-      // RENDER FIGHTERS WITH PIXEL ART SPRITES
-      const p1SpriteImage = getSpriteData(fighterData?.player1?.id || '');
-      const p1HasValidSprite = p1SpriteImage && p1SpriteImage.complete && p1SpriteImage.naturalWidth > 0;
-      renderAuthenticFighter({
+      // RENDER FIGHTERS WITH ADVANCED REALISTIC VISUALS
+      const hitStopActive = false; // TODO: Connect to visual effects hook
+      const shakeOffset = { x: 0, y: 0 }; // Already handled by ctx.translate above
+      
+      renderAdvancedFighter({
         ctx,
         fighter: p1,
-        spriteImage: p1HasValidSprite ? p1SpriteImage : null,
-        frameCoords: p1HasValidSprite && p1FrameCoords ? p1FrameCoords : null,
         effects: {
           alpha: p1.state.current === 'stunned' ? 0.7 : 1,
+          shake: shakeOffset,
+          hueRotate: 0,
           glow: p1.state.current === 'special',
-          flash: p1.state.current === 'hurt',
-          special: p1.state.current === 'special'
+          flash: p1.state.current === 'hurt' || hitStopActive
         }
       });
       
-      const p2SpriteImage = getSpriteData(fighterData?.player2?.id || '');
-      const p2HasValidSprite = p2SpriteImage && p2SpriteImage.complete && p2SpriteImage.naturalWidth > 0;
-      renderAuthenticFighter({
+      renderAdvancedFighter({
         ctx,
         fighter: p2,
-        spriteImage: p2HasValidSprite ? p2SpriteImage : null,
-        frameCoords: p2HasValidSprite && p2FrameCoords ? p2FrameCoords : null,
         effects: {
           alpha: p2.state.current === 'stunned' ? 0.7 : 1,
+          shake: shakeOffset,
+          hueRotate: 0,
           glow: p2.state.current === 'special',
-          flash: p2.state.current === 'hurt',
-          special: p2.state.current === 'special'
+          flash: p2.state.current === 'hurt' || hitStopActive
         }
       });
       
