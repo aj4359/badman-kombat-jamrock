@@ -156,11 +156,11 @@ const BadManKombatUltimate3D = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {FIGHTERS.map(fighter => {
                 const spriteMap: Record<string, string> = {
-                  'leroy': '/src/assets/leroy-sprite.png',
-                  'jordan': '/src/assets/jordan-sprite.png',
-                  'sifu': '/src/assets/sifu-sprite.png',
-                  'razor': '/src/assets/razor-sprite.png',
-                  'rootsman': '/src/assets/rootsman-sprite.png',
+                  'leroy': '/src/assets/leroy-sprite-sheet.png',
+                  'jordan': '/src/assets/jordan-sprite-sheet.png',
+                  'sifu': '/src/assets/sifu-sprite-sheet.png',
+                  'razor': '/src/assets/razor-sprite-sheet.png',
+                  'rootsman': '/src/assets/rootsman-sprite-sheet.png',
                   'asha': '/src/assets/asha-warrior-sprite.png'
                 };
                 

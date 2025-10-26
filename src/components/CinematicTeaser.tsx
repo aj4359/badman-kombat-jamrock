@@ -4,13 +4,13 @@ import { Download, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useAudioManager } from '@/hooks/useAudioManager';
 
 // Import fighter images
-import leroySprite from '@/assets/leroy-sprite.png';
-import razorSprite from '@/assets/razor-sprite.png';
+import leroySprite from '@/assets/leroy-sprite-sheet.png';
+import razorSprite from '@/assets/razor-sprite-sheet.png';
 import voltageSprite from '@/assets/voltage-sprite.png';
 import blazeSprite from '@/assets/blaze-sprite.png';
-import jordanSprite from '@/assets/jordan-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
-import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite-sheet.png';
+import sifuSprite from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
 import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
 

@@ -9,12 +9,12 @@ import { StageCarousel } from '@/components/landing/StageCarousel';
 import { SocialProof } from '@/components/landing/SocialProof';
 import leroyPoster from '@/assets/leroy-poster.png';
 import fighterLineup from '@/assets/fighter-lineup.png';
-import leroySprite from '@/assets/leroy-sprite.png';
-import razorSprite from '@/assets/razor-sprite.png';
+import leroySprite from '@/assets/leroy-sprite-sheet.png';
+import razorSprite from '@/assets/razor-sprite-sheet.png';
 import voltageSprite from '@/assets/voltage-sprite.png';
-import jordanSprite from '@/assets/jordan-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
-import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import jordanSprite from '@/assets/jordan-sprite-sheet.png';
+import sifuSprite from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
 
 const MarvelRivalsLanding = () => {
   const navigate = useNavigate();
