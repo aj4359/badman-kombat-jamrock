@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,23 +32,26 @@ export default function DroneTrailerGenerator() {
   
   const { executeDroneSequence, droneState, availableShots } = useDroneCamera();
 
-  // Default fighter data for trailer
-  const fighterData = {
+  // Fighter selection state
+  const [selectedFighter1, setSelectedFighter1] = useState('johnwick');
+  const [selectedFighter2, setSelectedFighter2] = useState('leroy');
+  
+  const fighterData = useMemo(() => ({
     player1: {
-      id: 'johnwick',
-      name: 'John Wick',
+      id: selectedFighter1,
+      name: selectedFighter1.toUpperCase(),
       enhancedData: {
         stats: { power: 95, speed: 90, defense: 85 }
       }
     },
     player2: {
-      id: 'leroy',
-      name: 'Leroy "Cyber Storm"',
+      id: selectedFighter2,
+      name: selectedFighter2.toUpperCase(),
       enhancedData: {
         stats: { power: 85, speed: 90, defense: 75 }
       }
     }
-  };
+  }), [selectedFighter1, selectedFighter2]);
 
   const handleGenerateTrailer = () => {
     console.log('🎬 Starting drone trailer generation');
@@ -105,10 +108,10 @@ export default function DroneTrailerGenerator() {
             </Button>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Drone Camera Trailer Generator
+                Cinematic Drone Trailer Generator
               </h1>
               <p className="text-gray-400 mt-1">
-                Create cinematic trailers with automated drone camera movements
+                Professional camera movements with character selection
               </p>
             </div>
           </div>
@@ -184,6 +187,47 @@ export default function DroneTrailerGenerator() {
 
         {/* Control Panel - Right Side (1/3 width) */}
         <div className="space-y-4">
+          {/* Fighter Selection */}
+          <Card className="bg-black/40 border-yellow-500/30 p-6">
+            <h3 className="text-lg font-bold text-yellow-400 mb-4">Fighter Selection</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Player 1</label>
+                <Select value={selectedFighter1} onValueChange={setSelectedFighter1}>
+                  <SelectTrigger className="bg-black/60 border-yellow-500/30 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-yellow-500/30">
+                    <SelectItem value="johnwick" className="text-white hover:bg-yellow-500/10">John Wick</SelectItem>
+                    <SelectItem value="jordan" className="text-white hover:bg-yellow-500/10">Jordan</SelectItem>
+                    <SelectItem value="leroy" className="text-white hover:bg-yellow-500/10">Leroy</SelectItem>
+                    <SelectItem value="sifu" className="text-white hover:bg-yellow-500/10">Sifu</SelectItem>
+                    <SelectItem value="razor" className="text-white hover:bg-yellow-500/10">Razor</SelectItem>
+                    <SelectItem value="rootsman" className="text-white hover:bg-yellow-500/10">Rootsman</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Player 2</label>
+                <Select value={selectedFighter2} onValueChange={setSelectedFighter2}>
+                  <SelectTrigger className="bg-black/60 border-yellow-500/30 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-yellow-500/30">
+                    <SelectItem value="johnwick" className="text-white hover:bg-yellow-500/10">John Wick</SelectItem>
+                    <SelectItem value="jordan" className="text-white hover:bg-yellow-500/10">Jordan</SelectItem>
+                    <SelectItem value="leroy" className="text-white hover:bg-yellow-500/10">Leroy</SelectItem>
+                    <SelectItem value="sifu" className="text-white hover:bg-yellow-500/10">Sifu</SelectItem>
+                    <SelectItem value="razor" className="text-white hover:bg-yellow-500/10">Razor</SelectItem>
+                    <SelectItem value="rootsman" className="text-white hover:bg-yellow-500/10">Rootsman</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Card>
+
           {/* Sequence Selector */}
           <Card className="bg-black/40 border-yellow-500/30 p-6">
             <h3 className="text-lg font-bold text-yellow-400 mb-4">Trailer Sequence</h3>

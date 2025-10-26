@@ -157,9 +157,17 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false, tutorialCompleted = f
                   variant="destructive" 
                   size="lg" 
                   className="text-base px-6 py-4 bg-black border-red-600 hover:bg-red-950"
-                  onClick={() => navigate('/johnwick-trailer')}
+                  onClick={() => navigate('/johnwick-drone')}
                 >
-                  JOHN WICK
+                  🎬 JOHN WICK DRONE
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-base px-6 py-4 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+                  onClick={() => navigate('/drone-trailer')}
+                >
+                  🚁 DRONE CAMERA
                 </Button>
               </div>
               
@@ -225,9 +233,17 @@ const Hero: React.FC<HeroProps> = ({ isFirstVisit = false, tutorialCompleted = f
                   variant="destructive" 
                   size="lg" 
                   className="text-base px-6 py-4 bg-black border-red-600 hover:bg-red-950"
-                  onClick={() => navigate('/johnwick-trailer')}
+                  onClick={() => navigate('/johnwick-drone')}
                 >
-                  JOHN WICK
+                  🎬 JOHN WICK DRONE
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-base px-6 py-4 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+                  onClick={() => navigate('/drone-trailer')}
+                >
+                  🚁 DRONE CAMERA
                 </Button>
                 <Button 
                   variant="retro" 

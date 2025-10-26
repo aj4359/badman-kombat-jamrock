@@ -14,6 +14,7 @@ import TrailerGenerator from "./pages/TrailerGenerator";
 import GameOverviewRecorder from "./pages/GameOverviewRecorder";
 import JohnWickTrailer from "./pages/JohnWickTrailer";
 import DroneTrailerGenerator from "./pages/DroneTrailerGenerator";
+import JohnWickDroneTrailer from "./pages/JohnWickDroneTrailer";
 import Rankings from "./pages/Rankings";
 import LiveStream from "./pages/LiveStream";
 import NotFound from "./pages/NotFound";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
             <Route path="/teaser-creator" element={<TeaserCreator />} />
             <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
+            <Route path="/johnwick-drone" element={<JohnWickDroneTrailer />} />
             <Route path="/game-overview" element={<GameOverviewRecorder />} />
             <Route path="/live-stream" element={<LiveStream />} />
             <Route path="/fighter-generator" element={<FighterGenerator />} />
