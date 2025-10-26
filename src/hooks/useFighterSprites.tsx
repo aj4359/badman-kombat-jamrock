@@ -2,20 +2,20 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { extractFramesFromSpriteSheet, createAnimationSequences, AnimationController, FIGHTER_SPRITE_CONFIGS } from '@/utils/spriteSheetLoader';
 
 // ✅ PHASE 1 FIX: Use sprite sheet images
-import leroySprite from '@/assets/leroy-sprite-sheet.png';
-import jordanSprite from '@/assets/jordan-sprite-sheet.png';
-import razorSprite from '@/assets/razor-sprite-sheet.png';
-import sifuSprite from '@/assets/sifu-sprite-sheet.png';
-import rootsmanSprite from '@/assets/rootsman-sprite-sheet.png';
-import johnwickSprite from '@/assets/johnwick-sprite.png';
+import leroySpriteSheet from '@/assets/leroy-sprite-sheet.png';
+import jordanSpriteSheet from '@/assets/jordan-sprite-sheet.png';
+import razorSpriteSheet from '@/assets/razor-sprite-sheet.png';
+import sifuSpriteSheet from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSpriteSheet from '@/assets/rootsman-sprite-sheet.png';
+import johnwickSpriteSheet from '@/assets/johnwick-sprite-sheet.png';
 
 const SPRITE_PATHS: Record<string, string> = {
-  leroy: leroySprite,
-  jordan: jordanSprite,
-  razor: razorSprite,
-  sifu: sifuSprite,
-  rootsman: rootsmanSprite,
-  johnwick: johnwickSprite,
+  leroy: leroySpriteSheet,
+  jordan: jordanSpriteSheet,
+  razor: razorSpriteSheet,
+  sifu: sifuSpriteSheet,
+  rootsman: rootsmanSpriteSheet,
+  johnwick: johnwickSpriteSheet,
 };
 
 export const useFighterSprites = () => {
