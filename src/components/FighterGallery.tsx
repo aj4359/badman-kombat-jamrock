@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
+import sifuSpriteSheet from '@/assets/sifu-sprite-sheet.png';
 
 const fighters = [
   {
@@ -33,7 +33,7 @@ const fighters = [
     name: 'Sifu Y.K. Leung',
     title: 'The Dragon Master',
     description: 'Legendary kung fu master who brought ancient Chinese martial arts to the Caribbean.',
-    image: sifuSprite,
+    image: sifuSpriteSheet,
     origin: 'Hong Kong → Jamaica',
     style: 'Dragon Kung Fu',
     special: 'Celestial Strike',

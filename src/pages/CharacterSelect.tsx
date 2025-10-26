@@ -9,16 +9,16 @@ import { FighterGallery } from '@/components/FighterGallery';
 import { useToast } from '@/hooks/use-toast';
 
 // Import fighter images
-import leroySprite from '@/assets/leroy-sprite.png';
-import razorSprite from '@/assets/razor-sprite.png';
+import leroySpriteSheet from '@/assets/leroy-sprite-sheet.png';
+import razorSpriteSheet from '@/assets/razor-sprite-sheet.png';
 import voltageSprite from '@/assets/voltage-sprite.png';
 import blazeSprite from '@/assets/blaze-sprite.png';
-import jordanSprite from '@/assets/jordan-sprite.png';
-import sifuSprite from '@/assets/sifu-sprite.png';
-import rootsmanSprite from '@/assets/rootsman-sprite.png';
+import jordanSpriteSheet from '@/assets/jordan-sprite-sheet.png';
+import sifuSpriteSheet from '@/assets/sifu-sprite-sheet.png';
+import rootsmanSpriteSheet from '@/assets/rootsman-sprite-sheet.png';
 import elderZionSprite from '@/assets/elder-zion-sprite.png';
 import marcusSprite from '@/assets/marcus-sprite.png';
-import johnwickSprite from '@/assets/johnwick-sprite.png';
+import johnwickSpriteSheet from '@/assets/johnwick-sprite-sheet.png';
 import { ENHANCED_FIGHTER_DATA } from '@/data/enhancedFighterData';
 
 // Removed - moved inside component for better error handling
@@ -34,7 +34,7 @@ const fighters = [
     height: "6'1\"",
     weight: '180 lbs',
     color: 'hsl(180, 100%, 50%)',
-    image: leroySprite,
+    image: leroySpriteSheet,
     stats: {
       power: 85,
       speed: 90,
@@ -57,7 +57,7 @@ const fighters = [
     height: "5'8\"",
     weight: '145 lbs',
     color: 'hsl(320, 100%, 60%)',
-    image: razorSprite,
+    image: razorSpriteSheet,
     stats: {
       power: 95,
       speed: 80,
@@ -126,7 +126,7 @@ const fighters = [
     height: "5'10\"",
     weight: '165 lbs',
     color: 'hsl(270, 100%, 60%)',
-    image: jordanSprite,
+    image: jordanSpriteSheet,
     stats: {
       power: 75,
       speed: 95,
@@ -149,7 +149,7 @@ const fighters = [
     height: "5'7\"",
     weight: '160 lbs',
     color: 'hsl(45, 90%, 60%)',
-    image: sifuSprite,
+    image: sifuSpriteSheet,
     stats: {
       power: 90,
       speed: 85,
@@ -172,7 +172,7 @@ const fighters = [
     height: "6'0\"",
     weight: '175 lbs',
     color: 'hsl(150, 80%, 50%)',
-    image: rootsmanSprite,
+    image: rootsmanSpriteSheet,
     stats: {
       power: 85,
       speed: 90,
@@ -241,7 +241,7 @@ const fighters = [
     height: "6'1\"",
     weight: '185 lbs',
     color: 'hsl(0, 0%, 20%)',
-    image: johnwickSprite,
+    image: johnwickSpriteSheet,
     stats: {
       power: 95,
       speed: 90,
