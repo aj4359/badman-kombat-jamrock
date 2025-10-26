@@ -26,7 +26,7 @@ export const useFighterSprites = () => {
 
   useEffect(() => {
     const loadSprites = async () => {
-      console.log('🎨 [PHASE 2 FIX] Loading single sprite images (not sheets)...');
+      console.log('🎨 [SPRITE SYSTEM] Loading sprite sheet images...');
       
       const loadPromises = Object.entries(SPRITE_PATHS).map(
         ([fighterId, path]) =>
@@ -47,7 +47,7 @@ export const useFighterSprites = () => {
               }
               
               spriteImages.current[fighterId] = img;
-              console.log(`✅ [PHASE 2] ${fighterId}: Single sprite loaded (${img.naturalWidth}x${img.naturalHeight})`);
+              console.log(`✅ [SPRITE SYSTEM] ${fighterId}: Sprite sheet loaded (${img.naturalWidth}x${img.naturalHeight})`);
               resolve();
             };
             
@@ -67,7 +67,7 @@ export const useFighterSprites = () => {
 
       try {
         await Promise.all(loadPromises);
-        console.log('✅ [PHASE 2] Single sprite loading complete');
+        console.log('✅ [SPRITE SYSTEM] Sprite sheet loading complete');
       } catch (error) {
         console.warn('⚠️ [PHASE 2] Sprite loading errors, using geometric fallbacks:', error);
       } finally {
@@ -91,18 +91,42 @@ export const useFighterSprites = () => {
     animationName: string,
     frameIndex: number
   ): { x: number; y: number; width: number; height: number } | null => {
-    // ✅ PHASE 2: Single sprites don't have frame coordinates, return full image
     const spriteImage = spriteImages.current[fighterId];
     if (!spriteImage || !spriteImage.complete || spriteImage.naturalWidth === 0) {
       return null; // Will use geometric fallback
     }
     
-    // Return full image dimensions (single sprite, not a sheet)
+    // Get sprite sheet configuration
+    const config = FIGHTER_SPRITE_CONFIGS[fighterId];
+    if (!config) {
+      console.warn(`⚠️ No sprite config for ${fighterId}`);
+      return null;
+    }
+    
+    // Get animation definition
+    const animDefs = require('@/utils/spriteSheetLoader').ANIMATION_DEFINITIONS[fighterId] || 
+                     require('@/utils/spriteSheetLoader').ANIMATION_DEFINITIONS.default;
+    const animDef = animDefs[animationName];
+    
+    if (!animDef || !animDef.frames || animDef.frames.length === 0) {
+      console.warn(`⚠️ No animation '${animationName}' for ${fighterId}`);
+      return null;
+    }
+    
+    // Get the frame index from the animation sequence
+    const safeFrameIndex = frameIndex % animDef.frames.length;
+    const spriteSheetIndex = animDef.frames[safeFrameIndex];
+    
+    // Calculate row and column in the sprite sheet grid
+    const col = spriteSheetIndex % config.cols;
+    const row = Math.floor(spriteSheetIndex / config.cols);
+    
+    // Calculate source coordinates in the sprite sheet
     return {
-      x: 0,
-      y: 0,
-      width: spriteImage.naturalWidth,
-      height: spriteImage.naturalHeight
+      x: col * config.frameWidth,
+      y: row * config.frameHeight,
+      width: config.frameWidth,
+      height: config.frameHeight
     };
   }, []);
 
