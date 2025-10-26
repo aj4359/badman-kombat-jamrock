@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import {
   JOHN_WICK_ACTION_SEQUENCE,
   JohnWickTrailerSequence 
 } from '@/utils/johnWickDroneSequences';
+import { CHARACTER_SHOWCASE_SEQUENCES } from '@/utils/droneTrailerSequences';
 import {
   Select,
   SelectContent,
@@ -27,6 +28,8 @@ export default function JohnWickDroneTrailer() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedSequence, setSelectedSequence] = useState<JohnWickTrailerSequence>(JOHN_WICK_ACTION_SEQUENCE);
   const [currentShotIndex, setCurrentShotIndex] = useState(0);
+  const [fps, setFps] = useState(60);
+  const frameTimesRef = useRef<number[]>([]);
   
   // John Wick specific state
   const [killCount, setKillCount] = useState(0);
@@ -36,6 +39,32 @@ export default function JohnWickDroneTrailer() {
   const [currentOpponent, setCurrentOpponent] = useState(0);
   
   const opponents = ['leroy', 'jordan', 'razor', 'sifu'];
+
+  // FPS Monitoring
+  useEffect(() => {
+    let lastTime = performance.now();
+    let frameId: number;
+
+    const measureFPS = () => {
+      const currentTime = performance.now();
+      const deltaTime = currentTime - lastTime;
+      
+      frameTimesRef.current.push(deltaTime);
+      if (frameTimesRef.current.length > 60) {
+        frameTimesRef.current.shift();
+      }
+      
+      const avgFrameTime = frameTimesRef.current.reduce((a, b) => a + b, 0) / frameTimesRef.current.length;
+      const currentFPS = Math.round(1000 / avgFrameTime);
+      
+      setFps(currentFPS);
+      lastTime = currentTime;
+      frameId = requestAnimationFrame(measureFPS);
+    };
+
+    frameId = requestAnimationFrame(measureFPS);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
   
   const { executeDroneSequence, droneState } = useDroneCamera();
 
@@ -194,6 +223,13 @@ export default function JohnWickDroneTrailer() {
                 <p className="text-white/60">Zoom: {droneState.zoom.toFixed(1)}x</p>
                 <p className="text-white/60">Elev: {Math.round(droneState.elevation)}px</p>
               </div>
+
+              {/* Performance Monitor */}
+              <div className="absolute bottom-4 right-4 bg-black/80 border border-border rounded px-3 py-2 text-xs font-mono">
+                <p className={fps >= 55 ? 'text-green-400' : fps >= 30 ? 'text-yellow-400' : 'text-red-400'}>
+                  FPS: {fps}
+                </p>
+              </div>
             </div>
 
             {/* Recording Controls */}
@@ -225,6 +261,77 @@ export default function JohnWickDroneTrailer() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Character-Specific Preset Buttons */}
+            <div className="grid grid-cols-4 gap-3 mt-6">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 h-auto py-4 border-red-600/50 hover:bg-red-600/20"
+                onClick={() => {
+                  const sequence = CHARACTER_SHOWCASE_SEQUENCES.johnwick;
+                  setSelectedSequence({
+                    name: sequence.name,
+                    description: sequence.description,
+                    totalDuration: sequence.totalDuration,
+                    shots: sequence.shots
+                  } as JohnWickTrailerSequence);
+                }}
+              >
+                <span className="text-2xl">🔫</span>
+                <span className="text-xs">JOHN WICK</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 h-auto py-4 border-purple-600/50 hover:bg-purple-600/20"
+                onClick={() => {
+                  const sequence = CHARACTER_SHOWCASE_SEQUENCES.jordan;
+                  setSelectedSequence({
+                    name: sequence.name,
+                    description: sequence.description,
+                    totalDuration: sequence.totalDuration,
+                    shots: sequence.shots
+                  } as JohnWickTrailerSequence);
+                }}
+              >
+                <span className="text-2xl">🎧</span>
+                <span className="text-xs">JORDAN</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 h-auto py-4 border-cyan-600/50 hover:bg-cyan-600/20"
+                onClick={() => {
+                  const sequence = CHARACTER_SHOWCASE_SEQUENCES.leroy;
+                  setSelectedSequence({
+                    name: sequence.name,
+                    description: sequence.description,
+                    totalDuration: sequence.totalDuration,
+                    shots: sequence.shots
+                  } as JohnWickTrailerSequence);
+                }}
+              >
+                <span className="text-2xl">⚡</span>
+                <span className="text-xs">LEROY</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 h-auto py-4 border-yellow-600/50 hover:bg-yellow-600/20"
+                onClick={() => {
+                  const sequence = CHARACTER_SHOWCASE_SEQUENCES.sifu;
+                  setSelectedSequence({
+                    name: sequence.name,
+                    description: sequence.description,
+                    totalDuration: sequence.totalDuration,
+                    shots: sequence.shots
+                  } as JohnWickTrailerSequence);
+                }}
+              >
+                <span className="text-2xl">🥋</span>
+                <span className="text-xs">SIFU</span>
+              </Button>
+            </div>
 
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between text-gray-400">

@@ -377,3 +377,259 @@ export const ALL_SEQUENCES = [
   ACTION_SEQUENCE,
   CINEMATIC_SHOWCASE
 ];
+
+// Character-Specific Showcase Sequences
+export const CHARACTER_SHOWCASE_SEQUENCES: Record<string, TrailerSequence> = {
+  jordan: {
+    name: 'Jordan Sound Master Showcase',
+    description: 'DJ Jordan with sound wave cinematics and beat-synced camera movements',
+    totalDuration: 25000,
+    shots: [
+      {
+        name: 'Soundwave Intro',
+        duration: 4000,
+        zoom: 1.5,
+        rotation: 45,
+        elevation: 60
+      },
+      {
+        name: 'Headphone Pulse Closeup',
+        duration: 3000,
+        zoom: 2.0,
+        rotation: -10,
+        elevation: 30
+      },
+      {
+        name: 'Beat Drop Orbit',
+        duration: 8000,
+        zoom: 1.3,
+        rotation: 0,
+        elevation: 100,
+        orbit: true,
+        orbitSpeed: 1.5
+      },
+      {
+        name: 'Vinyl Scratch Attack',
+        duration: 3000,
+        zoom: 1.6,
+        rotation: 20,
+        elevation: 50
+      },
+      {
+        name: 'Speaker Stack Wide',
+        duration: 4000,
+        zoom: 0.9,
+        rotation: 0,
+        elevation: 200
+      },
+      {
+        name: 'Victory Pose',
+        duration: 3000,
+        zoom: 1.4,
+        rotation: -5,
+        elevation: 70
+      }
+    ]
+  },
+  
+  leroy: {
+    name: 'Leroy Digital Dread Showcase',
+    description: 'Cyber Rasta with holographic effects and tech glitch camera movements',
+    totalDuration: 28000,
+    shots: [
+      {
+        name: 'Cyber Tattoo Reveal',
+        duration: 4000,
+        zoom: 1.8,
+        rotation: 0,
+        elevation: 40
+      },
+      {
+        name: 'Dreadlock Extension',
+        duration: 3000,
+        zoom: 1.5,
+        rotation: 15,
+        elevation: 60
+      },
+      {
+        name: 'Holographic Circle Orbit',
+        duration: 8000,
+        zoom: 1.4,
+        rotation: 0,
+        elevation: 80,
+        orbit: true,
+        orbitSpeed: 2.0
+      },
+      {
+        name: 'Circuit Pattern Attack',
+        duration: 3000,
+        zoom: 1.7,
+        rotation: -20,
+        elevation: 50
+      },
+      {
+        name: 'Digital Glitch Wide',
+        duration: 4000,
+        zoom: 0.8,
+        rotation: 10,
+        elevation: 250
+      },
+      {
+        name: 'Tech Warrior Stance',
+        duration: 3000,
+        zoom: 1.3,
+        rotation: 0,
+        elevation: 90
+      },
+      {
+        name: 'Matrix Code Finale',
+        duration: 3000,
+        zoom: 2.2,
+        rotation: -8,
+        elevation: 30
+      }
+    ]
+  },
+  
+  sifu: {
+    name: 'Sifu Kung Fu Master Showcase',
+    description: 'Martial arts master with chi energy effects and crane shot cinematics',
+    totalDuration: 30000,
+    shots: [
+      {
+        name: 'Meditation Crane Shot',
+        duration: 5000,
+        zoom: 1.0,
+        rotation: 0,
+        elevation: 400,
+        path: 'crane'
+      },
+      {
+        name: 'Chi Energy Glow',
+        duration: 3000,
+        zoom: 1.6,
+        rotation: -5,
+        elevation: 60
+      },
+      {
+        name: 'Steel Wire Whip',
+        duration: 3000,
+        zoom: 1.8,
+        rotation: 25,
+        elevation: 40
+      },
+      {
+        name: 'Dragon Silhouette Orbit',
+        duration: 8000,
+        zoom: 1.2,
+        rotation: 0,
+        elevation: 120,
+        orbit: true,
+        orbitSpeed: 1.0
+      },
+      {
+        name: 'Spinning Kick',
+        duration: 2000,
+        zoom: 1.5,
+        rotation: -30,
+        elevation: 80
+      },
+      {
+        name: 'Martial Arts Stance Wide',
+        duration: 4000,
+        zoom: 0.9,
+        rotation: 0,
+        elevation: 200
+      },
+      {
+        name: 'Inner Peace Closeup',
+        duration: 3000,
+        zoom: 2.0,
+        rotation: 3,
+        elevation: 50
+      },
+      {
+        name: 'Temple Crane Out',
+        duration: 2000,
+        zoom: 0.7,
+        rotation: 0,
+        elevation: 500,
+        path: 'crane'
+      }
+    ]
+  },
+  
+  johnwick: {
+    name: 'John Wick Continental Showcase',
+    description: 'Baba Yaga with gun-fu, bullet time, and Continental cinematics',
+    totalDuration: 32000,
+    shots: [
+      {
+        name: 'Continental Establishing',
+        duration: 4000,
+        zoom: 0.8,
+        rotation: 0,
+        elevation: 300
+      },
+      {
+        name: 'Suit Adjustment',
+        duration: 2000,
+        zoom: 1.5,
+        rotation: -8,
+        elevation: 60
+      },
+      {
+        name: 'Gun Draw Closeup',
+        duration: 2000,
+        zoom: 2.0,
+        rotation: 15,
+        elevation: 40
+      },
+      {
+        name: 'Combat Orbit',
+        duration: 8000,
+        zoom: 1.3,
+        rotation: 0,
+        elevation: 80,
+        orbit: true,
+        orbitSpeed: 2.0
+      },
+      {
+        name: 'Headshot Moment',
+        duration: 2000,
+        zoom: 2.5,
+        rotation: 20,
+        elevation: 30
+      },
+      {
+        name: 'Bullet Time Matrix',
+        duration: 4000,
+        zoom: 1.8,
+        rotation: -25,
+        elevation: 50
+      },
+      {
+        name: 'Reload Sequence',
+        duration: 2000,
+        zoom: 1.6,
+        rotation: 10,
+        elevation: 70
+      },
+      {
+        name: 'Final Elimination',
+        duration: 3000,
+        zoom: 1.4,
+        rotation: 0,
+        elevation: 100
+      },
+      {
+        name: 'Walking Away Crane',
+        duration: 5000,
+        zoom: 0.9,
+        rotation: 0,
+        elevation: 250,
+        path: 'crane'
+      }
+    ]
+  }
+};
