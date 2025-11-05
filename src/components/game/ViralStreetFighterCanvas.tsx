@@ -6,6 +6,9 @@ import { useFighterSprites } from '@/hooks/useFighterSprites';
 import { useColorGrading } from '@/hooks/useColorGrading';
 import { renderAuthenticFighter } from './ScaledAuthenticFighter';
 import { renderAdvancedFighter } from './rendering/AdvancedFighterRenderer';
+import { createParticleEngine } from './rendering/effects/ParticleEngine';
+import { createImpactEffectManager } from './rendering/effects/ImpactEffects';
+import { createDamageVisualizer } from './rendering/effects/DamageVisuals';
 import { MobileControls } from '@/components/ui/MobileControls';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { KingstonStageBackground } from './KingstonStageBackground';
@@ -94,6 +97,11 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     }
   }, []); // Empty dependency array - initialize only once on mount
   
+  // Phase 2 Systems - AAA Visual Effects
+  const particleEngineRef = useRef(createParticleEngine());
+  const impactManagerRef = useRef(createImpactEffectManager());
+  const damageVisualizerRef = useRef(createDamageVisualizer());
+  
   const audioManager = useAudioManager();
   const visualEffectsHook = useVisualEffects();
   const { 
@@ -178,16 +186,35 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       }
     };
     
-    // Update visual effects
+    // Update visual effects + Phase 2 systems
     updateEffects(deltaTime);
+    particleEngineRef.current.update(deltaTime / 1000);
+    impactManagerRef.current.update(deltaTime / 1000);
     
-    // Apply screen shake
-    const shake = getShakeOffset();
+    // Update damage states for both fighters
+    const p1 = currentGameState.fighters.player1;
+    const p2 = currentGameState.fighters.player2;
+    if (p1) {
+      damageVisualizerRef.current.updateDamageState(p1.id, (p1.health / p1.maxHealth) * 100, deltaTime / 1000);
+    }
+    if (p2) {
+      damageVisualizerRef.current.updateDamageState(p2.id, (p2.health / p2.maxHealth) * 100, deltaTime / 1000);
+    }
+    
+    // Get camera transform from impact manager (includes shake + zoom)
+    const { scale, offsetX, offsetY } = impactManagerRef.current.getTransform();
+    const shake = { x: offsetX, y: offsetY };
+    
     ctx.save();
-    ctx.translate(shake.x, shake.y);
+    ctx.translate(shake.x + canvas.width / 2, shake.y + canvas.height / 2);
+    ctx.scale(scale, scale);
+    ctx.translate(-canvas.width / 2, -canvas.height / 2);
     
     // 1. RENDER AUTHENTIC 1970s KINGSTON STAGE BACKGROUND
     renderLate70sKingstonStage(ctx, frameCountRef.current, shake);
+    
+    // 2. RENDER BACKGROUND PARTICLES (dust, aura)
+    particleEngineRef.current.render(ctx, 'background');
     
     // DYNAMIC LIGHTING LAYER
     renderDynamicLighting();
@@ -198,9 +225,6 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     });
     
     // 3. DRAW FIGHTERS WITH PIXEL ART SPRITES + STREET FIGHTER EFFECTS
-    const p1 = currentGameState.fighters.player1;
-    const p2 = currentGameState.fighters.player2;
-    
     if (p1 && p2) {
       if (frameCountRef.current % 60 === 0) {
         console.log('🖼️ RENDER:', {
@@ -286,10 +310,20 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       const p1FrameCoords = getAnimationFrame(fighterData?.player1?.id || '', p1AnimName, p1FrameIndex);
       const p2FrameCoords = getAnimationFrame(fighterData?.player2?.id || '', p2AnimName, p2FrameIndex);
       
-      // RENDER FIGHTERS WITH ADVANCED REALISTIC VISUALS
-      const hitStopActive = false; // TODO: Connect to visual effects hook
+      // RENDER FIGHTERS WITH ADVANCED REALISTIC VISUALS + DAMAGE DEFORMATION
+      const hitStopActive = impactManagerRef.current.isFreezeActive();
       const shakeOffset = { x: 0, y: 0 }; // Already handled by ctx.translate above
       
+      const p1Deform = damageVisualizerRef.current.getDeformation(p1.id);
+      const p2Deform = damageVisualizerRef.current.getDeformation(p2.id);
+      
+      ctx.save();
+      if (p1Deform.scaleX !== 1 || p1Deform.rotation !== 0) {
+        ctx.translate(p1.x + p1.width / 2, p1.y + p1.height / 2);
+        ctx.rotate(p1Deform.rotation);
+        ctx.scale(p1Deform.scaleX, p1Deform.scaleY);
+        ctx.translate(-(p1.x + p1.width / 2), -(p1.y + p1.height / 2));
+      }
       renderAdvancedFighter({
         ctx,
         fighter: p1,
@@ -301,7 +335,16 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           flash: p1.state.current === 'hurt' || hitStopActive
         }
       });
+      damageVisualizerRef.current.renderDamageEffects(ctx, p1);
+      ctx.restore();
       
+      ctx.save();
+      if (p2Deform.scaleX !== 1 || p2Deform.rotation !== 0) {
+        ctx.translate(p2.x + p2.width / 2, p2.y + p2.height / 2);
+        ctx.rotate(p2Deform.rotation);
+        ctx.scale(p2Deform.scaleX, p2Deform.scaleY);
+        ctx.translate(-(p2.x + p2.width / 2), -(p2.y + p2.height / 2));
+      }
       renderAdvancedFighter({
         ctx,
         fighter: p2,
@@ -313,6 +356,8 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
           flash: p2.state.current === 'hurt' || hitStopActive
         }
       });
+      damageVisualizerRef.current.renderDamageEffects(ctx, p2);
+      ctx.restore();
       
       // Add combo counter display above fighters
       if (p1.comboCount && p1.comboCount > 1) {
@@ -323,7 +368,13 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
       }
     }
     
+    // RENDER FOREGROUND PARTICLES (hit impacts, combos)
+    particleEngineRef.current.render(ctx, 'foreground');
+    
     ctx.restore();
+    
+    // Apply screen-space impact effects (flash, blur, chromatic aberration)
+    impactManagerRef.current.applyEffects(ctx, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
     
     // 4. DRAW UI ELEMENTS (no screen shake)
     if (currentGameState.fighters.player1 && currentGameState.fighters.player2) {
@@ -396,26 +447,66 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     };
   }, [render]);
 
-  // Combat event handlers with voice line integration
+  // Combat event handlers with Phase 2 effects integration
   useEffect(() => {
     const handleCombatEvent = (event: any) => {
+      const particleEngine = particleEngineRef.current;
+      const impactManager = impactManagerRef.current;
+      const damageVisualizer = damageVisualizerRef.current;
+      const { createHitImpactBurst, createDustCloud, createSpray } = require('./rendering/effects/ParticleEngine');
+      
+      const fighter = event.player === 1 ? gameState.fighters.player1 : gameState.fighters.player2;
+      
       switch (event.type) {
         case 'hit':
           addScreenShake(5, 200);
           addHitSpark(event.x || 400, event.y || 300, 'impact');
+          
+          // Phase 2: Particle burst + impact effects + damage
+          if (fighter) {
+            const hitX = fighter.x + fighter.width / 2;
+            const hitY = fighter.y + fighter.height / 2;
+            createHitImpactBurst(particleEngine, hitX, hitY, 'orange');
+            createSpray(particleEngine, hitX, hitY, 10);
+            
+            const attackType = event.attackType || 'medium';
+            impactManager.triggerHitImpact(attackType, hitX, hitY, event.direction || fighter.facing);
+            
+            const intensity = attackType === 'light' ? 'light' : attackType === 'heavy' ? 'heavy' : 'medium';
+            damageVisualizer.applyHitDeformation(fighter.id, event.direction || fighter.facing, intensity);
+          }
           break;
+          
         case 'special':
           addScreenShake(8, 300);
-          // Trigger voice line for special move
           if (event.player && event.voiceLine) {
             setActiveVoiceLine({ player: event.player, text: event.voiceLine });
           }
+          
+          // Phase 2: Special effects
+          if (fighter) {
+            impactManager.addZoomPunch(1.2, 0.3);
+            impactManager.addChromaticAberration(0.015, 0.4);
+          }
           break;
+          
         case 'super':
           addScreenShake(12, 500);
-          // Trigger voice line for super move
           if (event.player && event.voiceLine) {
             setActiveVoiceLine({ player: event.player, text: event.voiceLine });
+          }
+          
+          // Phase 2: Full super effects
+          impactManager.triggerSuperActivation();
+          break;
+          
+        case 'block':
+          // Phase 2: Block effects
+          if (fighter) {
+            const blockX = fighter.x + fighter.width / 2;
+            const blockY = fighter.y + fighter.height;
+            createDustCloud(particleEngine, blockX, blockY);
+            impactManager.triggerBlockImpact(blockX, blockY);
           }
           break;
       }
@@ -426,7 +517,7 @@ export const ViralStreetFighterCanvas: React.FC<ViralStreetFighterCanvasProps> =
     return () => {
       window.removeEventListener('streetfighter-event', handleCombatEvent);
     };
-  }, [addScreenShake, addHitSpark]);
+  }, [addScreenShake, addHitSpark, gameState.fighters]);
 
   // Setup canvas with DPI scaling and auto-focus for keyboard
   useEffect(() => {

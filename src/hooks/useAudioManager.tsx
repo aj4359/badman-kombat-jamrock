@@ -33,6 +33,12 @@ export const useAudioManager = () => {
     ambient: new Audio('/assets/audio/reggae-drum-bass.mp3'),
     effects: []
   });
+  
+  // Additional stage-specific tracks
+  const stageTracksRef = useRef({
+    arena: new Audio('/assets/audio/badman-kombat-arena.mp3'),
+    temple: new Audio('/assets/audio/temple-crane-dub.mp3')
+  });
 
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
