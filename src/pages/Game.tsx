@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ViralStreetFighterCanvas } from '@/components/game/ViralStreetFighterCanvas';
+import { PhaserGameEngine } from '@/components/game/PhaserGameEngine';
 import { RastaChatbot } from '@/components/RastaChatbot';
 import { GameMenu } from '@/components/game/GameMenu';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,7 @@ const Game = () => {
         EXIT
       </Button>
       
-      <ViralStreetFighterCanvas fighterData={fighterData} />
+      <PhaserGameEngine fighterData={fighterData} />
       
       {/* Game Menu (Pause Menu) */}
       <GameMenu 
