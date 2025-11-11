@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.generate-fighter-sprite]
 verify_jwt = false
+
+[functions.generate-fighter-sprite-ai]
+verify_jwt = false

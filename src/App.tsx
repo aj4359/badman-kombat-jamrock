@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import FighterGenerator from "./pages/FighterGenerator";
 import Tutorial from "./pages/Tutorial";
 import CinematicTrailerGenerator from "./pages/CinematicTrailerGenerator";
+import SpriteGenerator from "./pages/SpriteGenerator";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/tutorial" element={<Tutorial />} />
             <Route path="/rankings" element={<Rankings />} />
             <Route path="/cinematic-trailer" element={<CinematicTrailerGenerator />} />
+            <Route path="/sprite-generator" element={<SpriteGenerator />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
