@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { detectQualityTier } from '@/game3d/quality';
 
 type FighterRig = {
   root: THREE.Group;
@@ -122,7 +123,7 @@ function createFighter(opts: {
   return { root, torso, head, leftArm, rightArm, leftLeg, rightLeg, health: 100, hitFlash: 0 };
 }
 
-function addArena(scene: THREE.Scene) {
+function addArena(scene: THREE.Scene, crowdDensity = 1) {
   const floorMat = makeMaterial(0x7d684d, 0.93, 0.0);
   const floor = new THREE.Mesh(new THREE.CylinderGeometry(8.8, 9.2, 0.45, 64), floorMat);
   floor.position.y = -0.28;
@@ -144,9 +145,10 @@ function addArena(scene: THREE.Scene) {
   const crowdMat = makeMaterial(0x101010, 0.98, 0.0);
   for (let tier = 0; tier < 3; tier++) {
     const radius = 10.5 + tier * 1.45;
-    for (let i = 0; i < 72; i++) {
+    const crowdCount = Math.max(18, Math.round(72 * crowdDensity));
+    for (let i = 0; i < crowdCount; i++) {
       if ((i + tier) % 3 === 0) continue;
-      const a = (i / 72) * Math.PI * 2;
+      const a = (i / crowdCount) * Math.PI * 2;
       const person = new THREE.Group();
       const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.62, 4, 8), crowdMat);
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), crowdMat);
@@ -173,22 +175,26 @@ export default function NextGenFight() {
   const [enemyHealth, setEnemyHealth] = useState(100);
   const [phase, setPhase] = useState<'entrance' | 'fight' | 'ko'>('entrance');
   const [combo, setCombo] = useState(0);
+  const [qualityLabel, setQualityLabel] = useState('AUTO');
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
+    const quality = detectQualityTier();
+    setQualityLabel(quality.tier.toUpperCase());
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x080909);
-    scene.fog = new THREE.FogExp2(0x120d09, 0.032);
+    scene.fog = new THREE.FogExp2(0x120d09, quality.fogDensity);
 
     const camera = new THREE.PerspectiveCamera(43, mount.clientWidth / mount.clientHeight, 0.1, 120);
     camera.position.set(0, 4.7, 9.8);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatioCap));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = quality.shadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
@@ -199,14 +205,14 @@ export default function NextGenFight() {
     scene.add(hemi);
     const key = new THREE.SpotLight(0xffc875, 150, 28, Math.PI / 5, 0.55, 1.1);
     key.position.set(-4, 10, 5);
-    key.castShadow = true;
-    key.shadow.mapSize.set(1536, 1536);
+    key.castShadow = quality.shadows;
+    key.shadow.mapSize.set(quality.shadowMapSize, quality.shadowMapSize);
     scene.add(key);
     const rim = new THREE.SpotLight(0x8aa8ff, 85, 24, Math.PI / 4, 0.7, 1.2);
     rim.position.set(7, 6, -6);
     scene.add(rim);
 
-    addArena(scene);
+    addArena(scene, quality.crowdDensity);
 
     const player = createFighter({ skin: 0x5a2d1b, shirt: 0x3d1a54, trousers: 0xe9e2d8, accent: 0xb68b40, scale: 1.08 });
     player.root.position.set(0, 0, 4.25);
@@ -224,6 +230,7 @@ export default function NextGenFight() {
     let localPhase: 'entrance' | 'fight' | 'ko' = 'entrance';
     let entranceT = 0;
     let comboLocal = 0;
+    let animationFrame = 0;
 
     const onKeyDown = (e: KeyboardEvent) => {
       keys.add(e.key.toLowerCase());
@@ -350,7 +357,7 @@ export default function NextGenFight() {
       }
 
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+      animationFrame = requestAnimationFrame(animate);
     };
 
     animate();
@@ -359,11 +366,13 @@ export default function NextGenFight() {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatioCap));
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     };
     window.addEventListener('resize', onResize);
 
     return () => {
+      cancelAnimationFrame(animationFrame);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('resize', onResize);
@@ -394,6 +403,7 @@ export default function NextGenFight() {
         <div className="rounded border border-[#d59a47]/40 bg-black/55 px-3 py-2 text-right backdrop-blur">
           <div className="text-[10px] uppercase tracking-[.32em] text-[#d59a47]">{phase === 'entrance' ? 'Approaching' : phase === 'fight' ? 'Round One' : 'K.O.'}</div>
           <div className="mt-1 text-xs text-white/65">WASD move · J light · K heavy · L guard</div>
+          <div className="mt-1 text-[9px] uppercase tracking-[.25em] text-white/35">Render {qualityLabel}</div>
         </div>
       </header>
 
