@@ -22,6 +22,7 @@ import FighterGenerator from "./pages/FighterGenerator";
 import Tutorial from "./pages/Tutorial";
 import CinematicTrailerGenerator from "./pages/CinematicTrailerGenerator";
 import SpriteGenerator from "./pages/SpriteGenerator";
+import NextGenFight from "./pages/NextGenFight";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/trailer-generator" element={<TrailerGenerator />} />
             <Route path="/drone-trailer" element={<DroneTrailerGenerator />} />
             <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
+            <Route path="/next-gen-fight" element={<NextGenFight />} />
             <Route path="/teaser-creator" element={<TeaserCreator />} />
             <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
             <Route path="/johnwick-drone" element={<JohnWickDroneTrailer />} />
