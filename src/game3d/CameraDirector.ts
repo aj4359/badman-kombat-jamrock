@@ -7,6 +7,7 @@ export class CameraDirector {
   private modeTime = 0;
   private impact = 0;
   private impactSeed = 0;
+  private lastSeparation?: number;
 
   constructor(private readonly camera: THREE.PerspectiveCamera) {}
 
@@ -14,6 +15,7 @@ export class CameraDirector {
     if (mode === this.mode) return;
     this.mode = mode;
     this.modeTime = 0;
+    this.lastSeparation = undefined;
   }
 
   punch(strength = 1) {
@@ -23,6 +25,15 @@ export class CameraDirector {
 
   update(dt: number, player: THREE.Object3D, enemy: THREE.Object3D) {
     this.modeTime += dt;
+    const separation = player.position.distanceTo(enemy.position);
+    if (this.mode === 'fight' && this.lastSeparation !== undefined) {
+      const displacement = Math.abs(separation - this.lastSeparation);
+      if (displacement > 0.075 && displacement / Math.max(dt, 0.001) > 3.2) {
+        this.punch(THREE.MathUtils.clamp(displacement * 3.1, 0.28, 1));
+      }
+    }
+    this.lastSeparation = separation;
+
     if (this.mode === 'entrance') this.updateEntrance(player, enemy, dt);
     else if (this.mode === 'ko') this.updateKo(player, enemy, dt);
     else this.updateFight(player, enemy, dt);
