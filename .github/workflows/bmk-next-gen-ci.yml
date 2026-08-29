@@ -23,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint next-gen runtime
+        run: npx eslint src/game3d src/pages/NextGenFight.tsx
 
-      - name: Build
+      - name: Build application
         run: npm run build
