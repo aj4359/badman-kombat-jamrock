@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { FighterAssetManifest } from './assets';
+import { validateFighterAsset, type AssetValidationReport } from './AssetValidator';
 
 export type FighterState = 'idle' | 'walk' | 'guard' | 'light' | 'heavy' | 'hit' | 'knockdown' | 'victory';
 
@@ -11,6 +12,7 @@ export class FighterEntity {
   state: FighterState = 'idle';
   health = 100;
   ready = false;
+  validation?: AssetValidationReport;
 
   private activeAction?: THREE.AnimationAction;
   private manifest?: FighterAssetManifest;
@@ -22,6 +24,16 @@ export class FighterEntity {
     const model = gltf.scene;
     model.scale.setScalar(manifest.scale);
     model.position.y = manifest.yOffset;
+
+    this.validation = validateFighterAsset(model, gltf.animations);
+    if (!this.validation.ok) {
+      const messages = this.validation.issues
+        .filter((issue) => issue.severity === 'error')
+        .map((issue) => `${issue.code}: ${issue.message}`)
+        .join('; ');
+      throw new Error(`Invalid fighter asset ${manifest.id}: ${messages}`);
+    }
+
     model.traverse((child) => {
       const mesh = child as THREE.Mesh;
       if (mesh.isMesh) {
