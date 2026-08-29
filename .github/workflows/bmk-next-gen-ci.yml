@@ -24,7 +24,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Lint next-gen runtime
-        run: npx eslint src/game3d src/pages/NextGenFight.tsx
+        run: npx eslint src/game3d src/pages/NextGenFight.tsx src/pages/NextGenFightV2.tsx
 
       - name: Build application
         run: npm run build
