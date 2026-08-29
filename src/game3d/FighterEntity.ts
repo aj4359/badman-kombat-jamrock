@@ -13,8 +13,10 @@ export class FighterEntity {
   ready = false;
 
   private activeAction?: THREE.AnimationAction;
+  private manifest?: FighterAssetManifest;
 
   async load(manifest: FighterAssetManifest) {
+    this.manifest = manifest;
     const loader = new GLTFLoader();
     const gltf = await loader.loadAsync(manifest.model);
     const model = gltf.scene;
@@ -33,6 +35,11 @@ export class FighterEntity {
       const action = this.mixer.clipAction(clip, model);
       this.actions.set(clip.name.toLowerCase(), action);
     }
+
+    this.mixer.addEventListener('finished', () => {
+      if (this.health <= 0 || this.state === 'victory') return;
+      if (['light', 'heavy', 'hit'].includes(this.state)) this.play('idle', 0.08);
+    });
 
     this.ready = true;
     this.play('idle', 0);
@@ -72,6 +79,12 @@ export class FighterEntity {
   }
 
   private findAction(state: FighterState) {
+    const explicitName = this.manifest?.animations?.[state]?.toLowerCase();
+    if (explicitName) {
+      const explicit = this.actions.get(explicitName);
+      if (explicit) return explicit;
+    }
+
     const aliases: Record<FighterState, string[]> = {
       idle: ['idle', 'fight_idle', 'combat_idle'],
       walk: ['walk', 'walk_forward', 'locomotion'],
