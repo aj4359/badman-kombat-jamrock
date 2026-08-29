@@ -1,9 +1,11 @@
 export type FighterAssetId = 'leroy' | 'opponent';
 
+export type FighterAnimationState = 'idle' | 'walk' | 'guard' | 'light' | 'heavy' | 'hit' | 'knockdown' | 'victory';
+
 export type FighterAssetManifest = {
   id: FighterAssetId;
   model: string;
-  animations?: Partial<Record<'idle' | 'walk' | 'guard' | 'light' | 'heavy' | 'hit' | 'knockdown' | 'victory', string>>;
+  animations?: Partial<Record<FighterAnimationState, string>>;
   scale: number;
   yOffset: number;
 };
@@ -19,12 +21,32 @@ export const FIGHTER_ASSETS: Record<FighterAssetId, FighterAssetManifest> = {
     model: '/assets/game3d/fighters/leroy/leroy.glb',
     scale: 1,
     yOffset: 0,
+    animations: {
+      idle: 'idle',
+      walk: 'walk',
+      guard: 'guard',
+      light: 'jab',
+      heavy: 'hook',
+      hit: 'hit',
+      knockdown: 'knockdown',
+      victory: 'victory',
+    },
   },
   opponent: {
     id: 'opponent',
     model: '/assets/game3d/fighters/opponent/opponent.glb',
     scale: 1,
     yOffset: 0,
+    animations: {
+      idle: 'idle',
+      walk: 'walk',
+      guard: 'guard',
+      light: 'jab',
+      heavy: 'hook',
+      hit: 'hit',
+      knockdown: 'knockdown',
+      victory: 'victory',
+    },
   },
 };
 
