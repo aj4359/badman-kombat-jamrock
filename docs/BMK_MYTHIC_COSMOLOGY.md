@@ -9,6 +9,8 @@ The progression is:
 
 Kingston remains the emotional centre at every scale.
 
+The principal threshold between the grounded and mythic layers is currently developed as **The Veil**. See `docs/BMK_THE_VEIL.md`. The Veil is original BMK mythology and must not imply connection to Marvel, Wakanda, Black Panther, or another third-party continuity without a negotiated licence.
+
 ## The Old Lion
 The supplied heavy older fighter reference establishes a useful silhouette and physical language: mature, huge, weathered, grounded, dangerous without posing.
 
@@ -70,7 +72,7 @@ Rain, zinc, timber, concrete, sound systems, street tailoring, practical light, 
 Old gyms, hidden rooms, heirlooms, stories, scars, photographs, repeated techniques, witnesses who remember.
 
 ### Tier 3: Myth
-Rare impossible-seeming events, symbolic spaces, unexplained fighters/factions, heightened perception.
+Rare impossible-seeming events, symbolic spaces, unexplained fighters/factions, heightened perception. The Veil is the primary narrative threshold into this layer.
 
 ### Tier 4: Cosmos
 Only after the player is emotionally invested in the human world. Scale may become planetary/cosmic, but the story must remain about people, memory, inheritance and choice.
@@ -82,6 +84,9 @@ Only after the player is emotionally invested in the human world. Scale may beco
 - No real-person likeness enters production without rights clearance.
 - No third-party character, costume or franchise design is reproduced.
 - Cultural specificity beats decorative mash-ups.
+- Real Jamaican and Maroon history must be researched respectfully; fictional supernatural claims should not be attached to real communities or sacred locations.
 
 ## Production Consequence
 Do not expand current GLB scope because of this document. Leroy remains first production hero asset, Marcus second. The Old Lion can enter concept development in parallel, while the mythic/cosmic faction remains narrative and visual-development work until the grounded vertical slice passes its quality gates.
+
+For the financing proof, The Veil may be foreshadowed only through a tiny anomaly or post-credit beat. The impossible only matters after the real feels real.
