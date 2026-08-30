@@ -1,0 +1,30 @@
+name: BMK Next-Gen CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - bmk/next-gen-vertical-slice
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint next-gen runtime
+        run: npx eslint src/game3d src/pages/NextGenFight.tsx src/pages/NextGenFightV2.tsx
+
+      - name: Build application
+        run: npm run build
