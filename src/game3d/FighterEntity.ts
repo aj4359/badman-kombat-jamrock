@@ -5,6 +5,9 @@ import { validateFighterAsset, type AssetValidationReport } from './AssetValidat
 
 export type FighterState = 'idle' | 'walk' | 'guard' | 'light' | 'heavy' | 'hit' | 'knockdown' | 'victory';
 
+const LOCOMOTION_STATES = new Set<FighterState>(['idle', 'walk', 'guard']);
+const TRANSIENT_STATES = new Set<FighterState>(['light', 'heavy', 'hit', 'knockdown', 'victory']);
+
 export class FighterEntity {
   readonly root = new THREE.Group();
   readonly mixer = new THREE.AnimationMixer(this.root);
@@ -16,6 +19,7 @@ export class FighterEntity {
 
   private activeAction?: THREE.AnimationAction;
   private manifest?: FighterAssetManifest;
+  private transient = false;
 
   async load(manifest: FighterAssetManifest) {
     this.manifest = manifest;
@@ -49,8 +53,11 @@ export class FighterEntity {
     }
 
     this.mixer.addEventListener('finished', () => {
-      if (this.health <= 0 || this.state === 'victory') return;
-      if (['light', 'heavy', 'hit'].includes(this.state)) this.play('idle', 0.08);
+      if (!this.transient) return;
+      if (this.state === 'knockdown' || this.state === 'victory' || this.health <= 0) return;
+      this.transient = false;
+      this.activeAction = undefined;
+      this.play('idle', 0.08);
     });
 
     this.ready = true;
@@ -69,6 +76,8 @@ export class FighterEntity {
 
   play(state: FighterState, fade = 0.12, once = false) {
     if (!this.ready) return;
+    if (this.transient && LOCOMOTION_STATES.has(state)) return;
+
     const next = this.findAction(state);
     if (!next || next === this.activeAction) return;
 
@@ -88,6 +97,7 @@ export class FighterEntity {
     next.play();
     this.activeAction = next;
     this.state = state;
+    this.transient = once || TRANSIENT_STATES.has(state);
   }
 
   private findAction(state: FighterState) {
