@@ -22,6 +22,7 @@ import FighterGenerator from "./pages/FighterGenerator";
 import Tutorial from "./pages/Tutorial";
 import CinematicTrailerGenerator from "./pages/CinematicTrailerGenerator";
 import SpriteGenerator from "./pages/SpriteGenerator";
+import BMKComicZero from "./pages/BMKComicZero";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -49,6 +50,7 @@ const App = () => (
             />
             <Route path="/marvel" element={<MarvelRivalsLanding />} />
             <Route path="/landing" element={<BadManKombatLandingPage />} />
+            <Route path="/bmk/comic/00" element={<BMKComicZero />} />
             <Route path="/character-select" element={<CharacterSelect />} />
             <Route path="/vs-screen" element={<EnhancedVSScreen />} />
             <Route path="/game" element={<Game />} />
