@@ -1,0 +1,33 @@
+name: BMK Canon CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - feature/bmk-canon-takeover
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint BMK canon runtime
+        run: npx eslint src/types/bmkCanon.ts src/data/bmkCanon.ts src/data/bmkProductionAssets.ts src/lib/bmkAudioDirector.ts src/pages/BMKComicZero.tsx src/components/bmk
+
+      - name: Build application
+        run: npm run build
