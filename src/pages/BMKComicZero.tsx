@@ -3,6 +3,7 @@ import BMKSceneAtmosphere from '@/components/bmk/BMKSceneAtmosphere';
 import { BMK_ZERO_SCENES } from '@/data/bmkCanon';
 import { BMK_AUDIO_PROFILES } from '@/data/bmkAudioProfiles';
 import { bmkAudioDirector } from '@/lib/bmkAudioDirector';
+import { BMK_PRODUCTION_READINESS } from '@/lib/bmkProductionAssetRegistry';
 
 const BMKComicZero = () => {
   const [sceneIndex, setSceneIndex] = useState(0);
@@ -31,7 +32,13 @@ const BMKComicZero = () => {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden selection:bg-white selection:text-black">
+    <main
+      className="min-h-screen bg-black text-white overflow-hidden selection:bg-white selection:text-black"
+      data-bmk-production-ready={BMK_PRODUCTION_READINESS.readyForCanonExpansion ? 'true' : 'false'}
+    >
+      <span className="sr-only">
+        Production asset gate: {BMK_PRODUCTION_READINESS.approved} of {BMK_PRODUCTION_READINESS.total} assets approved.
+      </span>
       <section
         key={scene.sceneId}
         className={`relative min-h-screen flex items-end justify-center px-5 sm:px-8 pb-24 sm:pb-16 pt-24 ${reducedMotion ? '' : 'transition-opacity duration-700'}`}
