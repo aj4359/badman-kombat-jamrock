@@ -27,7 +27,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint BMK canon runtime
-        run: npx eslint src/types/bmkCanon.ts src/data/bmkCanon.ts src/data/bmkProductionAssets.ts src/lib/bmkAudioDirector.ts src/lib/bmkProductionAssetRegistry.ts src/pages/BMKComicZero.tsx src/components/bmk
+        run: npx eslint src/types/bmkCanon.ts src/data/bmkCanon.ts src/data/bmkProductionAssets.ts src/data/bmkProductionBoard.ts src/lib/bmkAudioDirector.ts src/lib/bmkProductionAssetRegistry.ts src/pages/BMKComicZero.tsx src/components/bmk
 
       - name: Build application
         run: npm run build
