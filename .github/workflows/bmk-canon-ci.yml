@@ -2,10 +2,13 @@ name: BMK Canon CI
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - feature/bmk-canon-takeover
   push:
     branches:
       - feature/bmk-canon-takeover
+      - feature/bmk-gameplay-clip
 
 jobs:
   verify:
@@ -26,8 +29,8 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
-      - name: Lint BMK canon runtime
-        run: npx eslint src/types/bmkCanon.ts src/data/bmkCanon.ts src/data/bmkProductionAssets.ts src/data/bmkProductionBoard.ts src/lib/bmkAudioDirector.ts src/lib/bmkProductionAssetRegistry.ts src/pages/BMKComicZero.tsx src/pages/BMKGameplayConcept.tsx src/components/bmk
+      - name: Lint BMK canon + gameplay runtime
+        run: npx eslint src/types/bmkCanon.ts src/data/bmkCanon.ts src/data/bmkProductionAssets.ts src/data/bmkProductionBoard.ts src/lib/bmkAudioDirector.ts src/lib/bmkProductionAssetRegistry.ts src/pages/BMKComicZero.tsx src/pages/BMKGameplayConcept.tsx src/pages/BMKGameplayClip.tsx src/components/bmk
 
       - name: Build application
         run: npm run build
