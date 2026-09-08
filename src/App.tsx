@@ -22,6 +22,8 @@ import FighterGenerator from "./pages/FighterGenerator";
 import Tutorial from "./pages/Tutorial";
 import CinematicTrailerGenerator from "./pages/CinematicTrailerGenerator";
 import SpriteGenerator from "./pages/SpriteGenerator";
+import BMKComicZero from "./pages/BMKComicZero";
+import BMKGameplayConcept from "./pages/BMKGameplayConcept";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -39,16 +41,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route 
-              path="/" 
-              element={
-                <Suspense fallback={<div className="min-h-screen bg-black" />}>
-                  <Index />
-                </Suspense>
-              } 
-            />
+            <Route path="/" element={<Suspense fallback={<div className="min-h-screen bg-black" />}><Index /></Suspense>} />
             <Route path="/marvel" element={<MarvelRivalsLanding />} />
             <Route path="/landing" element={<BadManKombatLandingPage />} />
+            <Route path="/bmk/comic/00" element={<BMKComicZero />} />
+            <Route path="/bmk/gameplay/001" element={<BMKGameplayConcept />} />
             <Route path="/character-select" element={<CharacterSelect />} />
             <Route path="/vs-screen" element={<EnhancedVSScreen />} />
             <Route path="/game" element={<Game />} />
@@ -67,7 +64,6 @@ const App = () => (
             <Route path="/rankings" element={<Rankings />} />
             <Route path="/cinematic-trailer" element={<CinematicTrailerGenerator />} />
             <Route path="/sprite-generator" element={<SpriteGenerator />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           <NavigationMenu />
