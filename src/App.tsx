@@ -24,6 +24,7 @@ import CinematicTrailerGenerator from "./pages/CinematicTrailerGenerator";
 import SpriteGenerator from "./pages/SpriteGenerator";
 import BMKComicZero from "./pages/BMKComicZero";
 import BMKGameplayConcept from "./pages/BMKGameplayConcept";
+import BMKGameplayClip from "./pages/BMKGameplayClip";
 import { EnhancedVSScreen } from "./components/EnhancedVSScreen";
 import BadManKombatUltimate3D from "./components/BadManKombatUltimate3D";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -32,45 +33,7 @@ import MarvelRivalsLanding from "./components/MarvelRivalsLanding";
 import BadManKombatLandingPage from "./components/BadManKombatLandingPage";
 
 const queryClient = new QueryClient();
-
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Suspense fallback={<div className="min-h-screen bg-black" />}><Index /></Suspense>} />
-            <Route path="/marvel" element={<MarvelRivalsLanding />} />
-            <Route path="/landing" element={<BadManKombatLandingPage />} />
-            <Route path="/bmk/comic/00" element={<BMKComicZero />} />
-            <Route path="/bmk/gameplay/001" element={<BMKGameplayConcept />} />
-            <Route path="/character-select" element={<CharacterSelect />} />
-            <Route path="/vs-screen" element={<EnhancedVSScreen />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/arcade" element={<ArcadeMode />} />
-            <Route path="/teaser" element={<Teaser />} />
-            <Route path="/trailer-generator" element={<TrailerGenerator />} />
-            <Route path="/drone-trailer" element={<DroneTrailerGenerator />} />
-            <Route path="/3d-ultimate" element={<BadManKombatUltimate3D />} />
-            <Route path="/teaser-creator" element={<TeaserCreator />} />
-            <Route path="/john-wick-trailer" element={<JohnWickTrailer />} />
-            <Route path="/johnwick-drone" element={<JohnWickDroneTrailer />} />
-            <Route path="/game-overview" element={<GameOverviewRecorder />} />
-            <Route path="/live-stream" element={<LiveStream />} />
-            <Route path="/fighter-generator" element={<FighterGenerator />} />
-            <Route path="/tutorial" element={<Tutorial />} />
-            <Route path="/rankings" element={<Rankings />} />
-            <Route path="/cinematic-trailer" element={<CinematicTrailerGenerator />} />
-            <Route path="/sprite-generator" element={<SpriteGenerator />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <NavigationMenu />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
-);
-
+const App = () => (<ErrorBoundary><QueryClientProvider client={queryClient}><TooltipProvider><Toaster/><Sonner/><BrowserRouter><Routes>
+<Route path="/" element={<Suspense fallback={<div className="min-h-screen bg-black"/>}><Index/></Suspense>}/><Route path="/marvel" element={<MarvelRivalsLanding/>}/><Route path="/landing" element={<BadManKombatLandingPage/>}/><Route path="/bmk/comic/00" element={<BMKComicZero/>}/><Route path="/bmk/gameplay/001" element={<BMKGameplayConcept/>}/><Route path="/bmk/gameplay/clip" element={<BMKGameplayClip/>}/><Route path="/character-select" element={<CharacterSelect/>}/><Route path="/vs-screen" element={<EnhancedVSScreen/>}/><Route path="/game" element={<Game/>}/><Route path="/arcade" element={<ArcadeMode/>}/><Route path="/teaser" element={<Teaser/>}/><Route path="/trailer-generator" element={<TrailerGenerator/>}/><Route path="/drone-trailer" element={<DroneTrailerGenerator/>}/><Route path="/3d-ultimate" element={<BadManKombatUltimate3D/>}/><Route path="/teaser-creator" element={<TeaserCreator/>}/><Route path="/john-wick-trailer" element={<JohnWickTrailer/>}/><Route path="/johnwick-drone" element={<JohnWickDroneTrailer/>}/><Route path="/game-overview" element={<GameOverviewRecorder/>}/><Route path="/live-stream" element={<LiveStream/>}/><Route path="/fighter-generator" element={<FighterGenerator/>}/><Route path="/tutorial" element={<Tutorial/>}/><Route path="/rankings" element={<Rankings/>}/><Route path="/cinematic-trailer" element={<CinematicTrailerGenerator/>}/><Route path="/sprite-generator" element={<SpriteGenerator/>}/><Route path="*" element={<NotFound/>}/>
+</Routes><NavigationMenu/></BrowserRouter></TooltipProvider></QueryClientProvider></ErrorBoundary>);
 export default App;
